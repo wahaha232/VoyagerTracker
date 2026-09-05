@@ -124,6 +124,26 @@ export const SPACECRAFT_META: Record<SpacecraftId, SpacecraftMeta> = {
   },
 };
 
+/** Traditional-Chinese names for the science instruments shown on tracker cards. */
+export const INSTRUMENT_ZH: Record<string, { name: string; description: string }> = {
+  MAG: {
+    name: '磁力計',
+    description: '量測行星際與星際磁場的強度與方向。',
+  },
+  LECP: {
+    name: '低能量帶電粒子儀',
+    description: '偵測日球層與星際介質中的低能量帶電粒子與宇宙射線。',
+  },
+  CRS: {
+    name: '宇宙射線次系統',
+    description: '量測宇宙射線與太陽高能粒子的強度與能量分布。',
+  },
+  PLS: {
+    name: '電漿科學儀',
+    description: '研究太陽風電漿及其與星際介質的交互作用。',
+  },
+};
+
 /** English (en-US) translation dictionary. */
 const enUS: Translation = {
   locale: 'en-US',

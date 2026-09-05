@@ -1,10 +1,9 @@
 /**
- * HomePage — the front page.
+ * HomePage — /  (EN / 繁中)
  *
- * Structure follows the content plan:
- * Hero → Live tracker (both spacecraft) → What are Voyager 1 & 2?
- * → Why they matter → Current mission status → Timeline preview →
- * Discoveries preview → How it works → FAQ → Related information.
+ * Structure: Hero → Live tracker → What are Voyager 1 & 2? → Why they
+ * matter → Current status → Timeline preview → Discoveries preview →
+ * How it works → FAQ preview → Related information.
  */
 
 import { SPACECRAFT_META } from '../constants/voyagerData';
@@ -12,12 +11,14 @@ import { pageUrl } from '../constants/site';
 import { LinkArrow } from '../components/icons';
 import TrackerSection from '../components/TrackerSection';
 import Voyager3D from '../components/Voyager3D';
-import { Callout, RelatedLinks, Section } from '../components/ui';
+import { RelatedLinks } from '../components/ui';
+import { bi, useZh } from '../components/content';
 
-const v1 = SPACECRAFT_META['voyager1'];
-const v2 = SPACECRAFT_META['voyager2'];
+const V1 = SPACECRAFT_META['voyager1'];
+const V2 = SPACECRAFT_META['voyager2'];
 
 export default function HomePage() {
+  const zh = useZh();
   return (
     <div>
       {/* ===== Hero ===== */}
@@ -25,36 +26,54 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:py-16">
           <div className="animate-fade-in">
             <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300">
-              Independent · Educational · Not affiliated with NASA
+              {zh ? '獨立 · 教育性質 · 與 NASA 無關' : 'Independent · Educational · Not affiliated with NASA'}
             </p>
             <h1 className="neon-text text-4xl font-black tracking-wide text-white sm:text-5xl lg:text-6xl">
-              Voyager Tracker
+              {zh ? '航海家號追蹤器' : 'Voyager Tracker'}
             </h1>
             <p className="mt-4 max-w-xl text-lg leading-relaxed text-slate-200 sm:text-xl">
-              Track NASA&rsquo;s Voyager 1 and Voyager 2 spacecraft as they continue their
-              historic journeys through interstellar space.
+              {zh ? (
+                <>
+                  追蹤 NASA 的航海家一號與二號太空船，看它們繼續穿越星際空間的歷史性旅程。
+                </>
+              ) : (
+                <>
+                  Track NASA&rsquo;s Voyager 1 and Voyager 2 spacecraft as they continue their
+                  historic journeys through interstellar space.
+                </>
+              )}
             </p>
             <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-slate-400">
-              Launched by NASA in 1977, Voyager 1 and Voyager 2 are the longest-running
-              deep-space missions in history and the only spacecraft operating beyond the
-              heliosphere. This site follows their distance from Earth and the Sun, their
-              speed and their interstellar status — and explains what the probes are doing,
-              where they have been and why their mission matters. All figures are clearly
-              labelled estimates built from published NASA/JPL data.
+              {zh ? (
+                <>
+                  1977 年由 NASA 發射的航海家一號與二號，是史上執行最久的深空任務，也是唯一在
+                  日球層之外運作的太空船。本站追蹤它們與地球、太陽的距離、速度與星際現況，並說明
+                  它們在做什麼、去過哪裡、為何重要。所有數字皆以 NASA/JPL 資料計算並清楚標示為估計值。
+                </>
+              ) : (
+                <>
+                  Launched by NASA in 1977, Voyager 1 and Voyager 2 are the longest-running
+                  deep-space missions in history and the only spacecraft operating beyond the
+                  heliosphere. This site follows their distance from Earth and the Sun, their
+                  speed and interstellar status — and explains what the probes are doing, where
+                  they have been and why their mission matters. All figures are clearly labelled
+                  estimates built from published NASA/JPL data.
+                </>
+              )}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <a
                 href="#live-tracker"
                 className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 px-5 py-3 text-sm font-bold text-space-950 shadow-lg shadow-cyan-500/25 transition-transform hover:scale-[1.02]"
               >
-                Open live tracker
+                {zh ? '開啟即時追蹤器' : 'Open live tracker'}
                 <LinkArrow className="h-4 w-4" />
               </a>
               <a
                 href={pageUrl('mission')}
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-space-900/70 px-5 py-3 text-sm font-semibold text-slate-200 transition-colors hover:border-cyan-400/60 hover:text-white"
               >
-                Learn about the mission
+                {zh ? '了解航海家任務' : 'Learn about the mission'}
               </a>
             </div>
           </div>
@@ -64,7 +83,7 @@ export default function HomePage() {
             <div className="hud-panel relative h-[340px] w-full overflow-hidden rounded-2xl sm:h-[430px]">
               <Voyager3D />
               <div className="pointer-events-none absolute bottom-3 left-4 rounded-md border border-cyan-500/20 bg-space-950/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-cyan-300/70 backdrop-blur-sm">
-                Drag to rotate · interactive Voyager model
+                {zh ? '拖曳旋轉 · 互動航海家模型' : 'Drag to rotate · interactive Voyager model'}
               </div>
             </div>
           </div>
@@ -75,242 +94,288 @@ export default function HomePage() {
       <div id="live-tracker" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-12 sm:px-6">
         <TrackerSection
           ids={['voyager1', 'voyager2']}
-          title="Voyager 1 & Voyager 2 Live Tracker"
-          intro="Distances, speeds and mission status for both interstellar probes. The numbers tick upward as the spacecraft continue outward at tens of kilometres per second — rotate the 3D model and explore the trajectory map to see where they are heading."
+          title={zh ? '航海家一號與二號即時追蹤器' : 'Voyager 1 & Voyager 2 Live Tracker'}
+          intro={
+            zh
+              ? '兩艘星際探測器的距離、速度與任務現況。數字會隨著太空船以每秒數十公里的速度向外飛行而不斷增加——轉動 3D 模型、瀏覽軌跡圖，看看它們正航向何方。'
+              : 'Distances, speeds and mission status for both interstellar probes. The numbers tick upward as the spacecraft continue outward at tens of kilometres per second — rotate the 3D model and explore the trajectory map to see where they are heading.'
+          }
         />
       </div>
 
-      {/* ===== What are Voyager 1 and Voyager 2? ===== */}
+      {/* ===== What are the Voyagers? ===== */}
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-        <Section
-          id="what-are-the-voyagers"
-          kicker="Introduction"
-          title="What are Voyager 1 and Voyager 2?"
-          lead="Two nearly identical robotic spacecraft built for a four-year mission that is now in its fifth decade."
-        >
+        <section id="what-are-the-voyagers" className="mb-12 scroll-mt-24">
+          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
+            {zh ? '引言' : 'Introduction'}
+          </p>
+          <h2 className="mb-2 text-2xl font-bold tracking-wide text-white sm:text-3xl">
+            {zh ? '什麼是航海家一號與二號？' : 'What are Voyager 1 and Voyager 2?'}
+          </h2>
+          <p className="mb-6 max-w-3xl text-slate-300/90">
+            {zh
+              ? '兩艘近乎相同的機器人太空船，原本只為期四年，如今卻已進入第五個十年的任務。'
+              : 'Two nearly identical robotic spacecraft built for a four-year mission that is now in its fifth decade.'}
+          </p>
           <div className="grid gap-6 md:grid-cols-2">
             <div className="hud-panel rounded-2xl p-6" style={{ borderColor: '#22d3ee40' }}>
-              <p className="mb-2 text-xl font-bold" style={{ color: '#22d3ee' }}>{v1.name}</p>
+              <p className="mb-2 text-xl font-bold" style={{ color: '#22d3ee' }}>{V1.name}</p>
               <p className="mb-3 text-sm leading-relaxed text-slate-400">
-                Launched 5 September 1977 · Cape Canaveral, Florida
+                {zh ? '1977 年 9 月 5 日發射 · 美國佛羅里達州卡納維爾角' : 'Launched 5 September 1977 · Cape Canaveral, Florida'}
               </p>
               <p className="text-[15px] leading-relaxed text-slate-200">
-                Voyager 1 was sent first to Jupiter and Saturn, then used Saturn&rsquo;s gravity
-                to swing north, away from the planets. It flew past Jupiter in 1979 and Saturn in
-                1980, photographed the famous Pale Blue Dot in 1990, and in 2012 became the first
-                human-made object to reach interstellar space. It is still the most distant
-                spacecraft ever built.
+                {zh
+                  ? '航海家一號先探索木星與土星，再借助土星重力甩向北方。它於 1979 年飛掠木星、1980 年飛掠土星、1990 年拍下著名的「蒼藍小點」，並於 2012 年成為第一個進入星際空間的人造物體。至今它仍是最遙遠的太空船。'
+                  : 'Voyager 1 explored Jupiter and Saturn, then used Saturn\u2019s gravity to swing north. It flew past Jupiter in 1979, Saturn in 1980, photographed the Pale Blue Dot in 1990, and in 2012 became the first human-made object in interstellar space. It is still the most distant spacecraft ever built.'}
               </p>
               <p className="mt-4">
                 <a href={pageUrl('voyager-1')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-                  Voyager 1 mission page <LinkArrow className="h-4 w-4" />
+                  {zh ? '航海家一號任務頁' : 'Voyager 1 mission page'} <LinkArrow className="h-4 w-4" />
                 </a>
               </p>
             </div>
             <div className="hud-panel rounded-2xl p-6" style={{ borderColor: '#34d39940' }}>
-              <p className="mb-2 text-xl font-bold" style={{ color: '#34d399' }}>{v2.name}</p>
+              <p className="mb-2 text-xl font-bold" style={{ color: '#34d399' }}>{V2.name}</p>
               <p className="mb-3 text-sm leading-relaxed text-slate-400">
-                Launched 20 August 1977 · Cape Canaveral, Florida
+                {zh ? '1977 年 8 月 20 日發射 · 美國佛羅里達州卡納維爾角' : 'Launched 20 August 1977 · Cape Canaveral, Florida'}
               </p>
               <p className="text-[15px] leading-relaxed text-slate-200">
-                Voyager 2 is the only spacecraft ever to visit Uranus and Neptune, completing the
-                &ldquo;Grand Tour&rdquo; of the outer planets. It flew past Jupiter in 1979, Saturn
-                in 1981, Uranus in 1986 and Neptune in 1989, then continued south out of the solar
-                system and entered interstellar space in 2018.
+                {zh
+                  ? '航海家二號是唯一造訪天王星與海王星的太空船，完成了外行星的「大旅行」。它於 1979 年飛掠木星、1981 年土星、1986 年天王星、1989 年海王星，隨後朝南方離開太陽系，並於 2018 年進入星際空間。'
+                  : 'Voyager 2 is the only spacecraft ever to visit Uranus and Neptune, completing the \u201cGrand Tour\u201d. It flew past Jupiter in 1979, Saturn in 1981, Uranus in 1986 and Neptune in 1989, then headed south and entered interstellar space in 2018.'}
               </p>
               <p className="mt-4">
                 <a href={pageUrl('voyager-2')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-300 hover:text-emerald-200">
-                  Voyager 2 mission page <LinkArrow className="h-4 w-4" />
+                  {zh ? '航海家二號任務頁' : 'Voyager 2 mission page'} <LinkArrow className="h-4 w-4" />
                 </a>
               </p>
             </div>
           </div>
-        </Section>
+        </section>
 
-        {/* ===== Why the mission matters ===== */}
-        <Section
-          id="why-it-matters"
-          kicker="Significance"
-          title="Why Are the Voyager Missions Important?"
-          lead="The Voyagers rewrote the textbooks on the outer solar system — and then kept going."
-        >
-          <p className="mb-4 max-w-4xl leading-relaxed text-slate-300">
-            The Voyager program delivered the first close-up views of four giant planets, their
-            rings and their moons, and in doing so it reshaped planetary science. Io&rsquo;s
-            volcanoes, Neptune&rsquo;s supersonic winds and the intricate structure of
-            Saturn&rsquo;s rings were revealed — or completely transformed — by these two
-            spacecraft.
+        {/* ===== Why it matters ===== */}
+        <section id="why-it-matters" className="mb-12 scroll-mt-24">
+          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
+            {zh ? '重要性' : 'Significance'}
           </p>
+          <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
+            {zh ? '為什麼航海家任務如此重要？' : 'Why Are the Voyager Missions Important?'}
+          </h2>
           <p className="max-w-4xl leading-relaxed text-slate-300">
-            Today the mission has a second life. Voyager 1 and Voyager 2 are the only probes
-            sampling the space between the Sun&rsquo;s influence and the rest of the galaxy,
-            returning the first direct measurements of interstellar plasma, magnetic fields and
-            cosmic rays. Instruments are being powered down one by one to stretch the available
-            power, and engineers expect at least one spacecraft to keep returning data well into
-            the 2030s.
+            {zh
+              ? '航海家計畫首次近距離觀察四顆巨行星、它們的光環與衛星，徹底改寫了行星科學。木衛一的火山、海王星的超音速風、土星環的精細結構，都由這兩艘探測器揭開或徹底改觀。'
+              : 'The Voyager program delivered the first close-up views of four giant planets, their rings and moons — reshaping planetary science. Io\u2019s volcanoes, Neptune\u2019s supersonic winds and Saturn\u2019s intricate rings were revealed or transformed by these two spacecraft.'}
           </p>
-          <Callout tone="cyan" title="Also aboard">
-            Each Voyager carries a Golden Record — a phonograph record with sounds, music,
-            greetings and images of Earth, designed as a message for any intelligence that finds
-            the spacecraft.{' '}
-            <a href={pageUrl('golden-record')} className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200">
-              Learn more about the Golden Record →
-            </a>
-          </Callout>
-        </Section>
+          <p className="mt-3 max-w-4xl leading-relaxed text-slate-300">
+            {zh
+              ? '如今任務進入第二章：兩艘航海家號是唯一正在取樣太陽影響力與銀河之間空間的探測器，回傳星際電漿、磁場與宇宙射線的首批直接量測。工程師正逐一關閉儀器以節省電力，預估至少一艘探測器可持續回傳資料到 2030 年代。'
+              : 'Today the mission has a second life: the Voyagers are the only probes sampling the space between the Sun\u2019s influence and the rest of the galaxy. Instruments are being powered down one by one, and engineers expect at least one spacecraft to keep returning data well into the 2030s.'}
+          </p>
+          <div className="my-6 rounded-xl border border-cyan-500/40 bg-cyan-500/5 p-5 text-sm leading-relaxed text-cyan-100">
+            <p className="mb-1.5 font-semibold text-white">
+              {zh ? '船上還載著…' : 'Also aboard'}
+            </p>
+            <p>
+              {zh ? (
+                <>
+                  每艘航海家號都攜帶一張金唱片，收錄地球的聲音、音樂、問候與影像，作為寫給任何發現者的訊息。{' '}
+                  <a href={pageUrl('golden-record')} className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200">
+                    深入了解金唱片 →
+                  </a>
+                </>
+              ) : (
+                <>
+                  Each Voyager carries a Golden Record — sounds, music, greetings and images of
+                  Earth, as a message for any intelligence that finds the spacecraft.{' '}
+                  <a href={pageUrl('golden-record')} className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200">
+                    Learn more about the Golden Record →
+                  </a>
+                </>
+              )}
+            </p>
+          </div>
+        </section>
 
         {/* ===== Current mission status ===== */}
-        <Section
-          id="current-status"
-          kicker="Right now"
-          title="Current Mission Status"
-          lead="What both spacecraft are doing at this moment, in plain language."
-        >
+        <section id="current-status" className="mb-12 scroll-mt-24">
+          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
+            {zh ? '現在進行式' : 'Right now'}
+          </p>
+          <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
+            {zh ? '目前的任務狀態' : 'Current Mission Status'}
+          </h2>
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="hud-panel rounded-2xl p-6" style={{ borderColor: '#22d3ee40' }}>
               <p className="font-mono text-xs uppercase tracking-widest text-cyan-400">Voyager 1</p>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-300">
-                <li>· In interstellar space since {v1.interstellarEntryDate}</li>
-                <li>· Moving away from the Sun at about 17 km/s</li>
-                <li>· Still returning data through NASA&rsquo;s Deep Space Network</li>
-                <li>· Signal travel time to Earth: roughly a day</li>
+                {[
+                  zh ? `· 自 ${V1.interstellarEntryDate} 起位於星際空間` : `· In interstellar space since ${V1.interstellarEntryDate}`,
+                  zh ? '· 以約 17 公里/秒遠離太陽' : '· Moving away from the Sun at about 17 km/s',
+                  zh ? '· 仍透過 NASA 深空網路回傳資料' : '· Still returning data through NASA\u2019s Deep Space Network',
+                  zh ? '· 訊號單程傳回地球約需一天' : '· Signal travel time to Earth: roughly a day',
+                ].map((item) => <li key={item}>{item}</li>)}
               </ul>
               <a href={pageUrl('voyager-1')} className="mt-4 inline-block text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-                Voyager 1 details →
+                {zh ? '航海家一號詳情 →' : 'Voyager 1 details →'}
               </a>
             </div>
             <div className="hud-panel rounded-2xl p-6" style={{ borderColor: '#34d39940' }}>
               <p className="font-mono text-xs uppercase tracking-widest text-emerald-400">Voyager 2</p>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-300">
-                <li>· In interstellar space since {v2.interstellarEntryDate}</li>
-                <li>· Moving away from the Sun at about 15 km/s</li>
-                <li>· Still returning data through NASA&rsquo;s Deep Space Network</li>
-                <li>· The only spacecraft to have visited Uranus and Neptune</li>
+                {[
+                  zh ? `· 自 ${V2.interstellarEntryDate} 起位於星際空間` : `· In interstellar space since ${V2.interstellarEntryDate}`,
+                  zh ? '· 以約 15 公里/秒遠離太陽' : '· Moving away from the Sun at about 15 km/s',
+                  zh ? '· 仍透過 NASA 深空網路回傳資料' : '· Still returning data through NASA\u2019s Deep Space Network',
+                  zh ? '· 唯一造訪過天王星與海王星的探測器' : '· The only spacecraft to have visited Uranus and Neptune',
+                ].map((item) => <li key={item}>{item}</li>)}
               </ul>
               <a href={pageUrl('voyager-2')} className="mt-4 inline-block text-sm font-semibold text-emerald-300 hover:text-emerald-200">
-                Voyager 2 details →
+                {zh ? '航海家二號詳情 →' : 'Voyager 2 details →'}
               </a>
             </div>
           </div>
           <p className="mt-4 font-mono text-[11px] text-slate-500">
-            Status summarized from NASA/JPL mission records. Exact live distances are shown in the
-            tracker above; signal travel time varies with Earth&rsquo;s orbital position.
+            {zh
+              ? '狀態摘要自 NASA/JPL 任務紀錄。確切即時距離請見上方追蹤器。'
+              : 'Status summarized from NASA/JPL mission records. Exact live distances are shown in the tracker above.'}
           </p>
-        </Section>
+        </section>
 
         {/* ===== Timeline preview ===== */}
-        <Section
-          id="timeline-preview"
-          kicker="History"
-          title="Voyager Mission Timeline"
-          lead="The story so far, in six milestones."
-        >
+        <section id="timeline-preview" className="mb-12 scroll-mt-24">
+          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
+            {zh ? '歷史' : 'History'}
+          </p>
+          <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
+            {zh ? '航海家任務時間軸' : 'Voyager Mission Timeline'}
+          </h2>
           <ol className="space-y-3">
-            {[
-              ['1977', 'Voyager 2 and Voyager 1 launch from Cape Canaveral (20 Aug & 5 Sep).'],
-              ['1979', 'Both spacecraft fly past Jupiter; Voyager 1 discovers active volcanoes on Io.'],
-              ['1980–1981', 'Saturn encounters: Voyager 1 (Nov 1980), then Voyager 2 (Aug 1981).'],
-              ['1986 · 1989', 'Voyager 2 becomes the only spacecraft to visit Uranus and Neptune.'],
-              ['2012 · 2018', 'Voyager 1, then Voyager 2, enter interstellar space.'],
-              ['Today', 'Both probes continue to return data from beyond the heliosphere.'],
-            ].map(([year, text]) => (
-              <li key={year} className="flex gap-4 rounded-xl border border-slate-800 bg-space-900/40 p-4">
-                <span className="shrink-0 font-mono text-sm font-bold text-cyan-300">{year}</span>
-                <span className="text-sm leading-relaxed text-slate-300">{text}</span>
+            {(
+              [
+                [bi('1977', '1977'), bi('Voyager 2 and Voyager 1 launch from Cape Canaveral.', '航海家二號與一號從卡納維爾角發射。')],
+                [bi('1979', '1979'), bi('Both spacecraft fly past Jupiter; Voyager 1 discovers active volcanoes on Io.', '兩艘探測器飛掠木星；航海家一號發現木衛一上的活火山。')],
+                [bi('1980–1981', '1980–1981'), bi('Saturn encounters by Voyager 1, then Voyager 2.', '航海家一號、接著二號飛掠土星。')],
+                [bi('1986 · 1989', '1986 · 1989'), bi('Voyager 2 becomes the only spacecraft to visit Uranus and Neptune.', '航海家二號成為唯一造訪天王星與海王星的太空船。')],
+                [bi('2012 · 2018', '2012 · 2018'), bi('Voyager 1, then Voyager 2, enter interstellar space.', '航海家一號、接著二號進入星際空間。')],
+                [bi('Today', '今日'), bi('Both probes continue to return data from beyond the heliosphere.', '兩艘探測器持續從日球層外回傳資料。')],
+              ] as { en: string; zh: string }[][]
+            ).map(([year, text]) => (
+              <li key={year.en} className="flex gap-4 rounded-xl border border-slate-800 bg-space-900/40 p-4">
+                <span className="shrink-0 font-mono text-sm font-bold text-cyan-300">
+                  {zh ? year.zh : year.en}
+                </span>
+                <span className="text-sm leading-relaxed text-slate-300">
+                  {zh ? text.zh : text.en}
+                </span>
               </li>
             ))}
           </ol>
           <p className="mt-4">
             <a href={pageUrl('timeline')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-              View the full mission timeline <LinkArrow className="h-4 w-4" />
+              {zh ? '查看完整時間軸' : 'View the full mission timeline'} <LinkArrow className="h-4 w-4" />
             </a>
           </p>
-        </Section>
+        </section>
 
         {/* ===== Discoveries preview ===== */}
-        <Section
-          id="discoveries-preview"
-          kicker="Science"
-          title="Scientific Discoveries"
-          lead="A few of the discoveries that changed planetary science forever."
-        >
+        <section id="discoveries-preview" className="mb-12 scroll-mt-24">
+          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
+            {zh ? '科學' : 'Science'}
+          </p>
+          <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
+            {zh ? '科學發現' : 'Scientific Discoveries'}
+          </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              ['Io\u2019s volcanoes', 'Voyager 1 photographed erupting volcanoes on Jupiter\u2019s moon Io in 1979 — the first active volcanoes found beyond Earth.'],
-              ['Neptune\u2019s winds', 'Voyager 2 measured supersonic winds on Neptune, among the fastest in the solar system.'],
-              ['Interstellar plasma', 'After 2012 and 2018, the Voyagers measured the density of plasma in the space between the stars.'],
-            ].map(([title, text]) => (
-              <div key={title} className="rounded-xl border border-slate-800 bg-space-900/40 p-5">
-                <h3 className="mb-2 font-semibold text-white">{title}</h3>
-                <p className="text-sm leading-relaxed text-slate-400">{text}</p>
+            {(
+              [
+                [bi('Io\u2019s volcanoes', '木衛一的火山'), bi('Voyager 1 photographed erupting volcanoes on Io in 1979 — the first active volcanoes found beyond Earth.', '1979 年航海家一號拍到木衛一上噴發的火山——地球以外首度發現的活火山。')],
+                [bi('Neptune\u2019s winds', '海王星的風'), bi('Voyager 2 measured supersonic winds on Neptune, among the fastest in the solar system.', '航海家二號測得海王星上的超音速風，位居太陽系之最。')],
+                [bi('Interstellar plasma', '星際電漿'), bi('After 2012 and 2018, the Voyagers measured the plasma density in the space between the stars.', '2012 與 2018 年之後，航海家號量測了星際空間的電漿密度。')],
+              ] as { en: string; zh: string }[][]
+            ).map(([title, text]) => (
+              <div key={title.en} className="rounded-xl border border-slate-800 bg-space-900/40 p-5">
+                <h3 className="mb-2 font-semibold text-white">{zh ? title.zh : title.en}</h3>
+                <p className="text-sm leading-relaxed text-slate-400">
+                  {zh ? text.zh : text.en}
+                </p>
               </div>
             ))}
           </div>
           <p className="mt-4">
             <a href={pageUrl('discoveries')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-              Explore all discoveries <LinkArrow className="h-4 w-4" />
+              {zh ? '探索所有發現' : 'Explore all discoveries'} <LinkArrow className="h-4 w-4" />
             </a>
           </p>
-        </Section>
+        </section>
 
-        {/* ===== How it works ===== */}
-        <Section
-          id="how-it-works-preview"
-          kicker="Method"
-          title="How Voyager Tracker Works"
-          lead="The numbers you see are honest estimates — here is how they are made."
-        >
+        {/* ===== How it works preview ===== */}
+        <section id="how-it-works-preview" className="mb-12 scroll-mt-24">
+          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
+            {zh ? '方法' : 'Method'}
+          </p>
+          <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
+            {zh ? '航海家號追蹤器如何運作' : 'How Voyager Tracker Works'}
+          </h2>
           <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              ['1 · Data source', 'Official NASA/JPL mission references provide baseline distances and cruise speeds for both spacecraft.'],
-              ['2 · Calculation', 'The site advances the baseline with the probes\u2019 velocities over elapsed time, then converts to AU, km and light-travel time.'],
-              ['3 · Update cycle', 'Values are recalculated in your browser about ten times per second. Baselines are refreshed whenever new official data is published.'],
-            ].map(([title, text]) => (
-              <div key={title} className="rounded-xl border border-slate-800 bg-space-900/40 p-5">
-                <h3 className="mb-2 font-mono text-sm font-bold text-cyan-300">{title}</h3>
-                <p className="text-sm leading-relaxed text-slate-400">{text}</p>
+            {(
+              [
+                [bi('1 · Data source', '1 · 資料來源'), bi('Official NASA/JPL mission references provide baseline distances and cruise speeds.', 'NASA/JPL 官方任務參考提供基準距離與巡航速度。')],
+                [bi('2 · Calculation', '2 · 計算方式'), bi('The baseline is advanced by each probe\u2019s velocity over elapsed time, converted to AU, km and light time.', '以各探測器速度隨經過時間推進基準值，再換算成 AU、公里與光行時間。')],
+                [bi('3 · Update cycle', '3 · 更新週期'), bi('Values recalculate about ten times per second in your browser; baselines refresh when new official data appears.', '數值每秒在你的瀏覽器中更新約十次；新官方資料出現時才更新基準。')],
+              ] as { en: string; zh: string }[][]
+            ).map(([title, text]) => (
+              <div key={title.en} className="rounded-xl border border-slate-800 bg-space-900/40 p-5">
+                <h3 className="mb-2 font-mono text-sm font-bold text-cyan-300">
+                  {zh ? title.zh : title.en}
+                </h3>
+                <p className="text-sm leading-relaxed text-slate-400">
+                  {zh ? text.zh : text.en}
+                </p>
               </div>
             ))}
           </div>
           <p className="mt-4">
             <a href={pageUrl('how-it-works')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-              Read the full methodology <LinkArrow className="h-4 w-4" />
+              {zh ? '閱讀完整方法說明' : 'Read the full methodology'} <LinkArrow className="h-4 w-4" />
             </a>
           </p>
-        </Section>
+        </section>
 
         {/* ===== FAQ preview ===== */}
-        <Section
-          id="faq-preview"
-          kicker="Questions"
-          title="Frequently Asked Questions"
-          lead="Short answers to the questions people ask most."
-        >
+        <section id="faq-preview" className="mb-12 scroll-mt-24">
+          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
+            {zh ? '問題' : 'Questions'}
+          </p>
+          <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
+            {zh ? '常見問題' : 'Frequently Asked Questions'}
+          </h2>
           <div className="space-y-3">
-            {[
-              ['Where are Voyager 1 and Voyager 2 now?', 'Both are in interstellar space. Voyager 1 crossed the heliopause in 2012 and Voyager 2 in 2018; they continue outward in different directions.'],
-              ['How fast are the Voyagers traveling?', 'Voyager 1 recedes from the Sun at roughly 17 km/s and Voyager 2 at about 15 km/s — tens of thousands of kilometres per hour.'],
-              ['Are the Voyagers still communicating with Earth?', 'Yes. NASA\u2019s Deep Space Network still receives data from both, though instruments are being shut down one by one to save power.'],
-              ['Is Voyager Tracker an official NASA website?', 'No. It is an independent educational project and is not affiliated with or endorsed by NASA or JPL.'],
-            ].map(([q, a]) => (
-              <details key={q} className="group rounded-xl border border-slate-800 bg-space-900/40">
+            {(
+              [
+                [bi('Where are Voyager 1 and Voyager 2 now?', '航海家一號與二號現在在哪裡？'), bi('Both are in interstellar space — Voyager 1 since 2012 and Voyager 2 since 2018 — travelling outward in different directions.', '兩者都在星際空間中——一號自 2012 年、二號自 2018 年起——朝不同方向繼續向外。')],
+                [bi('How fast are the Voyagers traveling?', '航海家號飛得有多快？'), bi('Voyager 1 recedes from the Sun at roughly 17 km/s and Voyager 2 at about 15 km/s.', '航海家一號以約 17 公里/秒、二號以約 15 公里/秒遠離太陽。')],
+                [bi('Are the Voyagers still communicating with Earth?', '航海家號還在與地球通訊嗎？'), bi('Yes — NASA\u2019s Deep Space Network still receives data from both spacecraft.', '是的——NASA 深空網路仍持續接收兩艘探測器的資料。')],
+                [bi('Is Voyager Tracker an official NASA website?', '航海家號追蹤器是 NASA 官方網站嗎？'), bi('No. It is an independent educational project and is not affiliated with or endorsed by NASA or JPL.', '不是。它是獨立教育專案，與 NASA 或 JPL 無關，也未獲其背書。')],
+              ] as { en: string; zh: string }[][]
+            ).map(([q, a]) => (
+              <details key={q.en} className="group rounded-xl border border-slate-800 bg-space-900/40">
                 <summary className="cursor-pointer list-none p-4 font-medium text-slate-100 transition-colors hover:text-cyan-300 marker:hidden">
-                  <span className="mr-2 text-cyan-400">Q.</span>
-                  {q}
+                  <span className="mr-2 text-cyan-400">{zh ? '問' : 'Q.'}</span>
+                  {zh ? q.zh : q.en}
                 </summary>
                 <p className="border-t border-slate-800 px-4 py-3 text-sm leading-relaxed text-slate-400">
-                  <span className="mr-2 text-emerald-400">A.</span>
-                  {a}
+                  <span className="mr-2 text-emerald-400">{zh ? '答' : 'A.'}</span>
+                  {zh ? a.zh : a.en}
                 </p>
               </details>
             ))}
           </div>
           <p className="mt-4">
             <a href={pageUrl('faq')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-              Browse all 17 questions <LinkArrow className="h-4 w-4" />
+              {zh ? '瀏覽全部十七個問題' : 'Browse all 17 questions'} <LinkArrow className="h-4 w-4" />
             </a>
           </p>
-        </Section>
+        </section>
       </div>
 
       {/* ===== Related information ===== */}

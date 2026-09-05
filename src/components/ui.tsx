@@ -6,7 +6,14 @@
 
 import type { ReactNode } from 'react';
 import { LinkArrow } from './icons';
-import { PAGES, pageUrl, type PageKey } from '../constants/site';
+import {
+  PAGES,
+  PAGES_ZH,
+  pageLabel,
+  pageUrl,
+  type PageKey,
+} from '../constants/site';
+import { useI18n } from '../i18n/context';
 
 /** Breadcrumb-style page header with a unique H1 and short intro paragraph. */
 export function ArticleHeader({
@@ -22,11 +29,14 @@ export function ArticleHeader({
   title: string;
   intro?: string;
 }) {
-  const items: { name: string; href?: string }[] = [{ name: 'Home', href: pageUrl('home') }];
+  const { locale } = useI18n();
+  const items: { name: string; href?: string }[] = [
+    { name: pageLabel('home', locale), href: pageUrl('home') },
+  ];
   if (parent) {
-    items.push({ name: PAGES[parent].label, href: pageUrl(parent) });
+    items.push({ name: pageLabel(parent, locale), href: pageUrl(parent) });
   }
-  items.push({ name: PAGES[current].label });
+  items.push({ name: pageLabel(current, locale) });
 
   return (
     <header className="animate-fade-in mb-10">
@@ -107,18 +117,22 @@ export function Callout({
 
 /** A row of quick "related page" link cards shown at the bottom of pages. */
 export function RelatedLinks({
-  title = 'Related Voyager Information',
+  title,
   items,
 }: {
   title?: string;
   items: PageKey[];
 }) {
+  const { locale } = useI18n();
+  const zh = locale === 'zh-TW';
+  const heading = title ?? (zh ? '相關的航海家資訊' : 'Related Voyager Information');
+
   return (
     <aside className="hud-panel mt-12 rounded-2xl p-6">
-      <h2 className="mb-4 text-lg font-bold tracking-wide text-white">{title}</h2>
+      <h2 className="mb-4 text-lg font-bold tracking-wide text-white">{heading}</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((key) => {
-          const page = PAGES[key];
+          const page = zh ? PAGES_ZH[key] : PAGES[key];
           return (
             <a
               key={key}

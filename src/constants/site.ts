@@ -191,3 +191,27 @@ export function pageUrl(key: PageKey): string {
     ? `${import.meta.env.BASE_URL}`
     : `${import.meta.env.BASE_URL}${info.href}`;
 }
+
+/** Traditional-Chinese labels for every page (content chrome stays bilingual). */
+export const PAGES_ZH: Record<PageKey, { label: string; title: string; description: string }> = {
+  home: { label: '首頁', title: '航海家號追蹤器', description: '航海家一號與二號的即時距離、速度與任務現況，以及完整任務介紹。' },
+  'voyager-1': { label: '航海家一號', title: '航海家一號', description: '航海家一號的任務歷史、與地球的距離及星際空間現況。' },
+  'voyager-2': { label: '航海家二號', title: '航海家二號', description: '唯一拜訪過天王星與海王星的探測器，含即時追蹤資料。' },
+  mission: { label: '任務介紹', title: '航海家任務', description: '航海家計畫如何開始、大旅行任務與持續至今的星際任務。' },
+  timeline: { label: '任務時間軸', title: '航海家任務時間軸', description: '從 1977 年發射到今日星際任務的真實時間軸。' },
+  discoveries: { label: '科學發現', title: '科學發現', description: '木衛一火山、海王星狂風與星際電漿——航海家的重要發現。' },
+  'golden-record': { label: '金唱片', title: '航海家金唱片', description: '搭載於航海家號上、代表地球聲音、音樂與影像的金質唱片。' },
+  'how-it-works': { label: '資料與方法', title: '資料與計算方法', description: '資料從哪裡來、距離如何估算，以及「即時」的真正意義。' },
+  faq: { label: '常見問題', title: '常見問題', description: '關於航海家號與本站的常見問題與誠實解答。' },
+  about: { label: '關於本站', title: '關於航海家號追蹤器', description: '這個獨立教育網站是什麼——以及它不是什麼。' },
+  sources: { label: '資料來源', title: '資料來源與參考', description: '本站每個數字背後的 NASA / JPL 官方來源。' },
+  updates: { label: '更新紀錄', title: '任務與網站更新', description: '真實的任務與網站更新紀錄，絕不為了 SEO 硬湊內容。' },
+  privacy: { label: '隱私政策', title: '隱私政策', description: '本站如何處理 Cookie、瀏覽器儲存與第三方服務。' },
+  contact: { label: '聯絡我們', title: '聯絡與意見回饋', description: '透過 GitHub 回報資料錯誤或技術問題。' },
+};
+
+/** Language-aware navigation label. */
+export function pageLabel(key: PageKey, locale: 'zh-TW' | 'en-US'): string {
+  return locale === 'zh-TW' ? PAGES_ZH[key].label : PAGES[key].label;
+}
+

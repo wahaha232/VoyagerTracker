@@ -9,6 +9,7 @@
 import { Rocket, Sun, Globe, Timer, Gauge, Activity, CalendarDays, Sparkles } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { LiveTelemetry, Locale, SpacecraftMeta, Translation } from '../types/voyager';
+import { INSTRUMENT_ZH } from '../constants/voyagerData';
 import {
   decomposeLightTime,
   formatAu,
@@ -59,6 +60,13 @@ function MetricRow({
 export default function TrackerCard({ meta, telemetry, locale, t }: TrackerCardProps) {
   const { hours, minutes, seconds } = decomposeLightTime(telemetry.lightTimeSeconds);
   const accent = meta.accent;
+  const instruments =
+    locale === 'zh-TW'
+      ? meta.instruments.map((inst) => ({
+          ...inst,
+          ...(INSTRUMENT_ZH[inst.code] ?? {}),
+        }))
+      : meta.instruments;
 
   return (
     <article
@@ -167,7 +175,7 @@ export default function TrackerCard({ meta, telemetry, locale, t }: TrackerCardP
           {t.metrics.activeInstruments}
         </p>
         <ul className="space-y-2">
-          {meta.instruments.map((inst) => (
+          {instruments.map((inst) => (
             <li
               key={inst.code}
               className="group flex items-start gap-3 rounded-lg border border-slate-700/40 bg-space-950/30 p-2.5 transition-colors hover:border-slate-500/60"

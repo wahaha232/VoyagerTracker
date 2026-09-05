@@ -9,10 +9,11 @@
  * Locale (EN / 繁中) only affects the telemetry UI labels.
  */
 
-import { useMemo, useState } from 'react';
-import type { Locale, SpacecraftId } from '../types/voyager';
+import { useMemo } from 'react';
+import type { SpacecraftId } from '../types/voyager';
 import { SPACECRAFT_META, TRANSLATIONS } from '../constants/voyagerData';
 import { useVoyagerLive } from '../hooks/useVoyagerLive';
+import { useI18n } from '../i18n/context';
 import TrackerCard from './TrackerCard';
 import Voyager3D from './Voyager3D';
 import VoyagerCanvas from './VoyagerCanvas';
@@ -30,7 +31,7 @@ interface TrackerSectionProps {
   showModel?: boolean;
 }
 
-const EXPLAINER: { term: string; detail: string }[] = [
+const EXPLAINER_EN: { term: string; detail: string }[] = [
   {
     term: 'Distance from Earth',
     detail:
@@ -68,10 +69,52 @@ const EXPLAINER: { term: string; detail: string }[] = [
   },
 ];
 
+const EXPLAINER_ZH: { term: string; detail: string }[] = [
+  {
+    term: '與地球的距離',
+    detail:
+      '探測器目前與地球之間的距離（以 AU 與公里表示）。由於探測器正逐漸遠離地球，這個數字每天都在增加。',
+  },
+  {
+    term: '與太陽的距離',
+    detail:
+      '改以太陽為基準的同一種測量。地球距太陽約 1 AU，因此這兩個距離通常相差不遠。',
+  },
+  {
+    term: '目前速度',
+    detail:
+      '探測器相對太陽的巡航速度（公里/秒）。探測器靠著 1977 年發射與行星重力助推所獲得的動能滑行——引擎並未點火。',
+  },
+  {
+    term: '任務已執行時間',
+    detail:
+      '從發射至今探測器已運作多久。兩艘航海家號都已進入服役的第五個十年，並持續回傳資料。',
+  },
+  {
+    term: '方向／軌跡',
+    detail:
+      '兩艘探測器各自的前進方向。航海家一號朝行星軌道面的北方離開太陽系；航海家二號則朝南方，因此兩者正在探索不同的星際空間區域。',
+  },
+  {
+    term: '資料更新頻率',
+    detail:
+      '距離數值會在您的瀏覽器內以固定基準插值，大約每秒更新十次，讓數字流暢跳動，無需不斷向外部伺服器查詢。',
+  },
+  {
+    term: '資料來源',
+    detail:
+      '基準距離與速度錨定於 NASA/JPL 航海家任務參考資料。本站顯示的每一個數值都是「計算估計值」，並非 NASA 即時遙測。',
+  },
+];
+
 /** Approximate elapsed time since an ISO launch date, in years. */
-function elapsedYearsLabel(launchDate: string): string {
+function elapsedYearsLabel(launchDate: string, zh: boolean): string {
   const ms = Date.now() - Date.parse(launchDate);
   const years = ms / (365.2425 * 24 * 3600 * 1000);
+  if (zh) {
+    if (years < 2) return `${Math.max(1, Math.floor(years * 12))} 個月`;
+    return `${Math.floor(years)} 年`;
+  }
   if (years < 2) return `${Math.max(1, Math.floor(years * 12))} months`;
   return `${Math.floor(years)} years`;
 }
@@ -83,35 +126,24 @@ export default function TrackerSection({
   showMap = true,
   showModel = false,
 }: TrackerSectionProps) {
-  const [locale, setLocale] = useState<Locale>('en-US');
+  const { locale } = useI18n();
+  const zh = locale === 'zh-TW';
   const telemetry = useVoyagerLive();
   const t = useMemo(() => TRANSLATIONS[locale], [locale]);
-
-  const toggleLocale = () => {
-    setLocale((prev) => (prev === 'en-US' ? 'zh-TW' : 'en-US'));
-  };
+  const explainer = zh ? EXPLAINER_ZH : EXPLAINER_EN;
 
   return (
     <section aria-label={title} className="mb-14">
       {/* Heading */}
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="mb-1 flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[0.25em] text-emerald-400">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-            </span>
-            Live data · calculated estimates
-          </p>
-          <h2 className="neon-text text-2xl font-bold tracking-wide text-white sm:text-3xl">{title}</h2>
-        </div>
-        <button
-          type="button"
-          onClick={toggleLocale}
-          className="rounded-lg border border-cyan-500/30 bg-space-900/80 px-3 py-2 font-mono text-xs font-medium text-slate-300 transition-all hover:border-cyan-400/60 hover:text-white"
-        >
-          {locale === 'en-US' ? '繁中' : 'EN'}
-        </button>
+      <div className="mb-5">
+        <p className="mb-1 flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[0.25em] text-emerald-400">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+          </span>
+          {zh ? '即時資料 · 計算估計值' : 'Live data · calculated estimates'}
+        </p>
+        <h2 className="neon-text text-2xl font-bold tracking-wide text-white sm:text-3xl">{title}</h2>
       </div>
       <p className="mb-6 max-w-4xl leading-relaxed text-slate-300">{intro}</p>
 
@@ -125,7 +157,7 @@ export default function TrackerSection({
               className="rounded-full border px-3 py-1.5 font-mono text-xs"
               style={{ color: meta.accent, borderColor: `${meta.accent}55`, backgroundColor: `${meta.accent}12` }}
             >
-              {meta.name} — mission elapsed ≈ {elapsedYearsLabel(meta.launchDate)}
+              {zh ? `${meta.name} — 任務已執行約 ${elapsedYearsLabel(meta.launchDate, true)}` : `${meta.name} — mission elapsed ≈ ${elapsedYearsLabel(meta.launchDate, false)}`}
             </span>
           );
         })}
@@ -133,12 +165,16 @@ export default function TrackerSection({
 
       {/* What you're seeing */}
       <div className="hud-panel mb-8 rounded-2xl p-5 sm:p-6">
-        <h3 className="mb-1 text-lg font-bold tracking-wide text-white">What you&rsquo;re seeing</h3>
+        <h3 className="mb-1 text-lg font-bold tracking-wide text-white">
+          {zh ? '您看到的數字代表什麼' : 'What you\u2019re seeing'}
+        </h3>
         <p className="mb-4 text-sm text-slate-400">
-          A short guide to every number on this page — what it measures and how to read it.
+          {zh
+            ? '這份小指南說明本頁每個數字所測量的內容，以及該如何解讀。'
+            : 'A short guide to every number on this page — what it measures and how to read it.'}
         </p>
         <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
-          {EXPLAINER.map((item) => (
+          {explainer.map((item) => (
             <div key={item.term} className="border-l-2 border-cyan-500/40 pl-3">
               <dt className="font-mono text-xs font-semibold uppercase tracking-widest text-cyan-300">
                 {item.term}
@@ -187,12 +223,24 @@ export default function TrackerSection({
 
       {/* Data transparency note */}
       <p className="mt-5 font-mono text-[11px] leading-relaxed tracking-wide text-slate-500">
-        Estimates anchored to a fixed ephemeris baseline from NASA/JPL mission references and
-        advanced by the probes&rsquo; velocities — see the{' '}
-        <a href="how-it-works.html" className="text-cyan-400 hover:text-cyan-300">
-          data &amp; methodology page
-        </a>{' '}
-        for details. Not official NASA data.
+        {zh ? (
+          <>
+            估計值以 NASA/JPL 任務參考資料的固定星曆基準為錨點，再依探測器速度推進計算——詳見{' '}
+            <a href="how-it-works.html" className="text-cyan-400 hover:text-cyan-300">
+              資料與計算方法
+            </a>{' '}
+            頁。並非 NASA 官方資料。
+          </>
+        ) : (
+          <>
+            Estimates anchored to a fixed ephemeris baseline from NASA/JPL mission references and
+            advanced by the probes&rsquo; velocities — see the{' '}
+            <a href="how-it-works.html" className="text-cyan-400 hover:text-cyan-300">
+              data &amp; methodology page
+            </a>{' '}
+            for details. Not official NASA data.
+          </>
+        )}
       </p>
     </section>
   );
