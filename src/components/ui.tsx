@@ -8,6 +8,7 @@ import type { ReactNode } from 'react';
 import { LinkArrow } from './icons';
 import {
   PAGES,
+  PAGES_ES,
   PAGES_ZH,
   pageLabel,
   pageUrl,
@@ -125,14 +126,17 @@ export function RelatedLinks({
 }) {
   const { locale } = useI18n();
   const zh = locale === 'zh-TW';
-  const heading = title ?? (zh ? '相關的航海家資訊' : 'Related Voyager Information');
+  const es = locale === 'es';
+  const heading =
+    title ??
+    (zh ? '相關的航海家資訊' : es ? 'Información relacionada de Voyager' : 'Related Voyager Information');
 
   return (
     <aside className="hud-panel mt-12 rounded-2xl p-6">
       <h2 className="mb-4 text-lg font-bold tracking-wide text-white">{heading}</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((key) => {
-          const page = zh ? PAGES_ZH[key] : PAGES[key];
+          const page = zh ? PAGES_ZH[key] : es ? PAGES_ES[key] : PAGES[key];
           return (
             <a
               key={key}

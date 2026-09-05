@@ -6,6 +6,8 @@
  * can crawl each URL independently.
  */
 
+import type { Locale } from '../types/voyager';
+
 export type PageKey =
   | 'home'
   | 'voyager-1'
@@ -192,7 +194,7 @@ export function pageUrl(key: PageKey): string {
     : `${import.meta.env.BASE_URL}${info.href}`;
 }
 
-/** Traditional-Chinese labels for every page (content chrome stays bilingual). */
+/** Traditional-Chinese labels for every page. */
 export const PAGES_ZH: Record<PageKey, { label: string; title: string; description: string }> = {
   home: { label: '首頁', title: '航海家號追蹤器', description: '航海家一號與二號的即時距離、速度與任務現況，以及完整任務介紹。' },
   'voyager-1': { label: '航海家一號', title: '航海家一號', description: '航海家一號的任務歷史、與地球的距離及星際空間現況。' },
@@ -210,8 +212,28 @@ export const PAGES_ZH: Record<PageKey, { label: string; title: string; descripti
   contact: { label: '聯絡我們', title: '聯絡與意見回饋', description: '透過 GitHub 回報資料錯誤或技術問題。' },
 };
 
+/** Spanish (Español) labels for every page. */
+export const PAGES_ES: Record<PageKey, { label: string; title: string; description: string }> = {
+  home: { label: 'Inicio', title: 'Rastreador Voyager', description: 'Distancia, velocidad y estado en vivo de Voyager 1 y 2, junto con la historia de la misión.' },
+  'voyager-1': { label: 'Voyager 1', title: 'Voyager 1', description: 'Historia de la misión Voyager 1, distancia a la Tierra y estado interestelar actual.' },
+  'voyager-2': { label: 'Voyager 2', title: 'Voyager 2', description: 'La única nave que visitó Urano y Neptuno, con datos de seguimiento en vivo.' },
+  mission: { label: 'Misión', title: 'La misión Voyager', description: 'Cómo comenzó el programa Voyager, el Gran Tour y la misión interestelar que continúa.' },
+  timeline: { label: 'Cronología', title: 'Cronología de la misión Voyager', description: 'Una cronología basada en hechos, desde los lanzamientos de 1977 hasta las operaciones interestelares.' },
+  discoveries: { label: 'Descubrimientos', title: 'Descubrimientos científicos', description: 'Volcanes en Ío, vientos de Neptuno y plasma interestelar: los grandes hallazgos de Voyager.' },
+  'golden-record': { label: 'Disco de Oro', title: 'El Disco de Oro', description: 'El disco fonográfico que llevan las Voyager como mensaje para cualquier civilización que lo encuentre.' },
+  'how-it-works': { label: 'Cómo funciona', title: 'Cómo funciona el Rastreador', description: 'De dónde salen los datos, cómo se estiman las distancias y qué significa \u201cen vivo\u201d aquí.' },
+  faq: { label: 'Preguntas', title: 'Preguntas frecuentes', description: 'Respuestas honestas a preguntas comunes sobre las Voyager y este sitio web.' },
+  about: { label: 'Acerca de', title: 'Acerca del Rastreador', description: 'Qué es este proyecto educativo independiente — y qué no es.' },
+  sources: { label: 'Fuentes', title: 'Fuentes y referencias', description: 'Las fuentes oficiales de NASA/JPL detrás de cada cifra de este sitio.' },
+  updates: { label: 'Actualizaciones', title: 'Actualizaciones de la misión y del sitio', description: 'Un registro de cambios reales, nunca generado solo para SEO.' },
+  privacy: { label: 'Privacidad', title: 'Política de privacidad', description: 'Cómo maneja este sitio cookies, almacenamiento local y servicios de terceros.' },
+  contact: { label: 'Contacto', title: 'Contacto y comentarios', description: 'Reporta un problema de datos o un fallo técnico a través del repositorio de GitHub.' },
+};
+
 /** Language-aware navigation label. */
-export function pageLabel(key: PageKey, locale: 'zh-TW' | 'en-US'): string {
-  return locale === 'zh-TW' ? PAGES_ZH[key].label : PAGES[key].label;
+export function pageLabel(key: PageKey, locale: Locale): string {
+  if (locale === 'zh-TW') return PAGES_ZH[key].label;
+  if (locale === 'es') return PAGES_ES[key].label;
+  return PAGES[key].label;
 }
 

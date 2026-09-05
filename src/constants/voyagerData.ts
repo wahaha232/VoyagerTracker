@@ -144,6 +144,26 @@ export const INSTRUMENT_ZH: Record<string, { name: string; description: string }
   },
 };
 
+/** Spanish names for the science instruments shown on tracker cards. */
+export const INSTRUMENT_ES: Record<string, { name: string; description: string }> = {
+  MAG: {
+    name: 'Magnetómetro',
+    description: 'Mide la intensidad y dirección del campo magnético interplanetario e interestelar.',
+  },
+  LECP: {
+    name: 'Partículas cargadas de baja energía',
+    description: 'Detecta partículas cargadas de baja energía y rayos cósmicos en la heliosfera y el medio interestelar.',
+  },
+  CRS: {
+    name: 'Subsistema de rayos cósmicos',
+    description: 'Mide la intensidad y el espectro de energía de los rayos cósmicos y las partículas solares energéticas.',
+  },
+  PLS: {
+    name: 'Ciencia del plasma',
+    description: 'Estudia el plasma del viento solar y su interacción con el medio interestelar.',
+  },
+};
+
 /** English (en-US) translation dictionary. */
 const enUS: Translation = {
   locale: 'en-US',
@@ -288,10 +308,83 @@ const zhTW: Translation = {
   },
 };
 
+/** Spanish (Español) translation dictionary. */
+const esES: Translation = {
+  locale: 'es',
+  nativeName: 'Español',
+  shortLabel: 'ES',
+  appTitle: 'Rastreador Voyager',
+  appSubtitle: 'Misión interestelar de la NASA · Telemetría en tiempo real',
+  nav: {
+    overview: 'Resumen',
+    telemetry: 'Telemetría',
+    trajectory: 'Trayectoria',
+    about: 'Acerca de',
+  },
+  dashboard: {
+    title: 'Panel de la misión',
+    subtitle: 'Telemetría estimada en vivo de las sondas interestelares Voyager',
+    live: 'EN VIVO',
+    updated: 'Actualizado',
+    compare: 'Vista comparativa',
+    single: 'Vista individual',
+  },
+  metrics: {
+    distanceFromSun: 'Distancia al Sol',
+    distanceFromEarth: 'Distancia a la Tierra',
+    lightTime: 'Tiempo de luz (ida)',
+    cruiseSpeed: 'Velocidad de crucero (rel. Sol)',
+    missionStatus: 'Estado de la misión',
+    activeInstruments: 'Instrumentos activos',
+    launchDate: 'Fecha de lanzamiento',
+    interstellarEntry: 'Entrada interestelar',
+    au: 'UA',
+    km: 'km',
+    kmPerSec: 'km/s',
+    hours: 'h',
+    minutes: 'min',
+    seconds: 's',
+  },
+  model: {
+    title: 'Nave Voyager — Modelo 3D',
+    subtitle: 'Arrastra para girar · desplázate para acercar · una representación interactiva de las sondas',
+    dragHint: 'Arrastra para girar',
+  },
+  canvas: {
+    title: 'Mapa de trayectoria heliocéntrica',
+    subtitle: 'Vista orbital 2D — el Sol, los sobrevuelos planetarios y la heliopausa',
+    sun: 'Sol',
+    earth: 'Tierra',
+    earthOrbit: 'Órbita de la Tierra',
+    heliopause: 'Heliopausa (~120 UA)',
+    voyager1: 'Voyager 1',
+    voyager2: 'Voyager 2',
+    jupiterFlyby: 'Sobrevuelo de Júpiter',
+    saturnFlyby: 'Sobrevuelo de Saturno',
+    legend: 'Leyenda',
+    scaleNote: 'Escala radial: 0 → 140 UA (logarítmica)',
+  },
+  status: {
+    interstellar: 'Espacio interestelar',
+    active: 'Activo',
+    operational: 'Operativo',
+  },
+  footer: {
+    disclaimer:
+      'La telemetría se interpola en el navegador a partir de constantes de efemérides de referencia con fines ilustrativos y no son datos oficiales de la NASA.',
+    dataSource: 'Efeméride de referencia · Referencia de la misión Voyager de la NASA',
+  },
+  toggle: {
+    showBoth: 'Mostrar ambas',
+    showSingle: 'Mostrar una',
+  },
+};
+
 /** All supported translations keyed by locale. */
 export const TRANSLATIONS: Record<Locale, Translation> = {
   'en-US': enUS,
   'zh-TW': zhTW,
+  es: esES,
 };
 
 /** Default locale used on first load. */

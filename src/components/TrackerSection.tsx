@@ -10,7 +10,7 @@
  */
 
 import { useMemo } from 'react';
-import type { SpacecraftId } from '../types/voyager';
+import type { Locale, SpacecraftId } from '../types/voyager';
 import { SPACECRAFT_META, TRANSLATIONS } from '../constants/voyagerData';
 import { useVoyagerLive } from '../hooks/useVoyagerLive';
 import { useI18n } from '../i18n/context';
@@ -107,13 +107,55 @@ const EXPLAINER_ZH: { term: string; detail: string }[] = [
   },
 ];
 
+const EXPLAINER_ES: { term: string; detail: string }[] = [
+  {
+    term: 'Distancia a la Tierra',
+    detail:
+      'Cuán lejos está la nave de nuestro planeta ahora mismo, en UA y kilómetros. Como las sondas se alejan de nosotros, esta cifra crece cada día.',
+  },
+  {
+    term: 'Distancia al Sol',
+    detail:
+      'La misma medida pero tomada desde el Sol. La Tierra orbita a ~1 UA del Sol, así que ambas distancias suelen ser parecidas.',
+  },
+  {
+    term: 'Velocidad actual',
+    detail:
+      'La velocidad de crucero de la sonda respecto al Sol, en km/s. Las naves viajan por inercia desde su lanzamiento en 1977 y sus asistencias gravitatorias — no hay motores encendidos.',
+  },
+  {
+    term: 'Tiempo transcurrido de la misión',
+    detail:
+      'Cuánto lleva operando cada nave desde su lanzamiento. Ambas Voyager superan ya su quinta década de servicio y siguen enviando datos.',
+  },
+  {
+    term: 'Dirección / trayectoria',
+    detail:
+      'Hacia dónde se dirige cada sonda. Voyager 1 salió del plano orbital de los planetas hacia el norte; Voyager 2 viaja hacia el sur, de modo que exploran regiones distintas del espacio interestelar.',
+  },
+  {
+    term: 'Frecuencia de actualización',
+    detail:
+      'Los valores de distancia se interpolan en tu navegador unas diez veces por segundo a partir de una línea base fija, sin consultar ninguna API.',
+  },
+  {
+    term: 'Fuente de datos',
+    detail:
+      'Las distancias y velocidades de referencia se anclan a referencias de la misión Voyager de NASA/JPL. Cada cifra de esta página es una estimación calculada, no telemetría oficial de la NASA.',
+  },
+];
+
 /** Approximate elapsed time since an ISO launch date, in years. */
-function elapsedYearsLabel(launchDate: string, zh: boolean): string {
+function elapsedYearsLabel(launchDate: string, locale: Locale): string {
   const ms = Date.now() - Date.parse(launchDate);
   const years = ms / (365.2425 * 24 * 3600 * 1000);
-  if (zh) {
+  if (locale === 'zh-TW') {
     if (years < 2) return `${Math.max(1, Math.floor(years * 12))} 個月`;
     return `${Math.floor(years)} 年`;
+  }
+  if (locale === 'es') {
+    if (years < 2) return `${Math.max(1, Math.floor(years * 12))} meses`;
+    return `${Math.floor(years)} años`;
   }
   if (years < 2) return `${Math.max(1, Math.floor(years * 12))} months`;
   return `${Math.floor(years)} years`;
@@ -128,9 +170,10 @@ export default function TrackerSection({
 }: TrackerSectionProps) {
   const { locale } = useI18n();
   const zh = locale === 'zh-TW';
+  const es = locale === 'es';
   const telemetry = useVoyagerLive();
   const t = useMemo(() => TRANSLATIONS[locale], [locale]);
-  const explainer = zh ? EXPLAINER_ZH : EXPLAINER_EN;
+  const explainer = zh ? EXPLAINER_ZH : es ? EXPLAINER_ES : EXPLAINER_EN;
 
   return (
     <section aria-label={title} className="mb-14">
@@ -141,7 +184,7 @@ export default function TrackerSection({
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
           </span>
-          {zh ? '即時資料 · 計算估計值' : 'Live data · calculated estimates'}
+          {zh ? '即時資料 · 計算估計值' : es ? 'Datos en vivo · estimaciones calculadas' : 'Live data · calculated estimates'}
         </p>
         <h2 className="neon-text text-2xl font-bold tracking-wide text-white sm:text-3xl">{title}</h2>
       </div>
@@ -157,7 +200,11 @@ export default function TrackerSection({
               className="rounded-full border px-3 py-1.5 font-mono text-xs"
               style={{ color: meta.accent, borderColor: `${meta.accent}55`, backgroundColor: `${meta.accent}12` }}
             >
-              {zh ? `${meta.name} — 任務已執行約 ${elapsedYearsLabel(meta.launchDate, true)}` : `${meta.name} — mission elapsed ≈ ${elapsedYearsLabel(meta.launchDate, false)}`}
+              {zh
+                ? `${meta.name} — 任務已執行約 ${elapsedYearsLabel(meta.launchDate, 'zh-TW')}`
+                : es
+                  ? `${meta.name} — misión transcurrida ≈ ${elapsedYearsLabel(meta.launchDate, 'es')}`
+                  : `${meta.name} — mission elapsed ≈ ${elapsedYearsLabel(meta.launchDate, 'en-US')}`}
             </span>
           );
         })}
@@ -166,12 +213,14 @@ export default function TrackerSection({
       {/* What you're seeing */}
       <div className="hud-panel mb-8 rounded-2xl p-5 sm:p-6">
         <h3 className="mb-1 text-lg font-bold tracking-wide text-white">
-          {zh ? '您看到的數字代表什麼' : 'What you\u2019re seeing'}
+          {zh ? '您看到的數字代表什麼' : es ? 'Lo que estás viendo' : 'What you\u2019re seeing'}
         </h3>
         <p className="mb-4 text-sm text-slate-400">
           {zh
             ? '這份小指南說明本頁每個數字所測量的內容，以及該如何解讀。'
-            : 'A short guide to every number on this page — what it measures and how to read it.'}
+            : es
+              ? 'Una breve guía de cada cifra de esta página: qué mide y cómo leerla.'
+              : 'A short guide to every number on this page — what it measures and how to read it.'}
         </p>
         <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
           {explainer.map((item) => (
@@ -230,6 +279,15 @@ export default function TrackerSection({
               資料與計算方法
             </a>{' '}
             頁。並非 NASA 官方資料。
+          </>
+        ) : es ? (
+          <>
+            Las estimaciones se anclan a una línea base de efemérides de las referencias de la
+            misión NASA/JPL y se proyectan con la velocidad de las sondas — consulta la página de{' '}
+            <a href="how-it-works.html" className="text-cyan-400 hover:text-cyan-300">
+              datos y metodología
+            </a>{' '}
+            para más detalles. No son datos oficiales de la NASA.
           </>
         ) : (
           <>

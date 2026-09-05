@@ -24,7 +24,7 @@ export type { Locale };
 function readInitialLocale(): Locale {
   try {
     const saved = window.localStorage.getItem(STORAGE_KEY);
-    return saved === 'zh-TW' || saved === 'en-US' ? saved : 'en-US';
+    return saved === 'zh-TW' || saved === 'en-US' || saved === 'es' ? saved : 'en-US';
   } catch {
     return 'en-US';
   }
@@ -51,12 +51,15 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     } catch {
       // Ignore storage failures (private mode etc.).
     }
-    document.documentElement.lang = locale === 'zh-TW' ? 'zh-TW' : 'en';
+    document.documentElement.lang = locale === 'zh-TW' ? 'zh-TW' : locale === 'es' ? 'es' : 'en';
   }, [locale]);
 
   const set = useCallback((next: Locale) => setLocale(next), []);
   const toggle = useCallback(
-    () => setLocale((prev) => (prev === 'en-US' ? 'zh-TW' : 'en-US')),
+    () =>
+      setLocale((prev) =>
+        prev === 'en-US' ? 'zh-TW' : prev === 'zh-TW' ? 'es' : 'en-US',
+      ),
     [],
   );
 

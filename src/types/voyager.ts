@@ -4,7 +4,7 @@
  */
 
 /** Supported application locales. */
-export type Locale = 'zh-TW' | 'en-US';
+export type Locale = 'zh-TW' | 'en-US' | 'es';
 
 /** Spacecraft identifiers. */
 export type SpacecraftId = 'voyager1' | 'voyager2';
