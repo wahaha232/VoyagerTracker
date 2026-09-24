@@ -1,145 +1,133 @@
 /**
  * UpdatesPage — /updates.html  (EN / 繁中 / Español)
+ *
+ * A dated log. Mission entries are the recent, sourced events from the
+ * timeline (single source of truth); website entries record real changes
+ * to this site, including corrections.
  */
 
+import { pageUrl } from '../constants/site';
 import { RelatedLinks } from '../components/ui';
-import { BiArticleHeader, BiSection, bi, useEs, useZh } from '../components/content';
+import { ExternalLinkIcon } from '../components/icons';
+import { BiArticleHeader, BiSection, bi, txt, useLang } from '../components/content';
+import { INSTRUMENT_STATUS_AS_OF } from '../constants/voyagerData';
+import { EVENTS } from './TimelinePage';
 
-interface UpdateEntry {
-  date: string;
-  title: { en: string; zh: string; es: string };
-  detail: { en: string; zh: string; es: string };
-  kind: 'Mission' | 'Website';
-}
+type Tri = { en: string; zh: string; es: string };
+const T = (en: string, zh: string, es: string): Tri => ({ en, zh, es });
 
-const KIND_ZH: Record<string, string> = { Mission: '任務', Website: '網站' };
-const KIND_ES: Record<string, string> = { Mission: 'Misión', Website: 'Sitio web' };
+/** Date the mission facts on this site were last checked against NASA sources. */
+const CONTENT_REVIEWED = '2026-09-25';
 
-const UPDATES: UpdateEntry[] = [
+const SITE_UPDATES: { date: string; title: Tri; detail: Tri }[] = [
   {
-    date: '2024 · Jun',
-    title: {
-      en: 'Voyager 1 returns to normal science operations',
-      zh: '航海家一號恢復正常科學運作',
-      es: 'Voyager 1 vuelve a las operaciones científicas normales',
-    },
-    detail: {
-      en: 'After a flight-data-system problem first reported in November 2023, NASA confirmed Voyager 1 had resumed returning science data from its operating instruments. Source: NASA/JPL public statements.',
-      zh: '繼 2023 年 11 月首次通報的飛行資料系統問題後，NASA 確認航海家一號已恢復回傳仍在運作儀器的科學資料。來源：NASA/JPL 公開聲明。',
-      es: 'Tras un problema en el sistema de datos de vuelo reportado por primera vez en noviembre de 2023, la NASA confirmó que Voyager 1 había reanudado el envío de datos científicos. Fuente: declaraciones públicas de NASA/JPL.',
-    },
-    kind: 'Mission',
+    date: '2026-09-25',
+    title: T('Correction: new calculation model and corrected figures', '更正：新的計算模型與修正後的數字', 'Corrección: nuevo modelo de cálculo y cifras corregidas'),
+    detail: T(
+      'The trackers previously started from a fixed 2026 estimate of 165.5 AU (Voyager 1) and 138.5 AU (Voyager 2) and treated the distance from Earth as equal to the distance from the Sun. Checked against JPL Horizons, those starting values were about 6 AU and 5 AU too low. An earlier entry on this page said the baseline had been verified against NASA values; that statement was wrong and has been withdrawn. The trackers now propagate JPL Horizons state vectors and model Earth’s orbit, and the result has been validated against JPL (see How It Works). The instrument lists were also corrected to match NASA’s current status.',
+      '追蹤器先前以固定的 2026 年估計值為起點——航海家一號 165.5 AU、二號 138.5 AU——並把與地球的距離視同與太陽的距離。與 JPL Horizons 比對後發現，這些起始值分別偏低約 6 AU 與 5 AU。本頁先前一則條目聲稱基準值已與 NASA 數值核對，該說法有誤，現已撤回。追蹤器現在改為推算 JPL Horizons 的狀態向量並納入地球公轉，結果已與 JPL 比對驗證（見「運作原理」）。儀器清單也已依 NASA 目前公布的狀態更正。',
+      'Los rastreadores partían antes de una estimación fija para 2026 de 165,5 UA (Voyager 1) y 138,5 UA (Voyager 2) y trataban la distancia a la Tierra como igual a la distancia al Sol. Comparados con JPL Horizons, esos valores eran unas 6 y 5 UA demasiado bajos. Una entrada anterior de esta página afirmaba que la línea base se había verificado con valores de la NASA; era incorrecto y se ha retirado. Ahora los rastreadores propagan vectores de estado de JPL Horizons y modelan la órbita terrestre, con validación frente a JPL (ver Cómo funciona). También se corrigieron las listas de instrumentos según el estado actual de la NASA.',
+    ),
   },
   {
-    date: '2026 · Aug',
-    title: {
-      en: 'Tracker baseline verified against NASA values',
-      zh: '追蹤器基準值已與 NASA 數值核對',
-      es: 'Línea base del rastreador verificada con valores de la NASA',
-    },
-    detail: {
-      en: 'The ephemeris baseline used by the live trackers was checked against NASA\u2019s published distances and the spacecraft\u2019s published cruise speeds.',
-      zh: '「即時追蹤器」使用的星曆基準，已與 NASA 公布之距離及探測器巡航速度進行核對。',
-      es: 'La línea base de efemérides del rastreador en vivo se verificó con las distancias publicadas por la NASA y las velocidades de crucero publicadas de las sondas.',
-    },
-    kind: 'Website',
+    date: '2026-09-25',
+    title: T('New: comparison, calculators, interactive timeline and more', '新增：比較頁、計算工具、互動式時間軸等', 'Novedad: comparación, calculadoras, cronología interactiva y más'),
+    detail: T(
+      'Added the Voyager 1 vs Voyager 2 comparison with a 1977–2035 distance and speed chart, four calculators, an interactive timeline with sources for every event, a science page organised by what Voyager saw and why it matters, an essay on why Voyager still matters, upcoming-milestone countdowns, a “since your last visit” panel and Terms of Use. Pages are now delivered as fully rendered HTML.',
+      '新增「航海家一號 vs 二號」比較頁（含 1977–2035 年距離與速度圖）、四個計算工具、每個事件都附出處的互動式時間軸、依「航海家看到什麼、為何重要」編排的科學頁面、一篇「航海家為何至今仍重要」專文、里程碑倒數、「自上次造訪以來」面板與使用條款。所有頁面現在都以完整渲染的 HTML 提供。',
+      'Se añadieron la comparación Voyager 1 frente a Voyager 2 con un gráfico de distancia y velocidad 1977–2035, cuatro calculadoras, una cronología interactiva con fuentes para cada evento, una página de ciencia organizada por qué vio Voyager y por qué importa, un ensayo sobre por qué Voyager sigue importando, cuentas atrás de hitos, un panel «desde tu última visita» y los Términos de uso. Las páginas se entregan ahora como HTML completo.',
+    ),
   },
   {
-    date: 'Ongoing',
-    title: {
-      en: 'Power management continues on both spacecraft',
-      zh: '兩艘探測器的電力管理持續進行中',
-      es: 'Continúa la gestión de energía de ambas naves',
-    },
-    detail: {
-      en: 'NASA continues its programme of switching off heaters and non-essential instruments to extend the Voyagers\u2019 operating life.',
-      zh: 'NASA 持續關閉加熱器與非必要儀器，以延長航海家號的運作壽命。',
-      es: 'La NASA continúa apagando calentadores e instrumentos no esenciales para alargar la vida útil de las Voyager.',
-    },
-    kind: 'Mission',
+    date: '2026-09-06',
+    title: T('Spanish translation added', '新增西班牙文版本', 'Se añade la traducción al español'),
+    detail: T('All pages became available in Spanish, alongside English and Traditional Chinese.', '所有頁面除英文與繁體中文外，也提供西班牙文版本。', 'Todas las páginas pasaron a estar disponibles en español, además de inglés y chino tradicional.'),
+  },
+  {
+    date: '2026-09-05',
+    title: T('Site rebuilt as a multi-page reference', '網站改版為多頁式參考網站', 'El sitio se rehace como referencia de varias páginas'),
+    detail: T('The single-page tracker became a multi-page site with mission, timeline, Golden Record, FAQ and sources pages.', '原本的單頁追蹤器改版為多頁網站，加入任務、時間軸、金唱片、常見問題與資料來源等頁面。', 'El rastreador de una sola página se convirtió en un sitio con páginas de misión, cronología, Disco de Oro, preguntas frecuentes y fuentes.'),
   },
 ];
 
 export default function UpdatesPage() {
-  const zh = useZh();
-  const es = useEs();
+  const locale = useLang();
+  const mission = EVENTS.filter((e) => e.date >= '2024-01-01').slice().reverse();
+  const fmtDate = (d: string) =>
+    new Intl.DateTimeFormat(locale, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' }).format(Date.parse(`${d}T00:00:00Z`));
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
       <BiArticleHeader
         current="updates"
-        title={bi('Mission & Website Updates', '任務與網站更新紀錄', 'Actualizaciones de la misión y del sitio')}
+        title={bi('Mission & site updates', '任務與網站更新紀錄', 'Novedades de la misión y del sitio')}
         intro={bi(
-          'A record of genuine Voyager mission developments and real changes to this website. Entries are added only when there is actual content to report.',
-          '這裡記錄真實的航海家任務發展與本站實際的更動。只有在有實際內容時才會新增條目。',
-          'Un registro de novedades reales de la misión Voyager y de cambios reales de este sitio. Solo se añaden entradas cuando hay contenido real que informar.',
+          'A dated record of recent Voyager events reported by NASA/JPL and of real changes to this website, including corrections. Nothing is added unless there is something genuine to report.',
+          '這裡以日期記錄 NASA/JPL 公布的近期航海家事件，以及本站的實際修改（包括更正）。沒有真正值得報告的內容時，不會新增任何條目。',
+          'Un registro fechado de los eventos recientes de Voyager publicados por NASA/JPL y de los cambios reales de este sitio, incluidas las correcciones. No se añade nada si no hay algo real que contar.',
         )}
       />
 
-      <div className="my-6 rounded-xl border border-amber-400/40 bg-amber-400/5 p-5 text-sm leading-relaxed text-amber-100">
-        <p className="mb-1.5 font-semibold text-white">
-          {zh ? '關於本頁' : es ? 'Acerca de esta página' : 'About this page'}
-        </p>
-        <p>
-          {zh
-            ? '「任務」類條目是 NASA/JPL 公布內容的摘要，可於資料來源頁點擊原始連結閱讀。'
-            : es
-              ? 'Los elementos de \u201cMisión\u201d son resúmenes de anuncios de NASA/JPL; sigue los enlaces de la página de Fuentes para leer los originales.'
-              : 'Mission items here are summaries of announcements published by NASA/JPL; follow the links on the Sources page to read the originals.'}
-        </p>
-      </div>
+      <dl className="mb-10 grid gap-3 sm:grid-cols-3">
+        {[
+          { k: T('Site last built', '網站最後建置', 'Última compilación'), v: __BUILD_DATE__ },
+          { k: T('Mission facts last reviewed', '任務事實最後核對', 'Última revisión de datos'), v: CONTENT_REVIEWED },
+          { k: T('NASA instrument status as of', 'NASA 儀器狀態截至', 'Estado de instrumentos NASA a'), v: INSTRUMENT_STATUS_AS_OF },
+        ].map((row) => (
+          <div key={row.k.en} className="rounded-xl border border-slate-700/60 bg-space-900/50 p-4">
+            <dt className="font-mono text-[11px] uppercase tracking-widest text-slate-400">{txt(row.k, locale)}</dt>
+            <dd className="mt-1 font-mono text-lg text-white">
+              <time dateTime={row.v}>{row.v}</time>
+            </dd>
+          </div>
+        ))}
+      </dl>
 
-      <BiSection
-        id="mission-updates"
-        kicker={bi('Mission', '任務', 'Misión')}
-        title={bi('Mission updates', '任務更新', 'Actualizaciones de la misión')}
-      >
+      <BiSection id="mission-updates" title={bi('Mission updates', '任務動態', 'Novedades de la misión')}>
         <div className="space-y-4">
-          {UPDATES.filter((u) => u.kind === 'Mission').map((item) => (
-            <UpdateCard key={item.title.en} item={item} zh={zh} es={es} />
+          {mission.map((e) => (
+            <article key={`${e.date}-${e.craft}`} className="rounded-xl border border-slate-800 bg-space-900/40 p-5">
+              <p className="font-mono text-xs font-bold uppercase tracking-widest text-cyan-300">
+                <time dateTime={e.date}>{fmtDate(e.date)}</time>
+                {e.upcoming ? ` · ${txt(T('upcoming', '即將到來', 'próximo'), locale)}` : ''}
+              </p>
+              <h3 className="mt-1 text-lg font-semibold text-white">{txt(e.title, locale)}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-slate-300">
+                {txt(e.what, locale)} {txt(e.context, locale)}
+              </p>
+              <a href={e.source.url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-1 text-xs text-cyan-300 underline underline-offset-2">
+                {e.source.label} <ExternalLinkIcon className="h-3 w-3" />
+              </a>
+            </article>
           ))}
         </div>
+        <p className="mt-4 text-sm text-slate-400">
+          {txt(T('Older events are on the', '更早的事件請見', 'Los eventos anteriores están en la'), locale)}{' '}
+          <a href={pageUrl('timeline')} className="text-cyan-300 underline underline-offset-2">
+            {txt(T('mission timeline', '任務時間軸', 'cronología'), locale)}
+          </a>
+          .
+        </p>
       </BiSection>
 
-      <BiSection
-        id="website-updates"
-        kicker={bi('Website', '網站', 'Sitio web')}
-        title={bi('Website updates', '網站更新', 'Actualizaciones del sitio')}
-      >
+      <BiSection id="website-updates" title={bi('Website changes and corrections', '網站修改與更正', 'Cambios y correcciones del sitio')}>
         <div className="space-y-4">
-          {UPDATES.filter((u) => u.kind === 'Website').map((item) => (
-            <UpdateCard key={item.title.en} item={item} zh={zh} es={es} />
+          {SITE_UPDATES.map((u) => (
+            <article key={u.title.en} className="rounded-xl border border-slate-800 bg-space-900/40 p-5">
+              <p className="font-mono text-xs font-bold uppercase tracking-widest text-emerald-300">
+                <time dateTime={u.date}>{fmtDate(u.date)}</time>
+              </p>
+              <h3 className="mt-1 text-lg font-semibold text-white">{txt(u.title, locale)}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-slate-300">{txt(u.detail, locale)}</p>
+            </article>
           ))}
         </div>
-        <p className="mt-4 max-w-4xl leading-relaxed text-slate-300">
-          {zh ? (
-            <>想提出修改建議嗎？請到 GitHub 儲存庫開啟 Issue。</>
-          ) : es ? (
-            <>
-              ¿Quieres proponer un cambio? Abre una incidencia en el{' '}
-              <a
-                href="https://github.com/wahaha232/VoyagerTracker/issues"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200"
-              >
-                repositorio de GitHub
-              </a>
-              .
-            </>
-          ) : (
-            <>
-              Want to propose a change? Please open an issue in the{' '}
-              <a
-                href="https://github.com/wahaha232/VoyagerTracker/issues"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200"
-              >
-                GitHub repository
-              </a>
-              .
-            </>
-          )}
+        <p className="mt-4 text-sm text-slate-400">
+          {txt(T('The complete change history is public in the', '完整的修改歷史公開於', 'El historial completo de cambios es público en el'), locale)}{' '}
+          <a href="https://github.com/wahaha232/VoyagerTracker/commits/main" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-cyan-300 underline underline-offset-2">
+            {txt(T('GitHub repository', 'GitHub 儲存庫', 'repositorio de GitHub'), locale)} <ExternalLinkIcon className="h-3 w-3" />
+          </a>
+          .
         </p>
       </BiSection>
 
@@ -147,29 +135,3 @@ export default function UpdatesPage() {
     </div>
   );
 }
-
-function UpdateCard({
-  item,
-  zh,
-  es,
-}: {
-  item: UpdateEntry;
-  zh: boolean;
-  es: boolean;
-}) {
-  const kind = zh ? KIND_ZH[item.kind] : es ? KIND_ES[item.kind] : item.kind;
-  return (
-    <article className="rounded-xl border border-slate-800 bg-space-900/40 p-5">
-      <p className="font-mono text-xs font-bold uppercase tracking-widest text-cyan-400">
-        {item.date} · {kind}
-      </p>
-      <h3 className="mt-1 text-lg font-semibold text-white">
-        {zh ? item.title.zh : es ? item.title.es : item.title.en}
-      </h3>
-      <p className="mt-1.5 text-sm leading-relaxed text-slate-400">
-        {zh ? item.detail.zh : es ? item.detail.es : item.detail.en}
-      </p>
-    </article>
-  );
-}
-

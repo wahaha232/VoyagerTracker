@@ -69,9 +69,9 @@ export default function MissionPage() {
       >
         <Paragraph
           value={bi(
-            'In the 1960s, planetary scientists noticed that the outer planets were about to line up in a way that would allow a single spacecraft to visit several of them using gravity assists — roughly once every 176 years.',
-            '1960 年代，行星科學家發現外行星即將出現一種排列方式，讓單一太空船能藉由「重力助推」連續造訪多顆行星——這種排列約每 176 年才出現一次。',
-            'En los años 60, los científicos planetarios notaron que los planetas exteriores se alinearían de forma que una sola nave pudiera visitar varios con asistencias gravitatorias — algo que ocurre aproximadamente cada 176 años.',
+            'In the 1960s, planetary scientists noticed that the outer planets were about to line up in a way that would allow a single spacecraft to visit several of them using gravity assists — roughly once every 175 years.',
+            '1960 年代，行星科學家發現外行星即將出現一種排列方式，讓單一太空船能藉由「重力助推」連續造訪多顆行星——這種排列約每 175 年才出現一次。',
+            'En los años 60, los científicos planetarios notaron que los planetas exteriores se alinearían de forma que una sola nave pudiera visitar varios con asistencias gravitatorias — algo que ocurre aproximadamente cada 175 años.',
           )}
         />
         <Paragraph
@@ -99,9 +99,9 @@ export default function MissionPage() {
         <Paragraph
           className="mt-3 max-w-4xl leading-relaxed text-slate-300"
           value={bi(
-            'Each spacecraft carried eleven science instruments, a 3.7-metre antenna, radioisotope power generators and a Golden Record greeting from Earth.',
-            '每艘太空船搭載十一項科學儀器、一座 3.7 公尺的天線、放射性同位素發電機，以及一張來自地球的金唱片問候。',
-            'Cada nave llevaba once instrumentos científicos, una antena de 3,7 m, generadores de radioisótopos y un saludo del Disco de Oro desde la Tierra.',
+            'Each spacecraft carried ten science instruments (radio science, using the communications system, is sometimes counted as an eleventh), a 3.7-metre dish antenna, three radioisotope power generators producing about 470 watts at launch, and a Golden Record greeting from Earth.',
+            '每艘太空船搭載十項科學儀器（利用通訊系統進行的無線電科學有時被算作第十一項）、一座 3.7 公尺的碟形天線、三具發射時合計約 470 瓦的放射性同位素發電機，以及一張來自地球的金唱片問候。',
+            'Cada nave llevaba diez instrumentos científicos (la radiociencia, hecha con el sistema de comunicaciones, a veces se cuenta como el undécimo), una antena parabólica de 3,7 m, tres generadores de radioisótopos que daban unos 470 vatios al despegar y el saludo del Disco de Oro.',
           )}
         />
       </BiSection>
@@ -162,9 +162,9 @@ export default function MissionPage() {
       >
         <Paragraph
           value={bi(
-            'The planetary mission ended in 1989, but the spacecraft kept working and NASA extended the mission several times. In the Voyager Interstellar Mission phase, both probes study cosmic rays, magnetic fields and plasma.',
-            '行星任務於 1989 年結束，但太空船仍持續運作，NASA 也多次延長任務。在「航海家星際任務」階段，兩艘探測器持續研究宇宙射線、磁場與電漿。',
-            'La misión planetaria terminó en 1989, pero las naves siguieron funcionando y la NASA la prorrogó varias veces. En la fase de la Misión Interestelar Voyager, ambas sondas estudian rayos cósmicos, campos magnéticos y plasma.',
+            'The planetary mission ended with the Neptune flyby in 1989. On 1 January 1990 the Voyager Interstellar Mission formally began, with a new goal: to explore the outer heliosphere and cross into interstellar space. Along the way Voyager 1 passed the termination shock — where the solar wind abruptly slows — in December 2004 at about 94 AU, and Voyager 2 did so in August 2007 at about 84 AU, a first sign that the heliosphere is not a perfect sphere.',
+            '行星任務隨著 1989 年的海王星飛掠結束。1990 年 1 月 1 日，「航海家星際任務」正式展開，新目標是探索日球層外圍並進入星際空間。途中，航海家一號於 2004 年 12 月在約 94 AU 處通過終端激波（太陽風驟然減速之處），航海家二號則於 2007 年 8 月在約 84 AU 處通過——這是日球層並非完美球體的第一個跡象。',
+            'La misión planetaria terminó con el sobrevuelo de Neptuno en 1989. El 1 de enero de 1990 empezó oficialmente la Misión Interestelar Voyager, con un nuevo objetivo: explorar la heliosfera exterior y entrar al espacio interestelar. Por el camino, la Voyager 1 cruzó el choque de terminación —donde el viento solar se frena bruscamente— en diciembre de 2004 a unas 94 UA, y la Voyager 2 en agosto de 2007 a unas 84 UA: una primera señal de que la heliosfera no es una esfera perfecta.',
           )}
         />
         <div className="my-4 rounded-xl border border-cyan-500/40 bg-cyan-500/5 p-5 text-sm leading-relaxed text-cyan-100">
@@ -173,10 +173,10 @@ export default function MissionPage() {
           </p>
           <p>
             {zh
-              ? '自 2010 年代中期起，NASA 會定期關閉加熱器與儀器以延長壽命。實際運作清單會隨時間改變，並由 NASA/JPL 公布。'
+              ? '隨著鈽衰變與熱電偶老化，每艘探測器的電力每年約減少 4 瓦。為了不超出電力預算，NASA 依多年前就規劃好的順序關閉加熱器與儀器；截至 2026 年，航海家一號運作兩項科學儀器，二號運作三項。最新狀態請見各太空船頁面。'
               : es
-                ? 'Desde mediados de la década de 2010, la NASA apaga periódicamente calentadores e instrumentos para alargar la vida de las naves. La lista cambia con el tiempo y la publica NASA/JPL.'
-                : 'Since the mid-2010s NASA has periodically switched off heaters and instruments to keep the probes alive. The exact list changes over time and is published by NASA/JPL.'}
+                ? 'La energía de cada sonda cae unos 4 vatios al año a medida que el plutonio decae y los termopares envejecen. Para no superar el presupuesto, la NASA apaga calentadores e instrumentos en un orden planificado con años de antelación; en 2026 la Voyager 1 mantiene dos instrumentos científicos y la Voyager 2 tres. El estado actual está en la página de cada nave.'
+                : 'Each probe’s power supply loses about 4 watts a year as its plutonium decays and its thermocouples age. To stay within budget, NASA switches off heaters and instruments in a sequence planned years ahead; as of 2026 Voyager 1 runs two science instruments and Voyager 2 three. Current status is shown on each spacecraft page.'}
           </p>
         </div>
       </BiSection>
@@ -217,7 +217,7 @@ export default function MissionPage() {
         </p>
       </BiSection>
 
-      <RelatedLinks items={['voyager-1', 'voyager-2', 'timeline', 'discoveries', 'sources']} />
+      <RelatedLinks items={['timeline', 'compare', 'why-voyager-matters', 'voyager-1', 'voyager-2']} />
     </div>
   );
 }

@@ -1,22 +1,25 @@
 /**
- * TrackerSection — reusable live-telemetry block.
+ * TrackerSection — the calculated-position tracker block.
  *
- * Keeps the original Tracker functionality intact (per-spacecraft telemetry
- * cards, interactive 3D model, 2D heliocentric trajectory map) and adds the
- * "What you're seeing" explainer that the content plan requires, so readers
- * understand what each number means.
- *
- * Locale (EN / 繁中) only affects the telemetry UI labels.
+ * Per-spacecraft cards, the "what these numbers mean" guide, the
+ * since-last-visit panel, upcoming milestones, the ecliptic map and
+ * (optionally) the 3D model. Live values render only in the browser, so
+ * the prerendered HTML never shows stale "frozen" figures.
  */
 
-import { useMemo } from 'react';
-import type { Locale, SpacecraftId } from '../types/voyager';
+import { Suspense, lazy } from 'react';
+import type { SpacecraftId } from '../types/voyager';
 import { SPACECRAFT_META, TRANSLATIONS } from '../constants/voyagerData';
 import { useVoyagerLive } from '../hooks/useVoyagerLive';
 import { useI18n } from '../i18n/context';
+import { pageUrl } from '../constants/site';
+import ClientOnly from './ClientOnly';
+import Milestones from './Milestones';
+import SinceLastVisit from './SinceLastVisit';
 import TrackerCard from './TrackerCard';
-import Voyager3D from './Voyager3D';
 import VoyagerCanvas from './VoyagerCanvas';
+
+const Voyager3D = lazy(() => import('./Voyager3D'));
 
 interface TrackerSectionProps {
   /** Which spacecraft to show: both (home) or a single probe (voyager pages). */
@@ -25,141 +28,68 @@ interface TrackerSectionProps {
   title: string;
   /** Short paragraph under the heading. */
   intro: string;
-  /** Show the 2D trajectory map. */
+  /** Show the 2D ecliptic map. */
   showMap?: boolean;
   /** Show the interactive 3D model beside the map. */
   showModel?: boolean;
+  /** Show the "what these numbers mean" guide. */
+  showGuide?: boolean;
 }
 
-const EXPLAINER_EN: { term: string; detail: string }[] = [
+type Tri = { en: string; zh: string; es: string };
+
+const GUIDE: { term: Tri; detail: Tri }[] = [
   {
-    term: 'Distance from Earth',
-    detail:
-      'How far the spacecraft is from our planet right now, shown in AU and kilometres. Because the probes are moving away from us, this number grows every day.',
+    term: { en: 'Distance from Earth', zh: '與地球的距離', es: 'Distancia a la Tierra' },
+    detail: {
+      en: 'The straight-line distance between the spacecraft and Earth, calculated from both positions. Because Earth circles the Sun, this number swings by up to about ±0.8 AU over a year — for a few months each year it even shrinks, while Earth moves toward the probe faster than the probe moves away.',
+      zh: '探測器與地球之間的直線距離，由兩者的位置計算而得。因為地球繞著太陽轉，這個數字在一年中會有約 ±0.8 AU 的起伏——每年有幾個月甚至會縮小，因為那段期間地球朝探測器移動的速度比探測器遠離的速度更快。',
+      es: 'La distancia en línea recta entre la nave y la Tierra, calculada a partir de ambas posiciones. Como la Tierra gira alrededor del Sol, esta cifra oscila hasta unas ±0,8 UA a lo largo del año; durante algunos meses incluso disminuye, porque la Tierra se acerca a la sonda más rápido de lo que la sonda se aleja.',
+    },
   },
   {
-    term: 'Distance from Sun',
-    detail:
-      'The same measurement taken from the Sun instead of from Earth. Earth orbits about 1 AU from the Sun, so the two distances are usually close to each other.',
+    term: { en: 'Distance from the Sun', zh: '與太陽的距離', es: 'Distancia al Sol' },
+    detail: {
+      en: 'The steadier number: it only ever grows. This is the figure scientists use when they talk about the heliosphere and interstellar space.',
+      zh: '較穩定的數字：只會持續增加。科學家討論日球層與星際空間時，使用的就是這個距離。',
+      es: 'La cifra más estable: solo crece. Es la que usan los científicos al hablar de la heliosfera y el espacio interestelar.',
+    },
   },
   {
-    term: 'Current velocity',
-    detail:
-      'The cruising speed of the probe relative to the Sun in km/s. The spacecraft coast on momentum from their 1977 launches and planetary flybys — no engines are firing.',
+    term: { en: 'One-way light time', zh: '單程光行時間', es: 'Tiempo de luz (ida)' },
+    detail: {
+      en: 'How long a radio signal, travelling at the speed of light, needs to cover the Earth distance. A command and its reply take twice as long, which is why the mission team plans every action days in advance.',
+      zh: '以光速傳遞的無線電訊號跨越這段地球距離所需的時間。一道指令加上回覆需要兩倍時間，這就是任務團隊必須提前數天規劃每個動作的原因。',
+      es: 'Lo que tarda una señal de radio, a la velocidad de la luz, en cubrir la distancia a la Tierra. Una orden y su respuesta tardan el doble; por eso el equipo planifica cada acción con días de antelación.',
+    },
   },
   {
-    term: 'Mission elapsed time',
-    detail:
-      'How long each spacecraft has been operating since launch. Both Voyagers are in their fifth decade of service and still return data.',
+    term: { en: 'Speed', zh: '速度', es: 'Velocidad' },
+    detail: {
+      en: 'Speed relative to the Sun. No engine is pushing: both probes coast on momentum gained at launch and from planetary gravity assists, and the Sun’s pull slows them by only a few metres per second each year. The second line shows how fast the Earth distance is changing today, which includes Earth’s own orbital motion.',
+      zh: '相對太陽的速度。沒有引擎在推進：兩艘探測器都靠發射時與行星重力助推獲得的動量滑行，太陽的引力每年只讓它們減速幾公尺/秒。第二行顯示今天與地球距離的變化速率，其中包含地球本身的公轉運動。',
+      es: 'Velocidad respecto al Sol. Ningún motor empuja: ambas sondas viajan por inercia gracias al lanzamiento y a las asistencias gravitatorias, y la atracción solar las frena solo unos metros por segundo cada año. La segunda línea muestra cuán rápido cambia hoy la distancia a la Tierra, lo que incluye el propio movimiento orbital terrestre.',
+    },
   },
   {
-    term: 'Direction / trajectory',
-    detail:
-      'Where each probe is heading. Voyager 1 left the planets’ orbital plane toward the north; Voyager 2 travels below it toward the south, so the two spacecraft are exploring different regions of interstellar space.',
+    term: { en: 'Scale', zh: '尺度比較', es: 'Escala' },
+    detail: {
+      en: 'Neptune, the outermost planet, orbits about 30 AU from the Sun. Comparing with it gives a feel for how far beyond the planets the Voyagers now are.',
+      zh: '最外側的行星海王星距太陽約 30 AU。和它比較，可以感受航海家號如今已遠遠飛出行星區域多少。',
+      es: 'Neptuno, el planeta más exterior, orbita a unas 30 UA del Sol. Compararse con él da una idea de lo lejos que están ya las Voyager de los planetas.',
+    },
   },
   {
-    term: 'Data update frequency',
-    detail:
-      'Distance values are interpolated in your browser about ten times per second from a fixed baseline, so the odometers tick smoothly without polling an API.',
-  },
-  {
-    term: 'Data source',
-    detail:
-      'Baseline distances and speeds are anchored to NASA/JPL Voyager mission references. Every value on this page is a calculated estimate, not live NASA telemetry.',
+    term: { en: 'Where the numbers come from', zh: '數字的來源', es: 'De dónde salen las cifras' },
+    detail: {
+      en: 'Your browser propagates a NASA/JPL Horizons state vector forward in time about ten times per second. Checked against JPL’s own predictions, the Earth distance agrees to within a few tens of thousands of kilometres — but it is still an estimate, not a measurement received from the spacecraft.',
+      zh: '您的瀏覽器以每秒約十次的頻率，將 NASA/JPL Horizons 的狀態向量往前推算。與 JPL 自己的預測比對，地球距離的誤差在數萬公里以內——但這仍是估計值，並非從探測器收到的量測資料。',
+      es: 'Tu navegador propaga hacia adelante, unas diez veces por segundo, un vector de estado de NASA/JPL Horizons. Comparada con las predicciones de JPL, la distancia a la Tierra coincide con un margen de unas decenas de miles de km; aun así es una estimación, no una medición enviada por la nave.',
+    },
   },
 ];
 
-const EXPLAINER_ZH: { term: string; detail: string }[] = [
-  {
-    term: '與地球的距離',
-    detail:
-      '探測器目前與地球之間的距離（以 AU 與公里表示）。由於探測器正逐漸遠離地球，這個數字每天都在增加。',
-  },
-  {
-    term: '與太陽的距離',
-    detail:
-      '改以太陽為基準的同一種測量。地球距太陽約 1 AU，因此這兩個距離通常相差不遠。',
-  },
-  {
-    term: '目前速度',
-    detail:
-      '探測器相對太陽的巡航速度（公里/秒）。探測器靠著 1977 年發射與行星重力助推所獲得的動能滑行——引擎並未點火。',
-  },
-  {
-    term: '任務已執行時間',
-    detail:
-      '從發射至今探測器已運作多久。兩艘航海家號都已進入服役的第五個十年，並持續回傳資料。',
-  },
-  {
-    term: '方向／軌跡',
-    detail:
-      '兩艘探測器各自的前進方向。航海家一號朝行星軌道面的北方離開太陽系；航海家二號則朝南方，因此兩者正在探索不同的星際空間區域。',
-  },
-  {
-    term: '資料更新頻率',
-    detail:
-      '距離數值會在您的瀏覽器內以固定基準插值，大約每秒更新十次，讓數字流暢跳動，無需不斷向外部伺服器查詢。',
-  },
-  {
-    term: '資料來源',
-    detail:
-      '基準距離與速度錨定於 NASA/JPL 航海家任務參考資料。本站顯示的每一個數值都是「計算估計值」，並非 NASA 即時遙測。',
-  },
-];
-
-const EXPLAINER_ES: { term: string; detail: string }[] = [
-  {
-    term: 'Distancia a la Tierra',
-    detail:
-      'Cuán lejos está la nave de nuestro planeta ahora mismo, en UA y kilómetros. Como las sondas se alejan de nosotros, esta cifra crece cada día.',
-  },
-  {
-    term: 'Distancia al Sol',
-    detail:
-      'La misma medida pero tomada desde el Sol. La Tierra orbita a ~1 UA del Sol, así que ambas distancias suelen ser parecidas.',
-  },
-  {
-    term: 'Velocidad actual',
-    detail:
-      'La velocidad de crucero de la sonda respecto al Sol, en km/s. Las naves viajan por inercia desde su lanzamiento en 1977 y sus asistencias gravitatorias — no hay motores encendidos.',
-  },
-  {
-    term: 'Tiempo transcurrido de la misión',
-    detail:
-      'Cuánto lleva operando cada nave desde su lanzamiento. Ambas Voyager superan ya su quinta década de servicio y siguen enviando datos.',
-  },
-  {
-    term: 'Dirección / trayectoria',
-    detail:
-      'Hacia dónde se dirige cada sonda. Voyager 1 salió del plano orbital de los planetas hacia el norte; Voyager 2 viaja hacia el sur, de modo que exploran regiones distintas del espacio interestelar.',
-  },
-  {
-    term: 'Frecuencia de actualización',
-    detail:
-      'Los valores de distancia se interpolan en tu navegador unas diez veces por segundo a partir de una línea base fija, sin consultar ninguna API.',
-  },
-  {
-    term: 'Fuente de datos',
-    detail:
-      'Las distancias y velocidades de referencia se anclan a referencias de la misión Voyager de NASA/JPL. Cada cifra de esta página es una estimación calculada, no telemetría oficial de la NASA.',
-  },
-];
-
-/** Approximate elapsed time since an ISO launch date, in years. */
-function elapsedYearsLabel(launchDate: string, locale: Locale): string {
-  const ms = Date.now() - Date.parse(launchDate);
-  const years = ms / (365.2425 * 24 * 3600 * 1000);
-  if (locale === 'zh-TW') {
-    if (years < 2) return `${Math.max(1, Math.floor(years * 12))} 個月`;
-    return `${Math.floor(years)} 年`;
-  }
-  if (locale === 'es') {
-    if (years < 2) return `${Math.max(1, Math.floor(years * 12))} meses`;
-    return `${Math.floor(years)} años`;
-  }
-  if (years < 2) return `${Math.max(1, Math.floor(years * 12))} months`;
-  return `${Math.floor(years)} years`;
-}
+const pick = (v: Tri, zh: boolean, es: boolean) => (zh ? v.zh : es ? v.es : v.en);
 
 export default function TrackerSection({
   ids,
@@ -167,136 +97,93 @@ export default function TrackerSection({
   intro,
   showMap = true,
   showModel = false,
+  showGuide = true,
 }: TrackerSectionProps) {
   const { locale } = useI18n();
   const zh = locale === 'zh-TW';
   const es = locale === 'es';
-  const telemetry = useVoyagerLive();
-  const t = useMemo(() => TRANSLATIONS[locale], [locale]);
-  const explainer = zh ? EXPLAINER_ZH : es ? EXPLAINER_ES : EXPLAINER_EN;
 
   return (
     <section aria-label={title} className="mb-14">
-      {/* Heading */}
       <div className="mb-5">
         <p className="mb-1 flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-[0.25em] text-emerald-400">
-          <span className="relative flex h-2 w-2">
+          <span className="relative flex h-2 w-2" aria-hidden="true">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
           </span>
-          {zh ? '即時資料 · 計算估計值' : es ? 'Datos en vivo · estimaciones calculadas' : 'Live data · calculated estimates'}
+          {zh ? '即時計算 · 估計值' : es ? 'Calculado en tiempo real · estimaciones' : 'Calculated in real time · estimates'}
         </p>
         <h2 className="neon-text text-2xl font-bold tracking-wide text-white sm:text-3xl">{title}</h2>
       </div>
       <p className="mb-6 max-w-4xl leading-relaxed text-slate-300">{intro}</p>
 
-      {/* Mission elapsed strip */}
-      <div className="mb-6 flex flex-wrap gap-2">
-        {ids.map((id) => {
-          const meta = SPACECRAFT_META[id];
-          return (
-            <span
-              key={id}
-              className="rounded-full border px-3 py-1.5 font-mono text-xs"
-              style={{ color: meta.accent, borderColor: `${meta.accent}55`, backgroundColor: `${meta.accent}12` }}
-            >
+      <ClientOnly
+        fallback={
+          <div className="hud-panel flex min-h-[360px] items-center justify-center rounded-2xl p-6 text-center">
+            <p className="max-w-md text-sm leading-relaxed text-slate-400">
               {zh
-                ? `${meta.name} — 任務已執行約 ${elapsedYearsLabel(meta.launchDate, 'zh-TW')}`
+                ? '正在您的瀏覽器中計算目前位置…（需要啟用 JavaScript）'
                 : es
-                  ? `${meta.name} — misión transcurrida ≈ ${elapsedYearsLabel(meta.launchDate, 'es')}`
-                  : `${meta.name} — mission elapsed ≈ ${elapsedYearsLabel(meta.launchDate, 'en-US')}`}
-            </span>
-          );
-        })}
-      </div>
-
-      {/* What you're seeing */}
-      <div className="hud-panel mb-8 rounded-2xl p-5 sm:p-6">
-        <h3 className="mb-1 text-lg font-bold tracking-wide text-white">
-          {zh ? '您看到的數字代表什麼' : es ? 'Lo que estás viendo' : 'What you\u2019re seeing'}
-        </h3>
-        <p className="mb-4 text-sm text-slate-400">
-          {zh
-            ? '這份小指南說明本頁每個數字所測量的內容，以及該如何解讀。'
-            : es
-              ? 'Una breve guía de cada cifra de esta página: qué mide y cómo leerla.'
-              : 'A short guide to every number on this page — what it measures and how to read it.'}
-        </p>
-        <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
-          {explainer.map((item) => (
-            <div key={item.term} className="border-l-2 border-cyan-500/40 pl-3">
-              <dt className="font-mono text-xs font-semibold uppercase tracking-widest text-cyan-300">
-                {item.term}
-              </dt>
-              <dd className="mt-1 text-sm leading-relaxed text-slate-300">{item.detail}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-
-      {/* Telemetry cards */}
-      <div className={`grid gap-6 ${ids.length > 1 ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
-        {ids.map((id) => (
-          <TrackerCard
-            key={id}
-            meta={SPACECRAFT_META[id]}
-            telemetry={telemetry[id]}
-            locale={locale}
-            t={t}
-          />
-        ))}
-      </div>
-
-      {/* 2D trajectory map (+ optional 3D model) */}
-      {showMap && (
-        <div className={`mt-8 ${showModel ? 'grid gap-6 lg:grid-cols-[1fr_1fr]' : ''}`}>
-          <div className="min-w-0">
-            <VoyagerCanvas telemetry={telemetry} locale={locale} t={t} />
+                  ? 'Calculando la posición actual en tu navegador… (requiere JavaScript)'
+                  : 'Calculating the current position in your browser… (requires JavaScript)'}
+            </p>
           </div>
-          {showModel && (
-            <div>
-              <h3 className="mb-3 text-lg font-semibold tracking-wide text-white">
-                {t.model.title}
-              </h3>
-              <p className="mb-3 font-mono text-xs text-slate-400">{t.model.subtitle}</p>
-              <div className="hud-panel relative h-[320px] w-full overflow-hidden rounded-2xl lg:h-[420px]">
-                <Voyager3D />
-                <div className="pointer-events-none absolute bottom-3 left-4 rounded-md border border-cyan-500/20 bg-space-950/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-cyan-300/70">
-                  {t.model.dragHint}
-                </div>
+        }
+      >
+        <LiveBlock ids={ids} showMap={showMap} showModel={showModel} />
+      </ClientOnly>
+
+      {showGuide && (
+        <div className="hud-panel mt-8 rounded-2xl p-5 sm:p-6">
+          <h3 className="mb-1 text-lg font-bold tracking-wide text-white">
+            {zh ? '這些數字代表什麼' : es ? 'Qué significan estas cifras' : 'What these numbers mean'}
+          </h3>
+          <p className="mb-4 text-sm text-slate-400">
+            {zh
+              ? '每個數值量測什麼、為什麼會變動，以及該如何解讀。'
+              : es
+                ? 'Qué mide cada valor, por qué cambia y cómo leerlo.'
+                : 'What each value measures, why it changes, and how to read it.'}
+          </p>
+          <dl className="grid gap-x-6 gap-y-4 md:grid-cols-2">
+            {GUIDE.map((item) => (
+              <div key={item.term.en} className="border-l-2 border-cyan-500/40 pl-3">
+                <dt className="font-mono text-xs font-semibold uppercase tracking-widest text-cyan-300">
+                  {pick(item.term, zh, es)}
+                </dt>
+                <dd className="mt-1 text-sm leading-relaxed text-slate-300">{pick(item.detail, zh, es)}</dd>
               </div>
-            </div>
-          )}
+            ))}
+          </dl>
         </div>
       )}
 
-      {/* Data transparency note */}
-      <p className="mt-5 font-mono text-[11px] leading-relaxed tracking-wide text-slate-500">
+      <p className="mt-5 font-mono text-[11px] leading-relaxed tracking-wide text-slate-400">
         {zh ? (
           <>
-            估計值以 NASA/JPL 任務參考資料的固定星曆基準為錨點，再依探測器速度推進計算——詳見{' '}
-            <a href="how-it-works.html" className="text-cyan-400 hover:text-cyan-300">
-              資料與計算方法
-            </a>{' '}
-            頁。並非 NASA 官方資料。
+            本站為獨立專案，數值為計算估計值，並非 NASA 官方遙測。模型、驗證結果與限制請見{' '}
+            <a href={pageUrl('how-it-works')} className="text-cyan-300 underline underline-offset-2 hover:text-cyan-200">
+              運作原理
+            </a>
+            。
           </>
         ) : es ? (
           <>
-            Las estimaciones se anclan a una línea base de efemérides de las referencias de la
-            misión NASA/JPL y se proyectan con la velocidad de las sondas — consulta la página de{' '}
-            <a href="how-it-works.html" className="text-cyan-400 hover:text-cyan-300">
-              datos y metodología
-            </a>{' '}
-            para más detalles. No son datos oficiales de la NASA.
+            Proyecto independiente: las cifras son estimaciones calculadas, no telemetría oficial de la NASA. El
+            modelo, su validación y sus límites se explican en{' '}
+            <a href={pageUrl('how-it-works')} className="text-cyan-300 underline underline-offset-2 hover:text-cyan-200">
+              Cómo funciona
+            </a>
+            .
           </>
         ) : (
           <>
-            Estimates anchored to a fixed ephemeris baseline from NASA/JPL mission references and
-            advanced by the probes&rsquo; velocities — see the{' '}
-            <a href="how-it-works.html" className="text-cyan-400 hover:text-cyan-300">
-              data &amp; methodology page
-            </a>{' '}
-            for details. Not official NASA data.
+            Independent project: figures are calculated estimates, not official NASA telemetry. The model, its
+            validation and its limits are explained on{' '}
+            <a href={pageUrl('how-it-works')} className="text-cyan-300 underline underline-offset-2 hover:text-cyan-200">
+              How It Works
+            </a>
+            .
           </>
         )}
       </p>
@@ -304,3 +191,49 @@ export default function TrackerSection({
   );
 }
 
+/** Everything that depends on the visitor's clock (client-only). */
+function LiveBlock({ ids, showMap, showModel }: { ids: SpacecraftId[]; showMap: boolean; showModel: boolean }) {
+  const { locale } = useI18n();
+  const telemetry = useVoyagerLive();
+  const t = TRANSLATIONS[locale];
+  const single = ids.length === 1 ? ids[0] : undefined;
+
+  return (
+    <>
+      <div className={`grid gap-6 ${ids.length > 1 ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
+        {ids.map((id) => (
+          <TrackerCard key={id} meta={SPACECRAFT_META[id]} telemetry={telemetry[id]} locale={locale} t={t} />
+        ))}
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <SinceLastVisit />
+        <Milestones only={single} />
+      </div>
+
+      {showMap && (
+        <div className={`mt-8 ${showModel ? 'grid gap-6 lg:grid-cols-2' : ''}`}>
+          <div className="min-w-0">
+            <h3 className="mb-1 text-lg font-semibold tracking-wide text-white">{t.canvas.title}</h3>
+            <p className="mb-3 font-mono text-xs text-slate-400">{t.canvas.subtitle}</p>
+            <VoyagerCanvas telemetry={telemetry} locale={locale} t={t} />
+          </div>
+          {showModel && (
+            <div className="min-w-0">
+              <h3 className="mb-1 text-lg font-semibold tracking-wide text-white">{t.model.title}</h3>
+              <p className="mb-3 font-mono text-xs text-slate-400">{t.model.subtitle}</p>
+              <div className="hud-panel relative h-[320px] w-full overflow-hidden rounded-2xl lg:h-[480px]">
+                <Suspense fallback={null}>
+                  <Voyager3D />
+                </Suspense>
+                <div className="pointer-events-none absolute bottom-3 left-4 rounded-md border border-cyan-500/20 bg-space-950/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-cyan-300/80">
+                  {t.model.dragHint}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  );
+}

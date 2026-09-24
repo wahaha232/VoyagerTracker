@@ -15,3 +15,5 @@ Thumbs.db
 
 # Local scratch files
 _docx_extract.txt
+dist-ssr/
+.claude/

@@ -2,13 +2,12 @@
  * Voyager2Page — /voyager-2.html  (EN / 繁中 / Español)
  */
 
-import { INSTRUMENT_ES, INSTRUMENT_ZH, SPACECRAFT_META } from '../constants/voyagerData';
 import { pageUrl } from '../constants/site';
 import { RelatedLinks } from '../components/ui';
 import { BiArticleHeader, BiSection, bi, FactGrid, useEs, useZh } from '../components/content';
 import TrackerSection from '../components/TrackerSection';
+import { InstrumentStatusList, PageQA, SourcesNote } from '../components/MissionExtras';
 
-const META = SPACECRAFT_META['voyager2'];
 
 const FACTS: { term: { en: string; zh: string; es: string }; detail: { en: string; zh: string; es: string } }[] = [
   {
@@ -89,165 +88,148 @@ const GRAND_TOUR: { date: string; title: { en: string; zh: string; es: string };
   },
 ];
 
+const QA = [
+  {
+    q: { en: 'Why is Voyager 2 closer to Earth than Voyager 1?', zh: '為什麼航海家二號比一號離地球近？', es: '¿Por qué la Voyager 2 está más cerca que la Voyager 1?' },
+    a: {
+      en: 'It launched on a slower trajectory chosen to reach Uranus and Neptune, and its Neptune flyby bent its path south and reduced its speed. It now travels at about 15 km/s compared with Voyager 1’s 17 km/s, so the gap grows by roughly 0.4 AU every year.',
+      zh: '它發射時就採用較慢、能抵達天王星與海王星的軌道，而海王星飛掠又把它甩向南方並使其減速。它現在的速度約 15 公里/秒，一號約 17 公里/秒，因此兩者差距每年增加約 0.4 AU。',
+      es: 'Despegó en una trayectoria más lenta elegida para llegar a Urano y Neptuno, y el sobrevuelo de Neptuno la desvió al sur y la frenó. Hoy va a unos 15 km/s frente a los 17 km/s de la Voyager 1, así que la distancia entre ambas crece unas 0,4 UA al año.',
+    },
+  },
+  {
+    q: { en: 'Why can only one antenna send commands to Voyager 2?', zh: '為什麼只有一座天線能向航海家二號發送指令？', es: '¿Por qué solo una antena puede enviar órdenes a la Voyager 2?' },
+    a: {
+      en: 'Voyager 2 is far south of the planets’ plane, so it is only visible from the Southern Hemisphere. The one Deep Space Network dish there with a transmitter powerful and compatible enough is the 70-metre antenna near Canberra, Australia.',
+      zh: '航海家二號遠在行星軌道面南方，只能從南半球看見。深空網路在南半球唯一具備足夠功率且相容的發射天線，是澳洲坎培拉附近的 70 公尺天線。',
+      es: 'La Voyager 2 está muy al sur del plano de los planetas y solo es visible desde el hemisferio sur. La única antena de la Red de Espacio Profundo allí con un transmisor potente y compatible es la de 70 metros cerca de Canberra, Australia.',
+    },
+  },
+  {
+    q: { en: 'What did Voyager 2 measure at the heliopause that Voyager 1 could not?', zh: '航海家二號在日球層頂量測到哪些一號做不到的事？', es: '¿Qué midió la Voyager 2 en la heliopausa que la Voyager 1 no pudo?' },
+    a: {
+      en: 'Its plasma science instrument still worked, so it measured the speed, density and temperature of the solar wind dropping away and the colder, denser interstellar plasma beginning — a direct confirmation of the crossing. Voyager 1’s equivalent instrument had failed in 1980.',
+      zh: '它的電漿科學儀仍在運作，因此量測到太陽風的速度、密度與溫度驟降，以及較冷、較密的星際電漿出現——直接證實了穿越事件。航海家一號的同型儀器在 1980 年就已故障。',
+      es: 'Su instrumento de ciencia del plasma aún funcionaba, así que midió cómo caían la velocidad, densidad y temperatura del viento solar y empezaba el plasma interestelar, más frío y denso: una confirmación directa del cruce. El de la Voyager 1 había fallado en 1980.',
+    },
+  },
+];
+
 export default function Voyager2Page() {
   const zh = useZh();
   const es = useEs();
-  const instMap = zh ? INSTRUMENT_ZH : es ? INSTRUMENT_ES : undefined;
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <BiArticleHeader
         current="voyager-2"
-        title={bi('Voyager 2 — Mission, Distance and Current Status', '航海家二號——任務、距離與目前狀態', 'Voyager 2 — misión, distancia y estado actual')}
+        title={bi('Voyager 2 — Distance, Speed & Mission Information', '航海家二號——距離、速度與任務資訊', 'Voyager 2: distancia, velocidad e información de la misión')}
         intro={bi(
-          'Voyager 2 is the only spacecraft ever to visit Uranus and Neptune. Launched in 1977, it completed the \u201cGrand Tour\u201d and then sailed on — becoming the second spacecraft to reach interstellar space in 2018.',
-          '航海家二號是唯一造訪過天王星與海王星的太空船。它於 1977 年發射，完成「大旅行」後繼續航行——並於 2018 年成為第二艘抵達星際空間的探測器。',
-          'La Voyager 2 es la única nave que ha visitado Urano y Neptuno. Lanzada en 1977, completó el \u201cGran Tour\u201d y siguió navegando — convirtiéndose en 2018 en la segunda nave en llegar al espacio interestelar.',
+          'Voyager 2 is the only spacecraft ever to visit Uranus and Neptune. Launched in 1977, it completed the “Grand Tour” of the four giant planets and then sailed on — becoming the second spacecraft to reach interstellar space, in 2018.',
+          '航海家二號是唯一造訪過天王星與海王星的太空船。它於 1977 年發射，完成四顆巨行星的「大旅行」後繼續航行——並於 2018 年成為第二艘抵達星際空間的探測器。',
+          'La Voyager 2 es la única nave que ha visitado Urano y Neptuno. Lanzada en 1977, completó el “Gran Tour” de los cuatro planetas gigantes y siguió navegando, hasta convertirse en 2018 en la segunda nave en llegar al espacio interestelar.',
         )}
       />
 
       <TrackerSection
         ids={['voyager2']}
-        title={zh ? '航海家二號即時追蹤器' : es ? 'Rastreador en vivo de Voyager 2' : 'Voyager 2 Live Tracker'}
+        title={zh ? '航海家二號此刻的計算位置' : es ? 'Voyager 2: posición calculada ahora' : 'Voyager 2 — calculated position right now'}
         intro={
           zh
-            ? '航海家二號與地球、太陽的估計距離、巡航速度與任務現況。這些數值以 NASA/JPL 參考基準計算，並非官方即時遙測。'
+            ? '航海家二號與地球、太陽的估計距離、速度、訊號延遲與任務時間，以及 NASA 公布的儀器狀態。數值由本站依 JPL Horizons 參考資料計算，並非官方遙測。'
             : es
-              ? 'Distancia estimada a la Tierra y al Sol, velocidad de crucero y estado de la misión de Voyager 2. Valores calculados a partir de una línea base de referencia de NASA/JPL, no telemetría oficial.'
-              : 'Estimated distance from Earth and the Sun, cruising speed and mission status for Voyager 2. Values are calculated from a NASA/JPL-referenced baseline, not live official telemetry.'
+              ? 'Distancia estimada a la Tierra y al Sol, velocidad, retardo de señal y tiempo de misión de la Voyager 2, más el estado de sus instrumentos según la NASA. Calculado por este sitio con datos de JPL Horizons; no es telemetría oficial.'
+              : 'Estimated distance from Earth and the Sun, speed, signal delay and mission time for Voyager 2, plus instrument status as reported by NASA. Calculated by this site from JPL Horizons reference data — not official telemetry.'
         }
         showMap
         showModel
+        showGuide={false}
       />
 
-      <BiSection
-        id="what-is-voyager-2"
-        kicker={bi('Profile', '介紹', 'Perfil')}
-        title={bi('What is Voyager 2?', '航海家二號是什麼？', '¿Qué es la Voyager 2?')}
-      >
+      <BiSection id="what-is-voyager-2" title={bi('What is Voyager 2?', '航海家二號是什麼？', '¿Qué es la Voyager 2?')}>
         <p className="max-w-4xl leading-relaxed text-slate-300">
           {zh
-            ? '航海家二號是航海家一號的孿生探測器。雖然它早了十六天發射，卻走了一條更慢、風景更多的路線——一條能造訪四顆巨行星的路線。'
+            ? '航海家二號是航海家一號的孿生探測器。雖然它早了十六天發射，卻走了一條更慢、風景更多的路線——一條能造訪四顆巨行星而不只兩顆的路線。這條路線利用了約每 175 年才出現一次的外行星排列。'
             : es
-              ? 'La Voyager 2 es la gemela de la Voyager 1. Aunque despegó dieciséis días antes, tomó una ruta más lenta y pintoresca — una que le permitió visitar cuatro gigantes gaseosos.'
-              : 'Voyager 2 is the twin of Voyager 1. Although it launched sixteen days earlier, it took a slower, more scenic route through the solar system — one that let it visit four giant planets instead of two.'}
+              ? 'La Voyager 2 es la gemela de la Voyager 1. Aunque despegó dieciséis días antes, tomó una ruta más lenta y pintoresca, que le permitió visitar cuatro planetas gigantes en lugar de dos. Esa ruta aprovechó una alineación de los planetas exteriores que ocurre aproximadamente cada 175 años.'
+              : 'Voyager 2 is the twin of Voyager 1. Although it launched sixteen days earlier, it took a slower, more scenic route — one that let it visit four giant planets instead of two. That route exploited an alignment of the outer planets that occurs only about once every 175 years.'}
         </p>
         <p className="mt-3 max-w-4xl leading-relaxed text-slate-300">
           {zh
-            ? '它對木星、土星、天王星與海王星的造訪，至今仍是人類對最外兩顆行星唯一的近距離探索。海王星之後，二號轉向太陽系南方，並於 2018 年 11 月 5 日進入星際空間。'
+            ? '它對天王星與海王星的造訪，至今仍是人類對最外兩顆行星唯一的近距離探索。海王星之後，二號轉向太陽系南方，並於 2018 年 11 月 5 日進入星際空間。'
             : es
-              ? 'Sus encuentros con Júpiter, Saturno, Urano y Neptuno siguen siendo la única exploración cercana de los dos planetas más lejanos. Tras Neptuno, la Voyager 2 se dirigió al sur y, el 5 de noviembre de 2018, entró al espacio interestelar.'
-              : 'Its encounters with Jupiter, Saturn, Uranus and Neptune remain the only close-up exploration of the two outermost planets. After Neptune, Voyager 2 curved southward and, on 5 November 2018, crossed into interstellar space.'}
+              ? 'Sus encuentros con Urano y Neptuno siguen siendo la única exploración cercana de los dos planetas más lejanos. Tras Neptuno, la Voyager 2 se dirigió al sur y, el 5 de noviembre de 2018, entró al espacio interestelar.'
+              : 'Its encounters with Uranus and Neptune remain the only close-up exploration of the two outermost planets. After Neptune, Voyager 2 curved southward and, on 5 November 2018, crossed into interstellar space.'}
         </p>
       </BiSection>
 
-      <BiSection
-        id="facts"
-        kicker={bi('Facts', '重點資料', 'Datos')}
-        title={bi('Voyager 2 at a glance', '航海家二號速覽', 'Voyager 2 de un vistazo')}
-      >
+      <BiSection id="facts" title={bi('Voyager 2 at a glance', '航海家二號速覽', 'Voyager 2 de un vistazo')}>
         <FactGrid items={FACTS} />
       </BiSection>
 
-      <BiSection
-        id="grand-tour"
-        kicker={bi('The Grand Tour', '大旅行', 'El Gran Tour')}
-        title={bi('Four planets, one spacecraft', '一艘太空船，四顆行星', 'Cuatro planetas, una nave')}
-      >
+      <BiSection id="grand-tour" title={bi('Four planets, one spacecraft', '一艘太空船，四顆行星', 'Cuatro planetas, una nave')}>
         <div className="space-y-5">
           {GRAND_TOUR.map((step) => (
             <div key={step.date}>
-              <p className="font-mono text-xs font-bold uppercase tracking-widest text-emerald-400">{step.date}</p>
+              <p className="font-mono text-xs font-bold uppercase tracking-widest text-emerald-300">{step.date}</p>
               <h3 className="mb-1 text-lg font-semibold text-white">{zh ? step.title.zh : es ? step.title.es : step.title.en}</h3>
               <p className="leading-relaxed text-slate-300">{zh ? step.text.zh : es ? step.text.es : step.text.en}</p>
             </div>
           ))}
         </div>
+        <p className="mt-5 text-sm text-slate-300">
+          <a href={pageUrl('discoveries')} className="text-emerald-300 underline underline-offset-2 hover:text-emerald-200">
+            {zh ? '這些飛掠發現了什麼、為何重要 →' : es ? 'Qué descubrieron estos sobrevuelos y por qué importa →' : 'What these flybys discovered and why it mattered →'}
+          </a>
+        </p>
       </BiSection>
 
-      <BiSection
-        id="instruments"
-        kicker={bi('Hardware', '硬體', 'Equipo')}
-        title={bi('Science instruments', '科學儀器', 'Instrumentos científicos')}
-      >
+      <BiSection id="instruments" title={bi('Which instruments still work?', '哪些儀器仍在運作？', '¿Qué instrumentos siguen funcionando?')}>
         <p className="mb-4 max-w-4xl leading-relaxed text-slate-300">
           {zh
-            ? '航海家二號搭載與一號相同的十一項儀器。在一號上早期故障的電漿儀，在二號上則持續運作，直接量測到了日球層的邊界：'
+            ? '航海家二號與一號一樣搭載十項科學儀器。電力每年約減少 4 瓦，NASA 因此依事先議定的順序逐一關閉儀器。2024 年電漿科學儀關閉，2025 年低能量帶電粒子儀也跟著關閉；2026 年的節電改裝則讓剩下的儀器能多運作至少一年。'
             : es
-              ? 'La Voyager 2 llevaba la misma dotación de once instrumentos que su gemela. Su instrumento de plasma, que falló pronto en la 1, siguió funcionando y midió directamente el límite de la heliosfera:'
-              : 'Voyager 2 carried the same suite of eleven instruments as its twin. Its plasma instrument, which failed early on Voyager 1, kept working long enough to measure the boundary of the heliosphere directly:'}
+              ? 'Como su gemela, la Voyager 2 lleva diez instrumentos científicos. Su energía cae unos 4 vatios al año, así que la NASA los apaga en un orden acordado de antemano. El de plasma se apagó en 2024 y el de partículas de baja energía en 2025; un cambio de ahorro energético en 2026 da a los restantes al menos un año más.'
+              : 'Like its twin, Voyager 2 carries ten science instruments. Its power drops by about 4 watts a year, so NASA switches instruments off in an order agreed years in advance. The plasma instrument was turned off in 2024 and the low-energy particle instrument in 2025; a power-saving change in 2026 bought the remaining ones at least another year.'}
         </p>
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {META.instruments.map((inst) => {
-            const localInst = instMap ? instMap[inst.code] : undefined;
-            return (
-              <li key={inst.code} className="rounded-xl border border-slate-800 bg-space-900/40 p-4">
-                <p className="font-mono text-xs font-bold text-emerald-300">{inst.code}</p>
-                <p className="mt-0.5 text-sm font-semibold text-slate-200">
-                  {localInst ? localInst.name : inst.name}
-                </p>
-                <p className="mt-1 text-sm leading-relaxed text-slate-400">
-                  {localInst ? localInst.description : inst.description}
-                </p>
-              </li>
-            );
-          })}
-        </ul>
+        <InstrumentStatusList id="voyager2" />
       </BiSection>
 
-      <BiSection
-        id="golden-record"
-        kicker={bi('Message in a bottle', '瓶中訊息', 'Mensaje en una botella')}
-        title={bi('The Golden Record aboard Voyager 2', '航海家二號上的金唱片', 'El Disco de Oro a bordo de la Voyager 2')}
-      >
+      <BiSection id="golden-record" title={bi('The Golden Record aboard Voyager 2', '航海家二號上的金唱片', 'El Disco de Oro a bordo de la Voyager 2')}>
         <p className="max-w-4xl leading-relaxed text-slate-300">
           {zh ? (
             <>
-              航海家二號攜帶與一號相同的金唱片。由於二號朝不同方向前進，兩張唱片正飛向不同的恆星。{' '}
+              航海家二號攜帶與一號相同的金唱片。由於二號朝不同方向前進，兩張唱片正飛向天空中不同的區域。{' '}
               <a href={pageUrl('golden-record')} className="text-emerald-300 underline decoration-emerald-500/40 underline-offset-2 hover:text-emerald-200">閱讀金唱片的故事 →</a>
             </>
           ) : es ? (
             <>
-              La Voyager 2 lleva el mismo Disco de Oro que la 1. Como viaja en otra dirección, los dos discos se dirigen hacia estrellas distintas.{' '}
+              La Voyager 2 lleva el mismo Disco de Oro que la 1. Como viaja en otra dirección, los dos discos se dirigen a regiones distintas del cielo.{' '}
               <a href={pageUrl('golden-record')} className="text-emerald-300 underline decoration-emerald-500/40 underline-offset-2 hover:text-emerald-200">Conoce el Disco de Oro →</a>
             </>
           ) : (
             <>
-              Voyager 2 carries the same Golden Record as Voyager 1. Because the spacecraft is heading in a different direction, the two records are travelling toward different stars.{' '}
+              Voyager 2 carries the same Golden Record as Voyager 1. Because it is heading in a different direction, the two records are travelling toward different parts of the sky.{' '}
               <a href={pageUrl('golden-record')} className="text-emerald-300 underline decoration-emerald-500/40 underline-offset-2 hover:text-emerald-200">Read about the Golden Record →</a>
             </>
           )}
         </p>
       </BiSection>
 
-      <BiSection
-        id="significance"
-        kicker={bi('Why it matters', '為什麼重要', 'Por qué importa')}
-        title={bi('Voyager 2\u2019s historical significance', '航海家二號的歷史意義', 'La importancia histórica de la Voyager 2')}
-      >
-        <p className="max-w-4xl leading-relaxed text-slate-300">
-          {zh
-            ? '航海家二號是唯一造訪過天王星與海王星的太空船——我們對這兩顆行星的大部分認識，都來自 1980 年代的這次飛掠。而它在太陽系南方測量星際空間的第二幕，則提供了第二組關鍵資料點。'
-            : es
-              ? 'La Voyager 2 es la única nave que ha visitado Urano y Neptuno, así que gran parte de lo que sabemos de esos planetas viene de un único sobrevuelo en los años 80. Su segunda etapa — medir el espacio interestelar desde el sur — da un segundo punto de datos esencial.'
-              : 'Voyager 2 is the only spacecraft to have visited Uranus and Neptune, so much of what we know about those two planets comes from a single flyby in the 1980s. Its second act — measuring interstellar space from a southern trajectory — gives scientists a second data point on the heliosphere.'}
-        </p>
-        <div className="my-4 rounded-xl border border-amber-400/40 bg-amber-400/5 p-5 text-sm leading-relaxed text-amber-100">
-          <p className="mb-1.5 font-semibold text-white">
-            {zh ? '距離查詢' : es ? 'Consulta de distancia' : 'Distance check'}
-          </p>
-          <p>
-            {zh
-              ? '本頁頂端的即時追蹤器會顯示航海家二號目前與地球、太陽的估計距離。'
-              : es
-                ? 'El rastreador en vivo de esta página muestra la distancia estimada actual de la Voyager 2 a la Tierra y al Sol.'
-                : 'The live tracker at the top of this page shows Voyager 2\u2019s current estimated distance from Earth and the Sun.'}
-          </p>
-        </div>
+      <BiSection id="questions" title={bi('Questions about Voyager 2', '關於航海家二號的問題', 'Preguntas sobre la Voyager 2')}>
+        <PageQA items={QA} />
       </BiSection>
 
-      <RelatedLinks items={['home', 'voyager-1', 'mission', 'timeline', 'discoveries']} />
+      <SourcesNote
+        links={[
+          { label: 'NASA Science — Voyager 2', url: 'https://science.nasa.gov/mission/voyager/voyager-2/' },
+          { label: 'NASA — Where are Voyager 1 and Voyager 2 now?', url: 'https://science.nasa.gov/mission/voyager/where-are-voyager-1-and-voyager-2-now/' },
+          { label: 'NASA — Voyager 2 enters interstellar space (2018)', url: 'https://www.nasa.gov/news-release/nasas-voyager-2-probe-enters-interstellar-space/' },
+          { label: 'NASA — Engineers help prolong Voyager 2’s science mission (2026)', url: 'https://science.nasa.gov/blogs/voyager/2026/08/04/nasa-engineers-help-prolong-voyager-2s-science-mission/' },
+          { label: 'JPL Horizons (trajectory data)', url: 'https://ssd.jpl.nasa.gov/horizons/' },
+        ]}
+      />
+
+      <RelatedLinks items={['compare', 'voyager-1', 'discoveries', 'timeline', 'tools']} />
     </div>
   );
 }
-
-

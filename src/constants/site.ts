@@ -3,7 +3,8 @@
  * and "Related information" panels.
  *
  * All content pages are real .html files (Vite MPA build) so search engines
- * can crawl each URL independently.
+ * can crawl each URL independently. Page titles/descriptions for <head> live
+ * in scripts/pages.mjs; keep the keys in sync.
  */
 
 import type { Locale } from '../types/voyager';
@@ -12,228 +13,253 @@ export type PageKey =
   | 'home'
   | 'voyager-1'
   | 'voyager-2'
+  | 'compare'
   | 'mission'
   | 'timeline'
   | 'discoveries'
   | 'golden-record'
+  | 'why-voyager-matters'
+  | 'tools'
   | 'how-it-works'
   | 'faq'
   | 'about'
   | 'sources'
   | 'updates'
   | 'privacy'
-  | 'contact';
+  | 'terms'
+  | 'contact'
+  | 'not-found';
 
-export type PageGroup = 'live' | 'learn' | 'support';
+type Tri = { en: string; zh: string; es: string };
 
-export interface PageInfo {
-  key: PageKey;
+interface PageInfo {
   /** File name used for the real URL ('' for the home page). */
   href: string;
-  /** Short label shown in menus. */
-  label: string;
-  /** Longer label used in content links. */
-  title: string;
-  group: PageGroup;
+  label: Tri;
   /** One-line description used in related-link cards. */
-  description: string;
+  description: Tri;
 }
 
 export const PAGES: Record<PageKey, PageInfo> = {
   home: {
-    key: 'home',
     href: '',
-    label: 'Home',
-    title: 'Voyager Tracker — Home',
-    group: 'live',
-    description: 'Live distance, speed and status of Voyager 1 and Voyager 2 with mission overview.',
+    label: { en: 'Home', zh: '首頁', es: 'Inicio' },
+    description: {
+      en: 'Where both Voyagers are right now, explained — with context and comparisons.',
+      zh: '兩艘航海家號此刻的位置與白話解說，附上尺度比較。',
+      es: 'Dónde están ahora ambas Voyager, explicado con contexto y comparaciones.',
+    },
   },
   'voyager-1': {
-    key: 'voyager-1',
     href: 'voyager-1.html',
-    label: 'Voyager 1',
-    title: 'Voyager 1',
-    group: 'live',
-    description: 'Voyager 1 mission history, distance from Earth and current interstellar status.',
+    label: { en: 'Voyager 1', zh: '航海家一號', es: 'Voyager 1' },
+    description: {
+      en: 'Jupiter, Saturn, the Pale Blue Dot and the first entry into interstellar space.',
+      zh: '木星、土星、蒼藍小點，以及人類首度進入星際空間。',
+      es: 'Júpiter, Saturno, el pálido punto azul y la primera entrada al espacio interestelar.',
+    },
   },
   'voyager-2': {
-    key: 'voyager-2',
     href: 'voyager-2.html',
-    label: 'Voyager 2',
-    title: 'Voyager 2',
-    group: 'live',
-    description: 'Voyager 2 — the only spacecraft to visit Uranus and Neptune — with live tracker data.',
+    label: { en: 'Voyager 2', zh: '航海家二號', es: 'Voyager 2' },
+    description: {
+      en: 'The only spacecraft to visit Uranus and Neptune, now in interstellar space.',
+      zh: '唯一造訪天王星與海王星的太空船，如今身處星際空間。',
+      es: 'La única nave que visitó Urano y Neptuno, hoy en el espacio interestelar.',
+    },
+  },
+  compare: {
+    href: 'compare.html',
+    label: { en: 'Compare', zh: '一號 vs 二號', es: 'Comparar' },
+    description: {
+      en: 'Side-by-side distance chart, routes and milestones — and why the twins differ.',
+      zh: '並列的距離圖表、路線與里程碑——以及這對雙胞胎為何如此不同。',
+      es: 'Gráfico de distancia, rutas e hitos lado a lado, y por qué las gemelas difieren.',
+    },
   },
   mission: {
-    key: 'mission',
     href: 'mission.html',
-    label: 'Mission',
-    title: 'The Voyager Mission',
-    group: 'learn',
-    description: 'How the Voyager program began, the Grand Tour and the mission that keeps going.',
+    label: { en: 'Mission', zh: '任務介紹', es: 'Misión' },
+    description: {
+      en: 'How the program began, the Grand Tour alignment and the extended mission.',
+      zh: '計畫如何開始、大旅行的行星排列，以及延長任務。',
+      es: 'Cómo empezó el programa, la alineación del Gran Tour y la misión extendida.',
+    },
   },
   timeline: {
-    key: 'timeline',
     href: 'timeline.html',
-    label: 'Timeline',
-    title: 'Voyager Mission Timeline',
-    group: 'learn',
-    description: 'A fact-based timeline from the 1977 launches to today\u2019s interstellar operations.',
+    label: { en: 'Timeline', zh: '任務時間軸', es: 'Cronología' },
+    description: {
+      en: 'Interactive timeline: every key event with its context and source.',
+      zh: '互動式時間軸：每個關鍵事件的背景與出處。',
+      es: 'Cronología interactiva: cada evento clave con su contexto y su fuente.',
+    },
   },
   discoveries: {
-    key: 'discoveries',
     href: 'discoveries.html',
-    label: 'Discoveries',
-    title: 'Scientific Discoveries',
-    group: 'learn',
-    description: 'Io\u2019s volcanoes, Neptune\u2019s winds, interstellar plasma — Voyager\u2019s key science results.',
+    label: { en: 'Science', zh: '科學發現', es: 'Ciencia' },
+    description: {
+      en: 'What Voyager saw at four giant planets and beyond — and why it mattered.',
+      zh: '航海家在四顆巨行星與更遠處看到了什麼——以及為何重要。',
+      es: 'Qué vio Voyager en cuatro planetas gigantes y más allá, y por qué importó.',
+    },
   },
   'golden-record': {
-    key: 'golden-record',
     href: 'golden-record.html',
-    label: 'Golden Record',
-    title: 'The Golden Record',
-    group: 'learn',
-    description: 'The phonograph record carried by Voyager as a message to any civilization that finds it.',
+    label: { en: 'Golden Record', zh: '金唱片', es: 'Disco de Oro' },
+    description: {
+      en: 'What is on the record each Voyager carries, and why it was made.',
+      zh: '每艘航海家號攜帶的唱片裡有什麼，以及它為何被製作。',
+      es: 'Qué contiene el disco que lleva cada Voyager y por qué se hizo.',
+    },
+  },
+  'why-voyager-matters': {
+    href: 'why-voyager-matters.html',
+    label: { en: 'Why It Matters', zh: '為何重要', es: 'Por qué importa' },
+    description: {
+      en: 'Why a 1970s mission is still scientifically important today.',
+      zh: '為什麼一項 1970 年代的任務至今仍具科學價值。',
+      es: 'Por qué una misión de los años setenta sigue siendo importante hoy.',
+    },
+  },
+  tools: {
+    href: 'tools.html',
+    label: { en: 'Tools', zh: '計算工具', es: 'Herramientas' },
+    description: {
+      en: 'Signal delay, unit converter, “where was it on…?” and travel-time calculators.',
+      zh: '訊號延遲、單位換算、「某天它在哪」與旅行時間計算器。',
+      es: 'Retardo de señal, conversor, “¿dónde estaba el…?” y tiempo de viaje.',
+    },
   },
   'how-it-works': {
-    key: 'how-it-works',
     href: 'how-it-works.html',
-    label: 'How It Works',
-    title: 'How Voyager Tracker Works',
-    group: 'learn',
-    description: 'Where the data comes from, how distances are estimated and what \u201clive\u201d really means here.',
+    label: { en: 'How It Works', zh: '運作原理', es: 'Cómo funciona' },
+    description: {
+      en: 'The calculation model, how it was validated, and its limits.',
+      zh: '計算模型、驗證方式，以及它的限制。',
+      es: 'El modelo de cálculo, cómo se validó y sus límites.',
+    },
   },
   faq: {
-    key: 'faq',
     href: 'faq.html',
-    label: 'FAQ',
-    title: 'Frequently Asked Questions',
-    group: 'learn',
-    description: 'Honest answers to common questions about the Voyager spacecraft and this website.',
+    label: { en: 'FAQ', zh: '常見問題', es: 'Preguntas' },
+    description: {
+      en: 'Honest answers about the probes, the numbers and this site.',
+      zh: '關於探測器、數字與本站的誠實解答。',
+      es: 'Respuestas honestas sobre las sondas, las cifras y este sitio.',
+    },
   },
   about: {
-    key: 'about',
     href: 'about.html',
-    label: 'About',
-    title: 'About Voyager Tracker',
-    group: 'support',
-    description: 'What this independent, educational website is — and what it is not.',
+    label: { en: 'About', zh: '關於本站', es: 'Acerca de' },
+    description: {
+      en: 'Who runs this independent project, why, and what it is not.',
+      zh: '誰在經營這個獨立專案、為什麼，以及它不是什麼。',
+      es: 'Quién lleva este proyecto independiente, por qué y qué no es.',
+    },
   },
   sources: {
-    key: 'sources',
     href: 'sources.html',
-    label: 'Sources',
-    title: 'Sources & References',
-    group: 'support',
-    description: 'Official NASA / JPL references and the methodology used for every figure on this site.',
+    label: { en: 'Sources', zh: '資料來源', es: 'Fuentes' },
+    description: {
+      en: 'Which NASA/JPL reference supports each part of the site.',
+      zh: '本站各部分內容分別依據哪些 NASA/JPL 資料。',
+      es: 'Qué referencia de NASA/JPL respalda cada parte del sitio.',
+    },
   },
   updates: {
-    key: 'updates',
     href: 'updates.html',
-    label: 'Updates',
-    title: 'Mission & Site Updates',
-    group: 'support',
-    description: 'A log of real mission and website changes — never generated for SEO alone.',
+    label: { en: 'Updates', zh: '更新紀錄', es: 'Novedades' },
+    description: {
+      en: 'Dated mission events from NASA/JPL and changes to this site.',
+      zh: 'NASA/JPL 公布的任務事件，以及本站的修改紀錄。',
+      es: 'Eventos de la misión publicados por NASA/JPL y cambios del sitio.',
+    },
   },
   privacy: {
-    key: 'privacy',
     href: 'privacy.html',
-    label: 'Privacy',
-    title: 'Privacy Policy',
-    group: 'support',
-    description: 'How this site handles cookies, local storage and third-party services.',
+    label: { en: 'Privacy', zh: '隱私政策', es: 'Privacidad' },
+    description: {
+      en: 'What is stored in your browser and which services pages contact.',
+      zh: '瀏覽器中儲存了什麼，以及頁面會連線到哪些服務。',
+      es: 'Qué se guarda en tu navegador y qué servicios contactan las páginas.',
+    },
+  },
+  terms: {
+    href: 'terms.html',
+    label: { en: 'Terms', zh: '使用條款', es: 'Términos' },
+    description: {
+      en: 'Conditions of use, accuracy limits and independence from NASA/JPL.',
+      zh: '使用條件、準確度限制，以及與 NASA/JPL 的獨立關係。',
+      es: 'Condiciones de uso, límites de precisión e independencia de NASA/JPL.',
+    },
   },
   contact: {
-    key: 'contact',
     href: 'contact.html',
-    label: 'Contact',
-    title: 'Contact & Feedback',
-    group: 'support',
-    description: 'Report a data problem or technical issue through the project\u2019s GitHub repository.',
+    label: { en: 'Contact', zh: '聯絡我們', es: 'Contacto' },
+    description: {
+      en: 'Report an error, broken link or calculation issue.',
+      zh: '回報錯誤、失效連結或計算問題。',
+      es: 'Informa de un error, un enlace roto o un problema de cálculo.',
+    },
+  },
+  'not-found': {
+    href: '404.html',
+    label: { en: 'Page not found', zh: '找不到頁面', es: 'Página no encontrada' },
+    description: { en: '', zh: '', es: '' },
   },
 };
 
-/** Pages shown in the compact desktop navigation bar. */
+/** Pages shown in the desktop navigation bar (Home is the logo). */
 export const HEADER_NAV: PageKey[] = [
-  'home',
   'voyager-1',
   'voyager-2',
+  'compare',
   'mission',
   'timeline',
   'discoveries',
   'golden-record',
-  'how-it-works',
+  'tools',
   'faq',
+  'sources',
   'about',
 ];
 
-/** Full ordered list shown in the mobile menu and footer. */
+/** Full ordered list shown in the mobile menu. */
 export const ALL_PAGES: PageKey[] = [
   'home',
   'voyager-1',
   'voyager-2',
+  'compare',
   'mission',
   'timeline',
   'discoveries',
   'golden-record',
+  'why-voyager-matters',
+  'tools',
   'how-it-works',
   'faq',
-  'about',
   'sources',
+  'about',
   'updates',
-  'privacy',
   'contact',
+  'privacy',
+  'terms',
 ];
 
 /** Build a real page URL under the deployment base path. */
 export function pageUrl(key: PageKey): string {
-  const info = PAGES[key];
-  return key === 'home'
-    ? `${import.meta.env.BASE_URL}`
-    : `${import.meta.env.BASE_URL}${info.href}`;
+  return `${import.meta.env.BASE_URL}${PAGES[key].href}`;
 }
 
-/** Traditional-Chinese labels for every page. */
-export const PAGES_ZH: Record<PageKey, { label: string; title: string; description: string }> = {
-  home: { label: '首頁', title: '航海家號追蹤器', description: '航海家一號與二號的即時距離、速度與任務現況，以及完整任務介紹。' },
-  'voyager-1': { label: '航海家一號', title: '航海家一號', description: '航海家一號的任務歷史、與地球的距離及星際空間現況。' },
-  'voyager-2': { label: '航海家二號', title: '航海家二號', description: '唯一拜訪過天王星與海王星的探測器，含即時追蹤資料。' },
-  mission: { label: '任務介紹', title: '航海家任務', description: '航海家計畫如何開始、大旅行任務與持續至今的星際任務。' },
-  timeline: { label: '任務時間軸', title: '航海家任務時間軸', description: '從 1977 年發射到今日星際任務的真實時間軸。' },
-  discoveries: { label: '科學發現', title: '科學發現', description: '木衛一火山、海王星狂風與星際電漿——航海家的重要發現。' },
-  'golden-record': { label: '金唱片', title: '航海家金唱片', description: '搭載於航海家號上、代表地球聲音、音樂與影像的金質唱片。' },
-  'how-it-works': { label: '資料與方法', title: '資料與計算方法', description: '資料從哪裡來、距離如何估算，以及「即時」的真正意義。' },
-  faq: { label: '常見問題', title: '常見問題', description: '關於航海家號與本站的常見問題與誠實解答。' },
-  about: { label: '關於本站', title: '關於航海家號追蹤器', description: '這個獨立教育網站是什麼——以及它不是什麼。' },
-  sources: { label: '資料來源', title: '資料來源與參考', description: '本站每個數字背後的 NASA / JPL 官方來源。' },
-  updates: { label: '更新紀錄', title: '任務與網站更新', description: '真實的任務與網站更新紀錄，絕不為了 SEO 硬湊內容。' },
-  privacy: { label: '隱私政策', title: '隱私政策', description: '本站如何處理 Cookie、瀏覽器儲存與第三方服務。' },
-  contact: { label: '聯絡我們', title: '聯絡與意見回饋', description: '透過 GitHub 回報資料錯誤或技術問題。' },
-};
-
-/** Spanish (Español) labels for every page. */
-export const PAGES_ES: Record<PageKey, { label: string; title: string; description: string }> = {
-  home: { label: 'Inicio', title: 'Rastreador Voyager', description: 'Distancia, velocidad y estado en vivo de Voyager 1 y 2, junto con la historia de la misión.' },
-  'voyager-1': { label: 'Voyager 1', title: 'Voyager 1', description: 'Historia de la misión Voyager 1, distancia a la Tierra y estado interestelar actual.' },
-  'voyager-2': { label: 'Voyager 2', title: 'Voyager 2', description: 'La única nave que visitó Urano y Neptuno, con datos de seguimiento en vivo.' },
-  mission: { label: 'Misión', title: 'La misión Voyager', description: 'Cómo comenzó el programa Voyager, el Gran Tour y la misión interestelar que continúa.' },
-  timeline: { label: 'Cronología', title: 'Cronología de la misión Voyager', description: 'Una cronología basada en hechos, desde los lanzamientos de 1977 hasta las operaciones interestelares.' },
-  discoveries: { label: 'Descubrimientos', title: 'Descubrimientos científicos', description: 'Volcanes en Ío, vientos de Neptuno y plasma interestelar: los grandes hallazgos de Voyager.' },
-  'golden-record': { label: 'Disco de Oro', title: 'El Disco de Oro', description: 'El disco fonográfico que llevan las Voyager como mensaje para cualquier civilización que lo encuentre.' },
-  'how-it-works': { label: 'Cómo funciona', title: 'Cómo funciona el Rastreador', description: 'De dónde salen los datos, cómo se estiman las distancias y qué significa \u201cen vivo\u201d aquí.' },
-  faq: { label: 'Preguntas', title: 'Preguntas frecuentes', description: 'Respuestas honestas a preguntas comunes sobre las Voyager y este sitio web.' },
-  about: { label: 'Acerca de', title: 'Acerca del Rastreador', description: 'Qué es este proyecto educativo independiente — y qué no es.' },
-  sources: { label: 'Fuentes', title: 'Fuentes y referencias', description: 'Las fuentes oficiales de NASA/JPL detrás de cada cifra de este sitio.' },
-  updates: { label: 'Actualizaciones', title: 'Actualizaciones de la misión y del sitio', description: 'Un registro de cambios reales, nunca generado solo para SEO.' },
-  privacy: { label: 'Privacidad', title: 'Política de privacidad', description: 'Cómo maneja este sitio cookies, almacenamiento local y servicios de terceros.' },
-  contact: { label: 'Contacto', title: 'Contacto y comentarios', description: 'Reporta un problema de datos o un fallo técnico a través del repositorio de GitHub.' },
-};
+const pickTri = (v: Tri, locale: Locale) => (locale === 'zh-TW' ? v.zh : locale === 'es' ? v.es : v.en);
 
 /** Language-aware navigation label. */
 export function pageLabel(key: PageKey, locale: Locale): string {
-  if (locale === 'zh-TW') return PAGES_ZH[key].label;
-  if (locale === 'es') return PAGES_ES[key].label;
-  return PAGES[key].label;
+  return pickTri(PAGES[key].label, locale);
 }
 
+/** Language-aware one-line description. */
+export function pageDescription(key: PageKey, locale: Locale): string {
+  return pickTri(PAGES[key].description, locale);
+}

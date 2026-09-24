@@ -1,69 +1,78 @@
 # Voyager Tracker
 
-An independent, educational website that tracks NASA's Voyager 1 and Voyager 2 spacecraft and
-explains their mission, science and history. The site combines a live (estimated) tracker —
-distance from Earth and the Sun, speed, one-way light time and interstellar status — with
-original articles about the Voyager mission, a fact-based timeline, key scientific discoveries,
-the Golden Record, an FAQ, a transparent methodology page and source references.
+An independent educational website about NASA's Voyager 1 and Voyager 2. It continuously
+calculates where both probes are — distance from Earth and the Sun, speed, signal delay — and
+explains what those numbers mean, how the twins compare, what they discovered and why the
+mission still matters.
 
-**This is not an official NASA website.** All interactive figures are calculated estimates based
-on published NASA/JPL mission data and are labelled as such.
+**This is not an official NASA website.** All live figures are calculated estimates, validated
+against NASA/JPL Horizons and labelled as such. They are not NASA telemetry.
 
 Live site: https://wahaha232.github.io/VoyagerTracker/
 
-## Pages
+## What the site offers
 
-The site is a multi-page React + Vite application. Each page is a real `.html` URL so search
-engines can crawl every page independently:
+| Page | What it is for |
+| --- | --- |
+| `/` | Where both probes are now, with context, milestones and "since your last visit" |
+| `voyager-1.html`, `voyager-2.html` | Per-spacecraft tracker, history, instrument status, recent events |
+| `compare.html` | Voyager 1 vs 2: live comparison, 1977–2035 distance/speed chart, why they differ |
+| `timeline.html` | Interactive, filterable timeline; every event has context and a source |
+| `discoveries.html` | Science by destination: what Voyager saw and why it matters |
+| `tools.html` | Light-time calculator, unit converter, "where was Voyager on…?", travel time |
+| `mission.html`, `golden-record.html`, `why-voyager-matters.html` | Background articles |
+| `how-it-works.html` | The calculation model, validation table and limitations |
+| `sources.html` | Which reference supports which part of the site |
+| `faq.html`, `about.html`, `updates.html`, `contact.html`, `privacy.html`, `terms.html` | Supporting pages |
 
-- `/` — home (hero, live tracker, mission overview)
-- `/voyager-1.html` — Voyager 1 mission, distance and status (+ tracker)
-- `/voyager-2.html` — Voyager 2 mission, distance and status (+ tracker)
-- `/mission.html` — the Voyager mission overview
-- `/timeline.html` — fact-based mission timeline
-- `/discoveries.html` — scientific discoveries
-- `/golden-record.html` — the Golden Record
-- `/how-it-works.html` — data sources and methodology
-- `/faq.html` — frequently asked questions
-- `/about.html`, `/sources.html`, `/updates.html`, `/privacy.html`, `/contact.html`
+Content is available in English, Traditional Chinese and Spanish (language switcher in the header).
 
-## Data methodology
+## How the numbers are calculated
 
-- **Historical** — fixed mission facts (launch, flybys, interstellar crossings) from NASA/JPL records.
-- **Estimated / calculated** — a published NASA/JPL baseline distance advanced by each
-  spacecraft's cruising velocity over elapsed time, then converted to AU, km and light-travel
-  time. Values tick smoothly in the browser (~10 Hz) from a fixed baseline; they are never
-  presented as live NASA telemetry.
-- The full methodology is explained on the site's `/how-it-works.html` page, and references are
-  listed on `/sources.html`.
+`src/lib/ephemeris.ts` holds the whole model:
 
-## Tech stack
+1. Barycentric state vectors (position + velocity) for both probes from JPL Horizons at a fixed
+   epoch, propagated with a third-order Taylor series under solar-system gravity.
+2. The Sun's offset from the barycentre, interpolated from a monthly JPL table.
+3. Earth's position from the Astronomical Almanac low-precision solar formula.
+4. Distances are straight-line distances between those positions; light time = distance / c.
 
-- React 19 + TypeScript
-- Vite (multi-page build — see `vite.config.ts` for the page inputs)
-- Tailwind CSS
-- Three.js / @react-three/fiber for the interactive 3D spacecraft model
+Checked against JPL's own geocentric distances every 5 days for 2024–2031, the Earth distance
+stays within about 40,000 km. The model also reproduces NASA's date for Voyager 1 reaching one
+light-day from Earth (18 Nov 2026).
 
-## Development
+## Data pipeline
+
+```bash
+npm run data       # re-download reference data from JPL Horizons (scripts/fetch-horizons.mjs)
+npm run validate   # compare the model with JPL; writes src/data/validation-summary.generated.ts
+```
+
+Generated files (`src/data/*.generated.ts`, `scripts/validation.generated.json`) are committed so
+the build never depends on network access. Instrument status and mission events are maintained
+by hand from NASA publications (`src/constants/voyagerData.ts`, `src/pages/TimelinePage.tsx`).
+
+## Build
+
+The site is a Vite + React + TypeScript multi-page app, prerendered to static HTML:
+
+- `scripts/pages.mjs` — single list of pages (titles, descriptions, schema type, sitemap hints)
+- `scripts/gen-html.mjs` — writes the per-page HTML entry files from that list
+- `scripts/prerender.mjs` — after `vite build`, renders every page with the SSR bundle, injects
+  the HTML, JSON-LD (FAQ schema generated from the FAQ data) and writes `sitemap.xml`
+- `scripts/check-site.mjs` — checks metadata, canonicals, headings, JSON-LD, internal links;
+  `--external` also requests every external link
 
 ```bash
 npm install
-npm run dev      # local dev server
-npm run build    # type-check + production build into dist/
-npm run preview  # preview the production build
-```
-
-## Deploying to GitHub Pages
-
-The site is published to the `gh-pages` branch. The build is configured with
-`base: '/VoyagerTracker/'` for project-page hosting.
-
-```bash
-npm run build
-npm run deploy   # gh-pages -d dist
+npm run dev        # development server
+npm run build      # gen-html → type-check → client build → SSR build → prerender
+npm run check      # static checks on dist/ (add -- --external for link checks)
+npm run preview    # serve dist/ at http://localhost:4173/VoyagerTracker/
+npm run deploy     # build and publish dist/ to the gh-pages branch
 ```
 
 ## Attribution
 
-- Mission data: NASA Science / JPL (see `/sources.html` for the full list of links)
-- This project is not affiliated with or endorsed by NASA or JPL.
+Mission data: NASA Science, NASA/JPL and the JPL Horizons System (see `sources.html`).
+This project is not affiliated with, endorsed by, or sponsored by NASA or JPL.

@@ -2,239 +2,294 @@
  * Voyager1Page — /voyager-1.html  (EN / 繁中 / Español)
  */
 
-import { INSTRUMENT_ES, INSTRUMENT_ZH, SPACECRAFT_META } from '../constants/voyagerData';
 import { pageUrl } from '../constants/site';
 import { RelatedLinks } from '../components/ui';
-import { BiArticleHeader, BiSection, bi, FactGrid, useEs, useZh } from '../components/content';
+import { BiArticleHeader, BiSection, bi, FactGrid, txt, useLang } from '../components/content';
 import TrackerSection from '../components/TrackerSection';
+import { InstrumentStatusList, PageQA, SourcesNote } from '../components/MissionExtras';
 
-const META = SPACECRAFT_META['voyager1'];
+type Tri = { en: string; zh: string; es: string };
+const T = (en: string, zh: string, es: string): Tri => ({ en, zh, es });
 
-const FACTS: { term: { en: string; zh: string; es: string }; detail: { en: string; zh: string; es: string } }[] = [
-  {
-    term: { en: 'Launch', zh: '發射', es: 'Lanzamiento' },
-    detail: { en: '5 September 1977, Cape Canaveral, Florida, USA (Titan IIIE-Centaur).', zh: '1977 年 9 月 5 日，美國佛羅里達州卡納維爾角（泰坦三號E-半人馬火箭）。', es: '5 de septiembre de 1977, Cabo Cañaveral, Florida, EE. UU. (Titán IIIE-Centauro).' },
-  },
-  {
-    term: { en: 'Mission start', zh: '任務開始', es: 'Inicio de la misión' },
-    detail: { en: 'Initially a four-year mission to explore Jupiter and Saturn.', zh: '最初是一項為期四年、探索木星與土星的任務。', es: 'En principio, una misión de cuatro años para explorar Júpiter y Saturno.' },
-  },
-  {
-    term: { en: 'Jupiter flyby', zh: '木星飛掠', es: 'Sobrevuelo de Júpiter' },
-    detail: { en: '5 March 1979 — discovered the first active volcanoes beyond Earth, on Io.', zh: '1979 年 3 月 5 日——在木衛一上發現地球以外首座活火山。', es: '5 de marzo de 1979 — descubrió los primeros volcanes activos más allá de la Tierra, en Ío.' },
-  },
-  {
-    term: { en: 'Saturn flyby', zh: '土星飛掠', es: 'Sobrevuelo de Saturno' },
-    detail: { en: '12 November 1980 — flew past Saturn and its moon Titan.', zh: '1980 年 11 月 12 日——飛掠土星及其衛星泰坦。', es: '12 de noviembre de 1980 — sobrevoló Saturno y su luna Titán.' },
-  },
-  {
-    term: { en: 'Interstellar space', zh: '進入星際空間', es: 'Espacio interestelar' },
-    detail: { en: 'Crossed the heliopause on 25 August 2012, at about 121 AU from the Sun.', zh: '2012 年 8 月 25 日、距離太陽約 121 AU 處穿越日球層頂。', es: 'Cruzó la heliopausa el 25 de agosto de 2012, a ~121 UA del Sol.' },
-  },
-  {
-    term: { en: 'Today', zh: '今日', es: 'Hoy' },
-    detail: { en: 'Still active, returning data from interstellar space through NASA\u2019s Deep Space Network.', zh: '仍然活躍，持續透過 NASA 深空網路回傳星際空間的資料。', es: 'Sigue activa, enviando datos del espacio interestelar a través de la Red de Espacio Profundo de la NASA.' },
-  },
+const FACTS: { term: Tri; detail: Tri }[] = [
+  { term: T('Launch', '發射', 'Lanzamiento'), detail: T('5 September 1977, Cape Canaveral, Florida (Titan IIIE-Centaur rocket).', '1977 年 9 月 5 日，美國佛羅里達州卡納維爾角（泰坦 IIIE－半人馬座火箭）。', '5 de septiembre de 1977, Cabo Cañaveral, Florida (cohete Titán IIIE-Centauro).') },
+  { term: T('Original plan', '原始計畫', 'Plan original'), detail: T('A roughly four-year mission to Jupiter and Saturn.', '為期約四年、前往木星與土星的任務。', 'Una misión de unos cuatro años a Júpiter y Saturno.') },
+  { term: T('Jupiter closest approach', '木星最接近日', 'Máximo acercamiento a Júpiter'), detail: T('5 March 1979.', '1979 年 3 月 5 日。', '5 de marzo de 1979.') },
+  { term: T('Saturn closest approach', '土星最接近日', 'Máximo acercamiento a Saturno'), detail: T('12 November 1980, including a close pass of the moon Titan.', '1980 年 11 月 12 日，並近距離飛掠衛星泰坦。', '12 de noviembre de 1980, con un paso cercano por la luna Titán.') },
+  { term: T('Most distant human-made object', '最遙遠的人造物體', 'Objeto humano más lejano'), detail: T('Since 17 February 1998, when it passed Pioneer 10 at about 69 AU.', '自 1998 年 2 月 17 日在約 69 AU 處超越先鋒十號以來。', 'Desde el 17 de febrero de 1998, cuando superó a la Pioneer 10 a unas 69 UA.') },
+  { term: T('Interstellar space', '進入星際空間', 'Espacio interestelar'), detail: T('Crossed the heliopause on 25 August 2012 at about 121.6 AU from the Sun.', '2012 年 8 月 25 日於距太陽約 121.6 AU 處穿越日球層頂。', 'Cruzó la heliopausa el 25 de agosto de 2012, a unas 121,6 UA del Sol.') },
 ];
 
-const JOURNEY: { date: string; title: { en: string; zh: string; es: string }; text: { en: string; zh: string; es: string } }[] = [
+const JOURNEY: { date: string; title: Tri; text: Tri }[] = [
   {
     date: '5 Mar 1979',
-    title: { en: 'Jupiter', zh: '木星', es: 'Júpiter' },
-    text: {
-      en: 'Voyager 1 returned thousands of images of Jupiter and its moons. The most famous discovery: erupting volcanoes on Io — the first active volcanoes seen beyond Earth.',
-      zh: '航海家一號回傳了數千張木星與其衛星的影像。最著名的發現是木衛一上噴發的火山——地球以外首度看到的活火山。',
-      es: 'La Voyager 1 envió miles de imágenes de Júpiter y sus lunas. El descubrimiento más famoso: volcanes en erupción en Ío — los primeros volcanes activos vistos más allá de la Tierra.',
-    },
+    title: T('Jupiter', '木星', 'Júpiter'),
+    text: T(
+      'Voyager 1 returned thousands of images of Jupiter and its moons. Its most famous discovery was a set of erupting volcanoes on Io — the first active volcanism seen anywhere beyond Earth. The flyby also boosted its speed from roughly 14 to 23 km/s relative to the Sun.',
+      '航海家一號回傳了數千張木星及其衛星的影像。最著名的發現是木衛一上噴發中的火山——這是人類首次在地球以外看到活火山。這次飛掠也讓它相對太陽的速度從約 14 公里/秒提升到 23 公里/秒。',
+      'La Voyager 1 envió miles de imágenes de Júpiter y sus lunas. Su descubrimiento más famoso fueron los volcanes en erupción de Ío, el primer vulcanismo activo visto fuera de la Tierra. El sobrevuelo además elevó su velocidad de unos 14 a 23 km/s respecto al Sol.',
+    ),
   },
   {
     date: '12 Nov 1980',
-    title: { en: 'Saturn & Titan', zh: '土星與泰坦', es: 'Saturno y Titán' },
-    text: {
-      en: 'The rings were revealed as thousands of ringlets, and the Titan flyby bent the spacecraft\u2019s trajectory steeply northward — the reason it left the solar system faster than its twin.',
-      zh: '土星環被證實由數千道細環組成；泰坦飛掠讓太空船軌道急轉向北——這正是它比孿生探測器更快離開太陽系的原因。',
-      es: 'Los anillos resultaron ser miles de anillos finos, y el sobrevuelo de Titán desvió la trayectoria hacia el norte — la razón por la que salió del sistema solar más rápido que su gemela.',
-    },
+    title: T('Saturn and Titan', '土星與泰坦', 'Saturno y Titán'),
+    text: T(
+      'The rings turned out to be made of thousands of narrow ringlets. Mission planners chose a close pass of Titan, Saturn’s hazy largest moon, over continuing to other planets; that manoeuvre bent Voyager 1’s path steeply north of the planets’ plane.',
+      '土星環原來是由數千道細窄的小環組成。任務規劃人員選擇近距離飛掠土星最大、籠罩在霧霾中的衛星泰坦，而放棄前往其他行星；這個操作把航海家一號的路徑大幅甩向行星軌道面北方。',
+      'Los anillos resultaron estar formados por miles de anillos estrechos. Los planificadores prefirieron un paso cercano por Titán, la brumosa luna mayor de Saturno, a seguir hacia otros planetas; esa maniobra desvió a la Voyager 1 bruscamente al norte del plano planetario.',
+    ),
   },
   {
     date: '14 Feb 1990',
-    title: { en: 'The Pale Blue Dot', zh: '蒼藍小點', es: 'El pálido punto azul' },
-    text: {
-      en: 'From about 6 billion km away, Voyager 1 photographed Earth — a pale blue dot smaller than a pixel.',
-      zh: '從約 60 億公里外，航海家一號拍下了地球——一個比畫素還小的蒼藍小點。',
-      es: 'Desde unos 6 000 millones de km, la Voyager 1 fotografió la Tierra — un pálido punto azul más pequeño que un píxel.',
-    },
+    title: T('The family portrait', '太陽系全家福', 'El retrato de familia'),
+    text: T(
+      'Before its cameras were switched off for good, Voyager 1 took a mosaic of six planets as seen from about 40 AU, including the image of Earth that became known as the Pale Blue Dot.',
+      '在相機永久關閉之前，航海家一號從約 40 AU 外拍下了六顆行星的拼接影像，其中包括後來被稱為「蒼藍小點」的地球影像。',
+      'Antes de apagar definitivamente sus cámaras, la Voyager 1 tomó un mosaico de seis planetas vistos desde unas 40 UA, incluida la imagen de la Tierra conocida como el pálido punto azul.',
+    ),
   },
   {
     date: '25 Aug 2012',
-    title: { en: 'Interstellar space', zh: '星際空間', es: 'Espacio interestelar' },
-    text: {
-      en: 'At about 121 AU, Voyager 1 crossed the heliopause. Instruments measured the interstellar plasma and the drop in solar particles — the first direct evidence a spacecraft had left the heliosphere.',
-      zh: '在約 121 AU 處，航海家一號穿越日球層頂。儀器量測到星際電漿與太陽粒子減少——這是太空船離開日球層的首個直接證據。',
-      es: 'A ~121 UA, la Voyager 1 cruzó la heliopausa. Los instrumentos midieron el plasma interestelar y la caída de partículas solares — la primera prueba directa de que una nave había dejado la heliosfera.',
-    },
+    title: T('Interstellar space', '星際空間', 'Espacio interestelar'),
+    text: T(
+      'Instruments recorded solar particles dropping sharply and galactic cosmic rays rising. Months later, plasma waves triggered by a solar outburst showed the surrounding gas was about 40 times denser than inside the heliosphere — the evidence that Voyager 1 had left the Sun’s bubble.',
+      '儀器記錄到太陽粒子急遽減少、銀河宇宙射線增加。數個月後，一次太陽爆發引起的電漿波顯示周圍氣體密度約是日球層內的 40 倍——這正是航海家一號已離開太陽泡泡的證據。',
+      'Los instrumentos registraron una fuerte caída de partículas solares y un aumento de rayos cósmicos galácticos. Meses después, ondas de plasma provocadas por una erupción solar mostraron un gas unas 40 veces más denso que dentro de la heliosfera: la prueba de que la Voyager 1 había salido de la burbuja solar.',
+    ),
+  },
+];
+
+const CONTEXT: { when: string; text: Tri }[] = [
+  {
+    when: '2023–2024',
+    text: T(
+      'From November 2023 the spacecraft sent unreadable data because a chip in its flight data system failed. Engineers relocated the affected code, and by June 2024 all four instruments operating at the time were returning science again.',
+      '自 2023 年 11 月起，由於飛行資料系統中的一枚晶片故障，太空船傳回的資料無法解讀。工程師把受影響的程式碼移到其他位置，到 2024 年 6 月，當時運作中的四項儀器全部恢復回傳科學資料。',
+      'Desde noviembre de 2023 la nave envió datos ilegibles por la avería de un chip de su sistema de datos de vuelo. Los ingenieros trasladaron el código afectado y en junio de 2024 los cuatro instrumentos activos entonces volvían a enviar ciencia.',
+    ),
+  },
+  {
+    when: '2025',
+    text: T(
+      'The cosmic ray instrument was switched off in February to save power, and in March engineers revived the primary roll thrusters, unused since heaters lost power in 2004, as a fallback for the backup thrusters then in use.',
+      '宇宙射線儀器於 2 月關閉以節省電力；3 月，工程師重新啟用了自 2004 年加熱器斷電後就停用的主滾轉推進器，作為當時使用中備用推進器的後援。',
+      'En febrero se apagó el instrumento de rayos cósmicos para ahorrar energía, y en marzo los ingenieros reactivaron los propulsores de balanceo principales, sin uso desde que sus calentadores perdieron energía en 2004, como respaldo de los de reserva en uso.',
+    ),
+  },
+  {
+    when: '2026',
+    text: T(
+      'The low-energy charged particle instrument was switched off in April, leaving the magnetometer and plasma wave instrument. NASA plans the same power-saving hardware swap it performed on Voyager 2, and Voyager 1 passes one light-day from Earth on 18 November.',
+      '低能量帶電粒子儀於 4 月關閉，剩下磁力計與電漿波儀器。NASA 計畫在一號上進行與二號相同的節電硬體改裝；航海家一號並將於 11 月 18 日來到距地球一光日處。',
+      'En abril se apagó el instrumento de partículas de baja energía, quedando el magnetómetro y el de ondas de plasma. La NASA prevé el mismo cambio de ahorro energético que hizo en la Voyager 2, y la Voyager 1 estará a un día-luz de la Tierra el 18 de noviembre.',
+    ),
+  },
+];
+
+const QA = [
+  {
+    q: T('Is Voyager 1 the fastest spacecraft ever?', '航海家一號是史上最快的太空船嗎？', '¿Es la Voyager 1 la nave más rápida de la historia?'),
+    a: T(
+      'No. It is the fastest object leaving the solar system, at about 17 km/s relative to the Sun, but probes diving toward the Sun, such as Parker Solar Probe, reach far higher speeds. Voyager 1 is, however, the most distant human-made object.',
+      '不是。它是離開太陽系速度最快的物體，相對太陽約 17 公里/秒，但俯衝向太陽的探測器（例如帕克太陽探測器）速度遠高於此。不過，航海家一號確實是距離最遠的人造物體。',
+      'No. Es el objeto que sale del sistema solar más deprisa, a unos 17 km/s respecto al Sol, pero sondas que caen hacia el Sol, como la Parker Solar Probe, alcanzan velocidades mucho mayores. Eso sí, la Voyager 1 es el objeto humano más lejano.',
+    ),
+  },
+  {
+    q: T('What does “one light-day from Earth” mean?', '「距地球一光日」是什麼意思？', '¿Qué significa «a un día-luz de la Tierra»?'),
+    a: T(
+      'It means light — and radio — needs 24 hours to travel between Earth and the spacecraft, about 25.9 billion km. A command sent in the morning gets its first reply two days later. The milestones panel above counts down to it using this site’s model and shows NASA’s own date for comparison.',
+      '意思是光（以及無線電）在地球與太空船之間傳遞需要 24 小時，距離約 259 億公里。早上送出的指令，要兩天後才會收到第一個回覆。上方的里程碑面板以本站模型倒數，並列出 NASA 公布的日期以供比對。',
+      'Significa que la luz —y la radio— tarda 24 horas en viajar entre la Tierra y la nave, unos 25 900 millones de km. Una orden enviada por la mañana recibe su primera respuesta dos días después. El panel de hitos de arriba hace la cuenta atrás con el modelo del sitio y muestra la fecha de la NASA para comparar.',
+    ),
+  },
+  {
+    q: T('Can Voyager 1 still take pictures?', '航海家一號還能拍照嗎？', '¿Puede la Voyager 1 seguir tomando fotos?'),
+    a: T(
+      'No. Its cameras were turned off in 1990, shortly after the family portrait, to save power and memory for the interstellar mission; there is nothing near enough to photograph anyway. Today it studies its surroundings with a magnetometer and a plasma wave instrument.',
+      '不能。為了替星際任務節省電力與記憶體，它的相機在 1990 年拍完全家福後不久就已關閉；何況附近也沒有足夠接近、值得拍攝的目標。如今它以磁力計與電漿波儀器研究周遭環境。',
+      'No. Sus cámaras se apagaron en 1990, poco después del retrato de familia, para ahorrar energía y memoria para la misión interestelar; además, no hay nada lo bastante cerca para fotografiar. Hoy estudia su entorno con un magnetómetro y un instrumento de ondas de plasma.',
+    ),
   },
 ];
 
 export default function Voyager1Page() {
-  const zh = useZh();
-  const es = useEs();
-  const instMap = zh ? INSTRUMENT_ZH : es ? INSTRUMENT_ES : undefined;
+  const locale = useLang();
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <BiArticleHeader
         current="voyager-1"
-        title={bi('Voyager 1 — Mission, Distance and Current Status', '航海家一號——任務、距離與目前狀態', 'Voyager 1 — misión, distancia y estado actual')}
+        title={bi('Voyager 1 — Distance, Speed & Mission Information', '航海家一號——距離、速度與任務資訊', 'Voyager 1: distancia, velocidad e información de la misión')}
         intro={bi(
-          'Voyager 1 is NASA\u2019s most distant spacecraft and the first human-made object to reach interstellar space. Launched in 1977, it explored Jupiter and Saturn before heading out of the solar system — and it is still talking to Earth today.',
-          '航海家一號是 NASA 距離最遠的太空船，也是第一個進入星際空間的人造物體。它於 1977 年發射，探索木星與土星後便朝向太陽系外飛去——至今仍持續與地球通訊。',
-          'La Voyager 1 es la nave más distante de la NASA y el primer objeto hecho por el ser humano en llegar al espacio interestelar. Lanzada en 1977, exploró Júpiter y Saturno antes de salir del sistema solar — y hoy sigue comunicándose con la Tierra.',
+          'Voyager 1 is the most distant human-made object and the first to reach interstellar space. Launched in 1977, it explored Jupiter and Saturn, photographed Earth as a “pale blue dot”, and is still sending data home from beyond the heliosphere.',
+          '航海家一號是距離最遠的人造物體，也是第一個抵達星際空間的人造物。它於 1977 年發射，探索了木星與土星，把地球拍成一粒「蒼藍小點」，至今仍從日球層之外把資料傳回地球。',
+          'La Voyager 1 es el objeto humano más lejano y el primero en llegar al espacio interestelar. Lanzada en 1977, exploró Júpiter y Saturno, fotografió la Tierra como un «pálido punto azul» y sigue enviando datos desde más allá de la heliosfera.',
         )}
       />
 
       <TrackerSection
         ids={['voyager1']}
-        title={zh ? '航海家一號即時追蹤器' : es ? 'Rastreador en vivo de Voyager 1' : 'Voyager 1 Live Tracker'}
-        intro={
-          zh
-            ? '航海家一號與地球、太陽的估計距離、巡航速度與任務現況。這些數值以 NASA/JPL 參考基準計算，並非官方即時遙測。'
-            : es
-              ? 'Distancia estimada a la Tierra y al Sol, velocidad de crucero y estado de la misión de Voyager 1. Valores calculados a partir de una línea base de referencia de NASA/JPL, no telemetría oficial.'
-              : 'Estimated distance from Earth and the Sun, cruising speed and mission status for Voyager 1. Values are calculated from a NASA/JPL-referenced baseline, not live official telemetry.'
-        }
+        title={txt(T('Voyager 1 — calculated position right now', '航海家一號此刻的計算位置', 'Voyager 1: posición calculada ahora'), locale)}
+        intro={txt(
+          T(
+            'Estimated distance from Earth and the Sun, speed, signal delay and mission time for Voyager 1, plus instrument status as reported by NASA and a countdown to its next milestones. Calculated by this site from JPL Horizons reference data — not official telemetry.',
+            '航海家一號與地球、太陽的估計距離、速度、訊號延遲與任務時間，以及 NASA 公布的儀器狀態與下一個里程碑的倒數。數值由本站依 JPL Horizons 參考資料計算，並非官方遙測。',
+            'Distancia estimada a la Tierra y al Sol, velocidad, retardo de señal y tiempo de misión de la Voyager 1, más el estado de sus instrumentos según la NASA y la cuenta atrás de sus próximos hitos. Calculado por este sitio con datos de JPL Horizons; no es telemetría oficial.',
+          ),
+          locale,
+        )}
         showMap
         showModel
+        showGuide={false}
       />
 
-      <BiSection
-        id="what-is-voyager-1"
-        kicker={bi('Profile', '介紹', 'Perfil')}
-        title={bi('What is Voyager 1?', '航海家一號是什麼？', '¿Qué es la Voyager 1?')}
-      >
+      <BiSection id="what-is-voyager-1" title={bi('What is Voyager 1?', '航海家一號是什麼？', '¿Qué es la Voyager 1?')}>
         <p className="max-w-4xl leading-relaxed text-slate-300">
-          {zh
-            ? '航海家一號是 NASA 噴射推進實驗室為航海家計畫打造、兩艘近乎相同的探測器之一。它原本的任務是趁行星罕見排列之機探索外太陽系——而它做的遠比那更多。'
-            : es
-              ? 'La Voyager 1 es una de las dos sondas casi idénticas construidas por el JPL de la NASA para el programa Voyager. Estaba diseñada para aprovechar una rara alineación planetaria — e hizo mucho más que eso.'
-              : 'Voyager 1 is one of two nearly identical probes built by NASA\u2019s Jet Propulsion Laboratory for the Voyager program. It was designed to take advantage of a rare planetary alignment — and it did far more than that.'}
+          {txt(
+            T(
+              'Voyager 1 is one of two nearly identical probes built by NASA’s Jet Propulsion Laboratory. It weighed about 800 kg at launch, carries a 3.7-metre dish antenna and draws power from three radioisotope thermoelectric generators, which convert heat from decaying plutonium into electricity.',
+              '航海家一號是 NASA 噴射推進實驗室打造的兩艘近乎相同的探測器之一。它發射時重約 800 公斤，配有一座 3.7 公尺的碟形天線，電力來自三具放射性同位素熱電機——把鈽衰變產生的熱轉換成電。',
+              'La Voyager 1 es una de las dos sondas casi idénticas construidas por el JPL de la NASA. Pesaba unos 800 kg al despegar, lleva una antena parabólica de 3,7 metros y obtiene energía de tres generadores termoeléctricos de radioisótopos, que convierten en electricidad el calor del plutonio.',
+            ),
+            locale,
+          )}
         </p>
         <p className="mt-3 max-w-4xl leading-relaxed text-slate-300">
-          {zh
-            ? '完成木星與土星的既定任務後，航海家一號被導向行星軌道面的北方。它持續運作、持續量測，並於 2012 年成為第一艘穿越日球層頂的太空船。'
-            : es
-              ? 'Tras sus encuentros con Júpiter y Saturno, la Voyager 1 fue redirigida al norte, fuera del plano de los planetas. Siguió operando y, en 2012, se convirtió en la primera nave en cruzar la heliopausa.'
-              : 'After completing its planned encounters with Jupiter and Saturn, Voyager 1 was redirected north, out of the plane in which the planets orbit. It kept operating and, in 2012, became the first spacecraft to cross the heliopause.'}
+          {txt(
+            T(
+              'After its encounters with Jupiter and Saturn, Voyager 1 had nowhere else to go but out. It kept operating as a probe of the outer heliosphere and, in 2012, became the first spacecraft to cross into interstellar space. It is travelling roughly 35° north of the plane in which the planets orbit.',
+              '在飛掠木星與土星之後，航海家一號已無其他目的地，只能一路向外。它繼續作為日球層外圍的探測器運作，並於 2012 年成為第一艘進入星際空間的太空船。它目前朝行星軌道面北方約 35° 的方向前進。',
+              'Tras sus encuentros con Júpiter y Saturno, a la Voyager 1 solo le quedaba alejarse. Siguió operando como sonda de la heliosfera exterior y en 2012 fue la primera nave en entrar al espacio interestelar. Viaja unos 35° al norte del plano en que orbitan los planetas.',
+            ),
+            locale,
+          )}
         </p>
       </BiSection>
 
-      <BiSection
-        id="facts"
-        kicker={bi('Facts', '重點資料', 'Datos')}
-        title={bi('Voyager 1 at a glance', '航海家一號速覽', 'Voyager 1 de un vistazo')}
-      >
+      <BiSection id="facts" title={bi('Voyager 1 at a glance', '航海家一號速覽', 'Voyager 1 de un vistazo')}>
         <FactGrid items={FACTS} />
       </BiSection>
 
-      <BiSection
-        id="journey"
-        kicker={bi('Journey', '旅程', 'Trayectoria')}
-        title={bi('Voyager 1\u2019s path through the solar system', '航海家一號穿越太陽系的路徑', 'El camino de la Voyager 1 por el sistema solar')}
-      >
+      <BiSection id="journey" title={bi('Voyager 1’s path through the solar system', '航海家一號穿越太陽系的路徑', 'El camino de la Voyager 1 por el sistema solar')}>
         <div className="space-y-5">
           {JOURNEY.map((step) => (
             <div key={step.date}>
-              <p className="font-mono text-xs font-bold uppercase tracking-widest text-cyan-400">{step.date}</p>
-              <h3 className="mb-1 text-lg font-semibold text-white">{zh ? step.title.zh : es ? step.title.es : step.title.en}</h3>
-              <p className="leading-relaxed text-slate-300">{zh ? step.text.zh : es ? step.text.es : step.text.en}</p>
+              <p className="font-mono text-xs font-bold uppercase tracking-widest text-cyan-300">{step.date}</p>
+              <h3 className="mb-1 text-lg font-semibold text-white">{txt(step.title, locale)}</h3>
+              <p className="max-w-4xl leading-relaxed text-slate-300">{txt(step.text, locale)}</p>
             </div>
           ))}
         </div>
       </BiSection>
 
-      <BiSection
-        id="instruments"
-        kicker={bi('Hardware', '硬體', 'Equipo')}
-        title={bi('Science instruments', '科學儀器', 'Instrumentos científicos')}
-      >
-        <p className="mb-4 max-w-4xl leading-relaxed text-slate-300">
-          {zh
-            ? '航海家一號原本搭載十一項科學儀器。為了節省電力，其中數項已被關閉；目前任務聚焦於研究星際空間中的粒子、磁場與電漿的儀器：'
-            : es
-              ? 'La Voyager 1 llevaba originalmente once instrumentos científicos. Varios se han apagado para ahorrar energía; la misión se centra en los que estudian partículas, campos y plasma en el espacio interestelar:'
-              : 'Voyager 1 originally carried eleven science instruments. Several have been switched off to save power; the mission today focuses on instruments that study particles, fields and plasma in interstellar space:'}
-        </p>
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {META.instruments.map((inst) => {
-            const localInst = instMap ? instMap[inst.code] : undefined;
-            return (
-              <li key={inst.code} className="rounded-xl border border-slate-800 bg-space-900/40 p-4">
-                <p className="font-mono text-xs font-bold text-cyan-300">{inst.code}</p>
-                <p className="mt-0.5 text-sm font-semibold text-slate-200">
-                  {localInst ? localInst.name : inst.name}
-                </p>
-                <p className="mt-1 text-sm leading-relaxed text-slate-400">
-                  {localInst ? localInst.description : inst.description}
-                </p>
-              </li>
-            );
-          })}
-        </ul>
-      </BiSection>
-
-      <BiSection
-        id="golden-record"
-        kicker={bi('Message in a bottle', '瓶中訊息', 'Mensaje en una botella')}
-        title={bi('The Golden Record aboard Voyager 1', '航海家一號上的金唱片', 'El Disco de Oro a bordo de la Voyager 1')}
-      >
-        <p className="max-w-4xl leading-relaxed text-slate-300">
-          {zh ? (
-            <>
-              兩艘航海家號都攜帶一張金唱片——內含影像、音樂、自然之聲與五十五種語言問候。若未來某個文明發現航海家一號，這張唱片將告訴他們：打造這艘太空船的是誰，地球又在哪裡。{' '}
-              <a href={pageUrl('golden-record')} className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200">閱讀金唱片的故事 →</a>
-            </>
-          ) : es ? (
-            <>
-              Ambas Voyager llevan una copia del Disco de Oro — un disco fonográfico dorado con imágenes, música, sonidos naturales y saludos en 55 idiomas. Si otra civilización encuentra la Voyager 1, el disco le dirá quién hizo la nave y dónde está la Tierra.{' '}
-              <a href={pageUrl('golden-record')} className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200">Conoce el Disco de Oro →</a>
-            </>
-          ) : (
-            <>
-              Both Voyagers carry a copy of the Golden Record — a gold-plated copper phonograph record with images, music, natural sounds and greetings in 55 languages. If another civilization ever finds Voyager 1, the record tells them who made the spacecraft and where Earth is.{' '}
-              <a href={pageUrl('golden-record')} className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200">Read about the Golden Record →</a>
-            </>
-          )}
-        </p>
-      </BiSection>
-
-      <BiSection
-        id="significance"
-        kicker={bi('Why it matters', '為什麼重要', 'Por qué importa')}
-        title={bi('Voyager 1\u2019s historical significance', '航海家一號的歷史意義', 'La importancia histórica de la Voyager 1')}
-      >
-        <p className="max-w-4xl leading-relaxed text-slate-300">
-          {zh
-            ? '航海家一號是深空探索的標竿：第一個近距離造訪木星與土星、第一個拍到地球以外活火山、第一個離開日球層的探測器，也是目前人類建造過最遙遠、移動最快的物體。'
-            : es
-              ? 'La Voyager 1 es el referente de la exploración del espacio profundo: la primera en visitar Júpiter y Saturno de cerca, en fotografiar un volcán activo más allá de la Tierra y en dejar la heliosfera; sigue siendo el objeto más distante y rápido jamás construido.'
-              : 'Voyager 1 is the benchmark for deep-space exploration: the first to visit Jupiter and Saturn in detail, the first to photograph an erupting volcano beyond Earth, the first to leave the heliosphere, and the most distant and fastest-moving object ever built by human hands.'}
-        </p>
-        <div className="my-4 rounded-xl border border-amber-400/40 bg-amber-400/5 p-5 text-sm leading-relaxed text-amber-100">
-          <p className="mb-1.5 font-semibold text-white">
-            {zh ? '距離查詢' : es ? 'Consulta de distancia' : 'Distance check'}
-          </p>
-          <p>
-            {zh
-              ? '想立刻知道航海家一號在哪裡嗎？本頁頂端的即時追蹤器會顯示它目前與地球、太陽的估計距離。'
-              : es
-                ? '¿Quieres saber dónde está la Voyager 1 ahora mismo? El rastreador en vivo muestra su distancia estimada actual a la Tierra y al Sol.'
-                : 'Curious how far Voyager 1 is right now? The live tracker at the top of this page shows its current estimated distance from Earth and the Sun.'}
-          </p>
+      <BiSection id="pale-blue-dot" title={bi('The Pale Blue Dot', '蒼藍小點', 'El pálido punto azul')}>
+        <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+          <div className="space-y-3 leading-relaxed text-slate-300">
+            <p>
+              {txt(
+                T(
+                  'On 14 February 1990, at the suggestion of astronomer Carl Sagan, the team turned Voyager 1’s camera back toward the Sun and the planets. From about 6 billion kilometres away, Earth filled less than a single pixel and appeared inside a streak of sunlight scattered in the camera optics.',
+                  '1990 年 2 月 14 日，在天文學家卡爾．薩根的建議下，團隊把航海家一號的相機轉回朝向太陽與行星。從約 60 億公里外看去，地球連一個畫素都佔不滿，出現在相機光學元件散射出的一道陽光之中。',
+                  'El 14 de febrero de 1990, a propuesta del astrónomo Carl Sagan, el equipo giró la cámara de la Voyager 1 hacia el Sol y los planetas. Desde unos 6000 millones de km, la Tierra ocupaba menos de un píxel y aparecía dentro de un rayo de luz solar dispersada en la óptica.',
+                ),
+                locale,
+              )}
+            </p>
+            <p>
+              {txt(
+                T(
+                  'The image was scientifically modest but culturally enormous. It made the scale of the solar system — and the fragility of the one world we live on — visible in a single frame. Soon afterwards the cameras were switched off permanently to conserve power for the long journey ahead.',
+                  '這張影像在科學上並不起眼，在文化上卻意義非凡。它讓太陽系的尺度——以及我們唯一居住的世界有多脆弱——在一張畫面中變得清晰可見。不久之後，相機便永久關閉，以替漫長的旅程保留電力。',
+                  'La imagen fue modesta científicamente pero enorme culturalmente: hizo visible en un solo fotograma la escala del sistema solar y la fragilidad del único mundo que habitamos. Poco después las cámaras se apagaron para siempre, para ahorrar energía para el largo viaje.',
+                ),
+                locale,
+              )}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-slate-700/60 bg-space-900/50 p-5 text-sm text-slate-300">
+            <p className="mb-2 font-semibold text-white">{txt(T('Try it yourself', '自己算算看', 'Pruébalo tú'), locale)}</p>
+            <p className="leading-relaxed">
+              {txt(
+                T(
+                  'The “Where was Voyager on…?” calculator shows that Voyager 1 was about 40 AU from the Sun that day — and how much farther it is now.',
+                  '「某一天，航海家在哪裡？」計算器顯示，那天航海家一號距太陽約 40 AU——以及它如今又遠了多少。',
+                  'La calculadora «¿Dónde estaba Voyager el…?» muestra que ese día la Voyager 1 estaba a unas 40 UA del Sol, y cuánto más lejos está ahora.',
+                ),
+                locale,
+              )}
+            </p>
+            <a href={`${pageUrl('tools')}#on-this-date`} className="mt-3 inline-block text-cyan-300 underline underline-offset-2 hover:text-cyan-200">
+              {txt(T('Open the calculator →', '開啟計算器 →', 'Abrir la calculadora →'), locale)}
+            </a>
+          </div>
         </div>
       </BiSection>
 
-      <RelatedLinks items={['home', 'voyager-2', 'timeline', 'discoveries', 'how-it-works']} />
+      <BiSection id="instruments" title={bi('Which instruments still work?', '哪些儀器仍在運作？', '¿Qué instrumentos siguen funcionando?')}>
+        <p className="mb-4 max-w-4xl leading-relaxed text-slate-300">
+          {txt(
+            T(
+              'Voyager 1 launched with ten science instruments. Its power supply loses about 4 watts a year, so NASA switches instruments off in a sequence agreed years ago. Its plasma instrument stopped working in 1980; the cosmic ray instrument was turned off in 2025 and the low-energy particle instrument in 2026.',
+              '航海家一號發射時搭載十項科學儀器。它的電源每年約減少 4 瓦，因此 NASA 依多年前就議定的順序逐一關閉儀器。電漿儀器在 1980 年失效；宇宙射線儀器於 2025 年、低能量粒子儀器於 2026 年相繼關閉。',
+              'La Voyager 1 despegó con diez instrumentos científicos. Su fuente de energía pierde unos 4 vatios al año, así que la NASA apaga instrumentos en un orden acordado hace años. El de plasma dejó de funcionar en 1980; el de rayos cósmicos se apagó en 2025 y el de partículas de baja energía en 2026.',
+            ),
+            locale,
+          )}
+        </p>
+        <InstrumentStatusList id="voyager1" />
+      </BiSection>
+
+      <BiSection id="current-context" title={bi('Voyager 1 today: recent events', '航海家一號的近況', 'La Voyager 1 hoy: hechos recientes')}>
+        <ol className="space-y-4 border-l border-slate-700/70 pl-6">
+          {CONTEXT.map((c) => (
+            <li key={c.when} className="relative">
+              <span className="absolute -left-[31px] top-1.5 h-3 w-3 rounded-full bg-cyan-400 ring-4 ring-space-950" aria-hidden="true" />
+              <p className="font-mono text-xs font-bold uppercase tracking-widest text-slate-400">{c.when}</p>
+              <p className="mt-1 max-w-4xl leading-relaxed text-slate-300">{txt(c.text, locale)}</p>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-4 text-sm text-slate-400">
+          {txt(T('A dated log of these and other events is kept on the', '這些事件與其他事件的日期紀錄，整理在', 'Un registro fechado de estos y otros hechos está en'), locale)}{' '}
+          <a href={pageUrl('updates')} className="text-cyan-300 underline underline-offset-2">
+            {txt(T('Updates page', '更新紀錄頁', 'la página de Novedades'), locale)}
+          </a>
+          .
+        </p>
+      </BiSection>
+
+      <BiSection id="golden-record" title={bi('The Golden Record aboard Voyager 1', '航海家一號上的金唱片', 'El Disco de Oro a bordo de la Voyager 1')}>
+        <p className="max-w-4xl leading-relaxed text-slate-300">
+          {txt(
+            T(
+              'Bolted to the side of Voyager 1 is a gold-plated copper record with images, music, natural sounds and greetings in 55 languages, plus instructions for playing it.',
+              '航海家一號的側面固定著一張鍍金銅唱片，收錄影像、音樂、自然聲音與 55 種語言的問候，並附有播放說明。',
+              'Atornillado al costado de la Voyager 1 hay un disco de cobre chapado en oro con imágenes, música, sonidos naturales y saludos en 55 idiomas, además de instrucciones para reproducirlo.',
+            ),
+            locale,
+          )}{' '}
+          <a href={pageUrl('golden-record')} className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200">
+            {txt(T('Read about the Golden Record →', '閱讀金唱片的故事 →', 'Conoce el Disco de Oro →'), locale)}
+          </a>
+        </p>
+      </BiSection>
+
+      <BiSection id="questions" title={bi('Questions about Voyager 1', '關於航海家一號的問題', 'Preguntas sobre la Voyager 1')}>
+        <PageQA items={QA} />
+      </BiSection>
+
+      <SourcesNote
+        links={[
+          { label: 'NASA Science — Voyager 1', url: 'https://science.nasa.gov/mission/voyager/voyager-1/' },
+          { label: 'NASA — Where are Voyager 1 and Voyager 2 now?', url: 'https://science.nasa.gov/mission/voyager/where-are-voyager-1-and-voyager-2-now/' },
+          { label: 'NASA — Voyager 1 returning science data from all four instruments (2024)', url: 'https://science.nasa.gov/blogs/voyager/2024/06/13/voyager-1-returning-science-data-from-all-four-instruments/' },
+          { label: 'NASA — Shuts off instrument on Voyager 1 (2026)', url: 'https://science.nasa.gov/blogs/voyager/2026/04/17/nasa-shuts-off-instrument-on-voyager-1-to-keep-spacecraft-operating/' },
+          { label: 'NASA Science — Voyager 1’s Pale Blue Dot', url: 'https://science.nasa.gov/resource/voyager-1s-pale-blue-dot/' },
+          { label: 'JPL Horizons (trajectory data)', url: 'https://ssd.jpl.nasa.gov/horizons/' },
+        ]}
+      />
+
+      <RelatedLinks items={['compare', 'voyager-2', 'timeline', 'why-voyager-matters', 'tools']} />
     </div>
   );
 }
-
-

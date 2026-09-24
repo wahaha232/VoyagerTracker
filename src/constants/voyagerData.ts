@@ -1,56 +1,14 @@
 /**
- * Ephemeris baseline parameters and bilingual translation dictionaries
- * for the Voyager Tracker application.
+ * Mission metadata, instrument status and trilingual UI dictionaries for
+ * the tracker components.
  *
- * The baseline values are anchored to a fixed epoch. The client-side
- * interpolation engine (see useVoyagerLive) advances these distances
- * smoothly using the stored velocity vectors — no external API polling
- * is required on every tick.
+ * Position/velocity figures are NOT stored here any more: they come from
+ * the JPL Horizons-based model in src/lib/ephemeris.ts.
  */
 
-import type {
-  EphemerisBaseline,
-  Locale,
-  SpacecraftId,
-  SpacecraftMeta,
-  Translation,
-} from '../types/voyager';
+import type { Locale, SpacecraftId, SpacecraftMeta, Translation } from '../types/voyager';
 
-/** One astronomical unit in kilometers (IAU 2012 definition). */
-export const AU_KM = 149_597_870.7;
-
-/** Speed of light in km/s. */
-export const SPEED_OF_LIGHT_KM_S = 299_792.458;
-
-/**
- * Baseline epoch: 2026-08-23T00:00:00Z (UTC).
- * Distances below are approximate real-world values for that epoch.
- */
-const BASE_EPOCH_MS = Date.UTC(2026, 7, 23, 0, 0, 0);
-
-/** Ephemeris baseline constants for each spacecraft. */
-export const EPHEMERIS: Record<SpacecraftId, EphemerisBaseline> = {
-  voyager1: {
-    baseEpochMs: BASE_EPOCH_MS,
-    // ~165.5 AU from the Sun at baseline epoch.
-    sunDistanceKm: 165.5 * AU_KM,
-    // ~165.5 AU from Earth (roughly radial outward).
-    earthDistanceKm: 165.5 * AU_KM,
-    // Heliocentric velocity vector (km/s) — mostly radial outward.
-    velocity: { x: 16.9, y: 1.2, z: 0.4 },
-    cruiseSpeedKmS: 17.0,
-  },
-  voyager2: {
-    baseEpochMs: BASE_EPOCH_MS,
-    // ~138.5 AU from the Sun at baseline epoch.
-    sunDistanceKm: 138.5 * AU_KM,
-    // ~138.5 AU from Earth.
-    earthDistanceKm: 138.5 * AU_KM,
-    // Heliocentric velocity vector (km/s).
-    velocity: { x: 15.1, y: -1.4, z: 0.6 },
-    cruiseSpeedKmS: 15.3,
-  },
-};
+export { AU_KM, C_KM_S as SPEED_OF_LIGHT_KM_S } from '../lib/ephemeris';
 
 /** Static mission metadata for each spacecraft. */
 export const SPACECRAFT_META: Record<SpacecraftId, SpacecraftMeta> = {
@@ -61,32 +19,6 @@ export const SPACECRAFT_META: Record<SpacecraftId, SpacecraftMeta> = {
     interstellarEntryDate: '2012-08-25',
     accent: '#22d3ee', // cyan
     gradient: 'from-cyan-500/20 to-sky-900/40',
-    instruments: [
-      {
-        code: 'MAG',
-        name: 'Magnetometer',
-        description:
-          'Measures the strength and direction of the interplanetary and interstellar magnetic field.',
-      },
-      {
-        code: 'LECP',
-        name: 'Low-Energy Charged Particles',
-        description:
-          'Detects low-energy charged particles and cosmic rays in the heliosphere and interstellar medium.',
-      },
-      {
-        code: 'CRS',
-        name: 'Cosmic Ray Subsystem',
-        description:
-          'Measures the intensity and energy spectrum of cosmic rays and solar energetic particles.',
-      },
-      {
-        code: 'PLS',
-        name: 'Plasma Science',
-        description:
-          'Studies the solar wind plasma and its interaction with the interstellar medium.',
-      },
-    ],
   },
   voyager2: {
     id: 'voyager2',
@@ -95,73 +27,78 @@ export const SPACECRAFT_META: Record<SpacecraftId, SpacecraftMeta> = {
     interstellarEntryDate: '2018-11-05',
     accent: '#34d399', // emerald
     gradient: 'from-emerald-500/20 to-teal-900/40',
-    instruments: [
-      {
-        code: 'MAG',
-        name: 'Magnetometer',
-        description:
-          'Measures the strength and direction of the interplanetary and interstellar magnetic field.',
-      },
-      {
-        code: 'LECP',
-        name: 'Low-Energy Charged Particles',
-        description:
-          'Detects low-energy charged particles and cosmic rays in the heliosphere and interstellar medium.',
-      },
-      {
-        code: 'CRS',
-        name: 'Cosmic Ray Subsystem',
-        description:
-          'Measures the intensity and energy spectrum of cosmic rays and solar energetic particles.',
-      },
-      {
-        code: 'PLS',
-        name: 'Plasma Science',
-        description:
-          'Studies the solar wind plasma and its interaction with the interstellar medium.',
-      },
-    ],
   },
 };
 
-/** Traditional-Chinese names for the science instruments shown on tracker cards. */
-export const INSTRUMENT_ZH: Record<string, { name: string; description: string }> = {
+type Tri = { en: string; zh: string; es: string };
+
+/** The five fields-and-particles instruments still relevant to the interstellar mission. */
+export const INSTRUMENTS: Record<string, { name: Tri; description: Tri }> = {
   MAG: {
-    name: '磁力計',
-    description: '量測行星際與星際磁場的強度與方向。',
+    name: { en: 'Magnetometer', zh: '磁力計', es: 'Magnetómetro' },
+    description: {
+      en: 'Measures the strength and direction of the magnetic field around the spacecraft.',
+      zh: '量測太空船周圍磁場的強度與方向。',
+      es: 'Mide la intensidad y dirección del campo magnético alrededor de la nave.',
+    },
   },
-  LECP: {
-    name: '低能量帶電粒子儀',
-    description: '偵測日球層與星際介質中的低能量帶電粒子與宇宙射線。',
+  PWS: {
+    name: { en: 'Plasma Wave Subsystem', zh: '電漿波次系統', es: 'Subsistema de ondas de plasma' },
+    description: {
+      en: 'Listens for waves in the surrounding plasma; used to estimate the density of interstellar gas.',
+      zh: '偵測周圍電漿中的波動，可用來推算星際氣體的密度。',
+      es: 'Detecta ondas en el plasma circundante; sirve para estimar la densidad del gas interestelar.',
+    },
   },
   CRS: {
-    name: '宇宙射線次系統',
-    description: '量測宇宙射線與太陽高能粒子的強度與能量分布。',
+    name: { en: 'Cosmic Ray Subsystem', zh: '宇宙射線次系統', es: 'Subsistema de rayos cósmicos' },
+    description: {
+      en: 'Counts high-energy particles from the galaxy and the Sun.',
+      zh: '計數來自銀河與太陽的高能粒子。',
+      es: 'Cuenta partículas de alta energía procedentes de la galaxia y del Sol.',
+    },
+  },
+  LECP: {
+    name: { en: 'Low-Energy Charged Particles', zh: '低能量帶電粒子儀', es: 'Partículas cargadas de baja energía' },
+    description: {
+      en: 'Measures lower-energy ions and electrons; mapped pressure fronts beyond the heliopause.',
+      zh: '量測較低能量的離子與電子，曾描繪出日球層頂外的壓力鋒面。',
+      es: 'Mide iones y electrones de menor energía; cartografió frentes de presión más allá de la heliopausa.',
+    },
   },
   PLS: {
-    name: '電漿科學儀',
-    description: '研究太陽風電漿及其與星際介質的交互作用。',
+    name: { en: 'Plasma Science', zh: '電漿科學儀', es: 'Ciencia del plasma' },
+    description: {
+      en: 'Measured the speed, density and temperature of plasma directly.',
+      zh: '直接量測電漿的速度、密度與溫度。',
+      es: 'Medía directamente la velocidad, densidad y temperatura del plasma.',
+    },
   },
 };
 
-/** Spanish names for the science instruments shown on tracker cards. */
-export const INSTRUMENT_ES: Record<string, { name: string; description: string }> = {
-  MAG: {
-    name: 'Magnetómetro',
-    description: 'Mide la intensidad y dirección del campo magnético interplanetario e interestelar.',
-  },
-  LECP: {
-    name: 'Partículas cargadas de baja energía',
-    description: 'Detecta partículas cargadas de baja energía y rayos cósmicos en la heliosfera y el medio interestelar.',
-  },
-  CRS: {
-    name: 'Subsistema de rayos cósmicos',
-    description: 'Mide la intensidad y el espectro de energía de los rayos cósmicos y las partículas solares energéticas.',
-  },
-  PLS: {
-    name: 'Ciencia del plasma',
-    description: 'Estudia el plasma del viento solar y su interacción con el medio interestelar.',
-  },
+/** Date of the NASA status report the instrument table below reflects. */
+export const INSTRUMENT_STATUS_AS_OF = '2026-08-04';
+
+/**
+ * Instrument status per spacecraft, from NASA's "Where Are Voyager 1 and
+ * Voyager 2 Now?" page and the Voyager mission blog (see sources.html).
+ * `off` is the month the instrument was switched off or stopped working.
+ */
+export const INSTRUMENT_STATUS: Record<SpacecraftId, { code: string; on: boolean; off?: string }[]> = {
+  voyager1: [
+    { code: 'MAG', on: true },
+    { code: 'PWS', on: true },
+    { code: 'LECP', on: false, off: '2026-04' },
+    { code: 'CRS', on: false, off: '2025-02' },
+    { code: 'PLS', on: false, off: '1980' },
+  ],
+  voyager2: [
+    { code: 'MAG', on: true },
+    { code: 'PWS', on: true },
+    { code: 'CRS', on: true },
+    { code: 'LECP', on: false, off: '2025-03' },
+    { code: 'PLS', on: false, off: '2024-10' },
+  ],
 };
 
 /** English (en-US) translation dictionary. */
@@ -170,7 +107,7 @@ const enUS: Translation = {
   nativeName: 'English',
   shortLabel: 'EN',
   appTitle: 'Voyager Tracker',
-  appSubtitle: 'NASA Interstellar Mission · Real-Time Telemetry',
+  appSubtitle: 'Voyager Interstellar Mission · Real-Time Estimates',
   nav: {
     overview: 'Overview',
     telemetry: 'Telemetry',
@@ -179,8 +116,8 @@ const enUS: Translation = {
   },
   dashboard: {
     title: 'Mission Dashboard',
-    subtitle: 'Live interpolated telemetry for the Voyager interstellar probes',
-    live: 'LIVE',
+    subtitle: 'Continuously calculated estimates for the Voyager interstellar probes',
+    live: 'ESTIMATE',
     updated: 'Updated',
     compare: 'Comparison View',
     single: 'Single View',
@@ -189,9 +126,9 @@ const enUS: Translation = {
     distanceFromSun: 'Distance from Sun',
     distanceFromEarth: 'Distance from Earth',
     lightTime: 'One-Way Light Time',
-    cruiseSpeed: 'Cruising Speed (rel. Sun)',
+    cruiseSpeed: 'Speed relative to the Sun',
     missionStatus: 'Mission Status',
-    activeInstruments: 'Active Instruments',
+    activeInstruments: 'Science instruments',
     launchDate: 'Launch Date',
     interstellarEntry: 'Interstellar Entry',
     au: 'AU',
@@ -218,7 +155,7 @@ const enUS: Translation = {
     jupiterFlyby: 'Jupiter Flyby',
     saturnFlyby: 'Saturn Flyby',
     legend: 'Legend',
-    scaleNote: 'Radial scale: 0 → 140 AU (logarithmic)',
+    scaleNote: 'Top-down view of the planets’ plane · distance scale 0 → 200 AU (logarithmic)',
   },
   status: {
     interstellar: 'Interstellar Space',
@@ -227,7 +164,7 @@ const enUS: Translation = {
   },
   footer: {
     disclaimer:
-      'Telemetry is interpolated client-side from baseline ephemeris constants for demonstration purposes and is not official NASA data.',
+      'Figures are calculated in your browser from JPL Horizons reference data. They are estimates, not official NASA telemetry.',
     dataSource: 'Baseline ephemeris · NASA Voyager mission reference',
   },
   toggle: {
@@ -242,7 +179,7 @@ const zhTW: Translation = {
   nativeName: '繁體中文',
   shortLabel: '繁',
   appTitle: '航海家號追蹤器',
-  appSubtitle: 'NASA 星際任務 · 即時遙測',
+  appSubtitle: '航海家星際任務 · 即時估算',
   nav: {
     overview: '總覽',
     telemetry: '遙測',
@@ -251,8 +188,8 @@ const zhTW: Translation = {
   },
   dashboard: {
     title: '任務儀表板',
-    subtitle: '航海家星際探測器的即時插值遙測資料',
-    live: '即時',
+    subtitle: '航海家星際探測器的持續計算估計值',
+    live: '估計值',
     updated: '更新於',
     compare: '比較檢視',
     single: '單一檢視',
@@ -261,9 +198,9 @@ const zhTW: Translation = {
     distanceFromSun: '與太陽的距離',
     distanceFromEarth: '與地球的距離',
     lightTime: '單程光行時間',
-    cruiseSpeed: '巡航速度（相對太陽）',
+    cruiseSpeed: '相對太陽的速度',
     missionStatus: '任務狀態',
-    activeInstruments: '運作中的儀器',
+    activeInstruments: '科學儀器',
     launchDate: '發射日期',
     interstellarEntry: '進入星際空間',
     au: '天文單位',
@@ -290,7 +227,7 @@ const zhTW: Translation = {
     jupiterFlyby: '木星飛掠',
     saturnFlyby: '土星飛掠',
     legend: '圖例',
-    scaleNote: '徑向比例：0 → 140 AU（對數）',
+    scaleNote: '由上往下俯視行星軌道面 · 距離比例 0 → 200 AU（對數）',
   },
   status: {
     interstellar: '星際空間',
@@ -299,7 +236,7 @@ const zhTW: Translation = {
   },
   footer: {
     disclaimer:
-      '遙測資料由基準星曆常數於用戶端插值產生，僅供展示用途，並非 NASA 官方資料。',
+      '數值以 JPL Horizons 參考資料在您的瀏覽器內計算，屬估計值，並非 NASA 官方遙測。',
     dataSource: '基準星曆 · NASA 航海家任務參考資料',
   },
   toggle: {
@@ -314,7 +251,7 @@ const esES: Translation = {
   nativeName: 'Español',
   shortLabel: 'ES',
   appTitle: 'Rastreador Voyager',
-  appSubtitle: 'Misión interestelar de la NASA · Telemetría en tiempo real',
+  appSubtitle: 'Misión interestelar Voyager · Estimaciones en tiempo real',
   nav: {
     overview: 'Resumen',
     telemetry: 'Telemetría',
@@ -323,8 +260,8 @@ const esES: Translation = {
   },
   dashboard: {
     title: 'Panel de la misión',
-    subtitle: 'Telemetría estimada en vivo de las sondas interestelares Voyager',
-    live: 'EN VIVO',
+    subtitle: 'Estimaciones calculadas continuamente para las sondas interestelares Voyager',
+    live: 'ESTIMADO',
     updated: 'Actualizado',
     compare: 'Vista comparativa',
     single: 'Vista individual',
@@ -333,9 +270,9 @@ const esES: Translation = {
     distanceFromSun: 'Distancia al Sol',
     distanceFromEarth: 'Distancia a la Tierra',
     lightTime: 'Tiempo de luz (ida)',
-    cruiseSpeed: 'Velocidad de crucero (rel. Sol)',
+    cruiseSpeed: 'Velocidad respecto al Sol',
     missionStatus: 'Estado de la misión',
-    activeInstruments: 'Instrumentos activos',
+    activeInstruments: 'Instrumentos científicos',
     launchDate: 'Fecha de lanzamiento',
     interstellarEntry: 'Entrada interestelar',
     au: 'UA',
@@ -362,7 +299,7 @@ const esES: Translation = {
     jupiterFlyby: 'Sobrevuelo de Júpiter',
     saturnFlyby: 'Sobrevuelo de Saturno',
     legend: 'Leyenda',
-    scaleNote: 'Escala radial: 0 → 140 UA (logarítmica)',
+    scaleNote: 'Vista cenital del plano de los planetas · escala 0 → 200 UA (logarítmica)',
   },
   status: {
     interstellar: 'Espacio interestelar',
@@ -371,7 +308,7 @@ const esES: Translation = {
   },
   footer: {
     disclaimer:
-      'La telemetría se interpola en el navegador a partir de constantes de efemérides de referencia con fines ilustrativos y no son datos oficiales de la NASA.',
+      'Las cifras se calculan en tu navegador a partir de datos de referencia de JPL Horizons. Son estimaciones, no telemetría oficial de la NASA.',
     dataSource: 'Efeméride de referencia · Referencia de la misión Voyager de la NASA',
   },
   toggle: {

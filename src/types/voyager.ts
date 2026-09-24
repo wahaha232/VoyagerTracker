@@ -1,6 +1,6 @@
 /**
  * TypeScript interfaces for the Voyager Tracker application.
- * Defines spacecraft telemetry, ephemeris baselines, and localized content.
+ * Defines spacecraft metadata, calculated estimates and localized content.
  */
 
 /** Supported application locales. */
@@ -8,37 +8,6 @@ export type Locale = 'zh-TW' | 'en-US' | 'es';
 
 /** Spacecraft identifiers. */
 export type SpacecraftId = 'voyager1' | 'voyager2';
-
-/** A 3D velocity vector in km/s (heliocentric ecliptic frame). */
-export interface VelocityVector {
-  x: number;
-  y: number;
-  z: number;
-}
-
-/** Baseline ephemeris constants used for client-side interpolation. */
-export interface EphemerisBaseline {
-  /** Unix epoch timestamp (ms) at which the baseline distances are exact. */
-  baseEpochMs: number;
-  /** Distance from the Sun at base epoch, in kilometers. */
-  sunDistanceKm: number;
-  /** Distance from Earth at base epoch, in kilometers. */
-  earthDistanceKm: number;
-  /** Heliocentric velocity vector in km/s. */
-  velocity: VelocityVector;
-  /** Nominal cruising speed relative to the Sun in km/s. */
-  cruiseSpeedKmS: number;
-}
-
-/** A single active scientific instrument aboard a spacecraft. */
-export interface Instrument {
-  /** Instrument acronym, e.g. "MAG". */
-  code: string;
-  /** Full instrument name (localized). */
-  name: string;
-  /** Short description of what the instrument measures (localized). */
-  description: string;
-}
 
 /** Static mission metadata for a spacecraft. */
 export interface SpacecraftMeta {
@@ -53,11 +22,9 @@ export interface SpacecraftMeta {
   accent: string;
   /** Tailwind gradient classes for the card header. */
   gradient: string;
-  /** List of currently active scientific instruments. */
-  instruments: Instrument[];
 }
 
-/** Live, interpolated telemetry for a spacecraft at a given instant. */
+/** Calculated (estimated) state of a spacecraft at a given instant. */
 export interface LiveTelemetry {
   /** Distance from the Sun in kilometers. */
   sunDistanceKm: number;
@@ -69,8 +36,10 @@ export interface LiveTelemetry {
   earthDistanceAu: number;
   /** One-way light time in seconds. */
   lightTimeSeconds: number;
-  /** Current cruising speed relative to the Sun in km/s. */
+  /** Speed relative to the Sun in km/s. */
   cruiseSpeedKmS: number;
+  /** Rate of change of the Earth distance in km/s (positive = moving away). */
+  rangeRateKmS: number;
   /** Timestamp (ms) at which this telemetry snapshot was computed. */
   timestampMs: number;
 }

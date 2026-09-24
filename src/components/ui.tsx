@@ -6,14 +6,7 @@
 
 import type { ReactNode } from 'react';
 import { LinkArrow } from './icons';
-import {
-  PAGES,
-  PAGES_ES,
-  PAGES_ZH,
-  pageLabel,
-  pageUrl,
-  type PageKey,
-} from '../constants/site';
+import { pageDescription, pageLabel, pageUrl, type PageKey } from '../constants/site';
 import { useI18n } from '../i18n/context';
 
 /** Breadcrumb-style page header with a unique H1 and short intro paragraph. */
@@ -44,7 +37,7 @@ export function ArticleHeader({
       <nav aria-label="Breadcrumb" className="mb-4 font-mono text-[11px] uppercase tracking-widest text-cyan-400/80">
         {items.map((item, i) => (
           <span key={`${item.name}-${i}`}>
-            {i > 0 && <span className="mx-2 text-slate-600">/</span>}
+            {i > 0 && <span className="mx-2 text-slate-500" aria-hidden="true">/</span>}
             {item.href ? (
               <a href={item.href} className="transition-colors hover:text-cyan-300">
                 {item.name}
@@ -136,7 +129,6 @@ export function RelatedLinks({
       <h2 className="mb-4 text-lg font-bold tracking-wide text-white">{heading}</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((key) => {
-          const page = zh ? PAGES_ZH[key] : es ? PAGES_ES[key] : PAGES[key];
           return (
             <a
               key={key}
@@ -145,10 +137,10 @@ export function RelatedLinks({
             >
               <span>
                 <span className="block font-semibold text-slate-100 group-hover:text-cyan-300">
-                  {page.label}
+                  {pageLabel(key, locale)}
                 </span>
                 <span className="mt-1 block text-xs leading-relaxed text-slate-400">
-                  {page.description}
+                  {pageDescription(key, locale)}
                 </span>
               </span>
               <LinkArrow className="mt-1 h-4 w-4 shrink-0 text-cyan-400 transition-transform group-hover:translate-x-1" />

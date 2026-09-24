@@ -34,10 +34,10 @@ export default function Header({ current }: HeaderProps) {
   }, []);
 
   const subtitle = es
-    ? 'Voyager 1 y 2 — datos en vivo e información de la misión'
+    ? 'Distancia, velocidad e información de la misión (estimaciones)'
     : zh
-      ? '航海家一號與二號 · 即時資料與任務資訊'
-      : 'Voyager 1 & 2 — Live Data & Mission Information';
+      ? '估算距離、速度與任務資訊'
+      : 'Estimated Distance, Speed & Mission Information';
 
   const select = (
     <label className="sr-only" htmlFor="lang-select">
@@ -51,18 +51,19 @@ export default function Header({ current }: HeaderProps) {
         {/* Brand */}
         <a
           href={pageUrl('home')}
-          className="flex items-center gap-3"
+          aria-current={current === 'home' ? 'page' : undefined}
+          className="flex shrink-0 items-center gap-3"
           aria-label={es ? 'Inicio del Rastreador Voyager' : zh ? '航海家號追蹤器首頁' : 'Voyager Tracker home'}
         >
           <span className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-emerald-500 text-space-950 shadow-lg shadow-cyan-500/30">
             <SatelliteIcon className="h-6 w-6" />
             <span className="absolute -inset-1 -z-10 rounded-xl bg-cyan-500/25 blur-md" aria-hidden="true" />
           </span>
-          <span className="leading-tight">
+          <span className="hidden leading-tight min-[360px]:block">
             <span className="neon-text block text-base font-bold tracking-[0.15em] text-white">
               {es ? 'Rastreador Voyager' : zh ? '航海家號追蹤器' : 'Voyager Tracker'}
             </span>
-            <span className="hidden font-mono text-[11px] tracking-wider text-cyan-300/70 sm:block">
+            <span className="hidden font-mono text-[11px] tracking-wider text-cyan-300/80 sm:block xl:hidden 2xl:block">
               {subtitle}
             </span>
           </span>
@@ -75,7 +76,7 @@ export default function Header({ current }: HeaderProps) {
               key={key}
               href={pageUrl(key)}
               aria-current={current === key ? 'page' : undefined}
-              className={`rounded-lg px-2 py-2 text-[12px] font-medium transition-colors ${
+              className={`whitespace-nowrap rounded-lg px-2 py-2 text-[12px] font-medium transition-colors ${
                 current === key
                   ? 'bg-cyan-500/10 text-cyan-300'
                   : 'text-slate-300 hover:bg-white/5 hover:text-white'

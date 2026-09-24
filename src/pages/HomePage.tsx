@@ -1,400 +1,315 @@
 /**
  * HomePage — /  (EN / 繁中 / Español)
+ *
+ * Answers, in order: what is this site, where are the Voyagers now, are
+ * the numbers official, what do they mean, and what else can I explore.
+ * Long-form material lives on the topic pages linked from here.
  */
 
-import { SPACECRAFT_META } from '../constants/voyagerData';
-import { pageUrl } from '../constants/site';
+import { Suspense, lazy } from 'react';
+import { pageUrl, type PageKey } from '../constants/site';
 import { LinkArrow } from '../components/icons';
+import ClientOnly from '../components/ClientOnly';
 import TrackerSection from '../components/TrackerSection';
-import Voyager3D from '../components/Voyager3D';
 import { RelatedLinks } from '../components/ui';
-import { useEs, useZh, bi } from '../components/content';
+import { txt, useLang } from '../components/content';
+import { useVoyagerLive, formatNumber } from '../hooks/useVoyagerLive';
+import { FAQ_ITEMS } from './FaqPage';
+import type { Locale } from '../types/voyager';
 
-const V1 = SPACECRAFT_META['voyager1'];
-const V2 = SPACECRAFT_META['voyager2'];
+const Voyager3D = lazy(() => import('../components/Voyager3D'));
+
+const tr = (locale: Locale, en: string, zh: string, es: string) => txt({ en, zh, es }, locale);
+
+/** Two-line live summary shown in the hero (client-only). */
+function HeroNumbers() {
+  const locale = useLang();
+  const live = useVoyagerLive(250);
+  return (
+    <dl className="mt-6 grid max-w-xl grid-cols-2 gap-3">
+      {(['voyager1', 'voyager2'] as const).map((id) => {
+        const v = live[id];
+        return (
+          <div key={id} className="rounded-xl border border-slate-700/60 bg-space-900/60 p-3">
+            <dt className={`font-mono text-xs font-bold uppercase tracking-widest ${id === 'voyager1' ? 'text-cyan-300' : 'text-emerald-300'}`}>
+              {id === 'voyager1' ? 'Voyager 1' : 'Voyager 2'}
+            </dt>
+            <dd className="mt-1 font-mono text-lg font-semibold text-white">
+              {locale === 'zh-TW'
+                ? `${formatNumber(v.earthDistanceKm / 1e8, locale, 2)} 億公里`
+                : `${formatNumber(v.earthDistanceKm / 1e9, locale, 3)} ${tr(locale, 'billion km', '', 'mil millones de km')}`}
+            </dd>
+            <dd className="font-mono text-xs text-slate-300">
+              {tr(locale, 'from Earth · signal delay', '距地球 · 訊號延遲', 'de la Tierra · retardo')}{' '}
+              {formatNumber(v.lightTimeSeconds / 3600, locale, 2)} {tr(locale, 'h', '小時', 'h')}
+            </dd>
+          </div>
+        );
+      })}
+    </dl>
+  );
+}
+
+const EXPLORE: { key: PageKey; en: string; zh: string; es: string }[] = [
+  {
+    key: 'compare',
+    en: 'Put the twins side by side: a 50-year distance chart built from JPL data, their different routes, and why identical spacecraft ended up so far apart.',
+    zh: '把這對雙胞胎並列比較：以 JPL 資料繪製的 50 年距離圖、兩條不同的路線，以及兩艘相同的太空船為何相距如此遙遠。',
+    es: 'Compara a las gemelas: un gráfico de 50 años de distancia con datos de JPL, sus rutas y por qué dos naves idénticas acabaron tan separadas.',
+  },
+  {
+    key: 'tools',
+    en: 'Calculate the signal delay for any distance, convert units, look up where each probe was on your birthday, and compare hypothetical travel times.',
+    zh: '計算任意距離的訊號延遲、換算單位、查詢您生日那天探測器在哪裡，並比較假設性的旅行時間。',
+    es: 'Calcula el retardo de señal, convierte unidades, consulta dónde estaba cada sonda el día que naciste y compara tiempos de viaje hipotéticos.',
+  },
+  {
+    key: 'timeline',
+    en: 'Click through the mission year by year. Each event explains what happened, why it mattered and where the information comes from.',
+    zh: '逐年點選任務事件。每個事件都說明發生了什麼、為何重要，以及資料出處。',
+    es: 'Recorre la misión año a año. Cada evento explica qué pasó, por qué importó y de dónde sale la información.',
+  },
+  {
+    key: 'discoveries',
+    en: 'Volcanoes on Io, Saturn’s braided rings, Uranus’s tipped magnetic field, Neptune’s winds — explained for non-specialists.',
+    zh: '木衛一的火山、土星交織的環、天王星歪斜的磁場、海王星的狂風——以非專業讀者也能理解的方式說明。',
+    es: 'Volcanes en Ío, los anillos de Saturno, el campo magnético inclinado de Urano, los vientos de Neptuno — explicados para todos.',
+  },
+  {
+    key: 'why-voyager-matters',
+    en: 'Why a mission launched in 1977 is still producing science nobody else can — and what it teaches about building things that last.',
+    zh: '為什麼一項 1977 年發射的任務，至今仍能產出其他任務無法取得的科學資料——以及它對「打造耐久系統」的啟示。',
+    es: 'Por qué una misión de 1977 sigue produciendo ciencia que nadie más puede obtener, y qué enseña sobre construir cosas duraderas.',
+  },
+  {
+    key: 'how-it-works',
+    en: 'See exactly how the numbers are calculated, how closely they match JPL’s predictions, and where the model stops being reliable.',
+    zh: '了解數字究竟如何計算、與 JPL 預測的吻合程度，以及模型在哪些情況下不再可靠。',
+    es: 'Mira exactamente cómo se calculan las cifras, cuánto coinciden con las predicciones de JPL y dónde deja de ser fiable el modelo.',
+  },
+];
 
 export default function HomePage() {
-  const zh = useZh();
-  const es = useEs();
+  const locale = useLang();
+  const t = (en: string, zh: string, es: string) => tr(locale, en, zh, es);
+  const faqPreview = FAQ_ITEMS.slice(0, 4);
+
   return (
     <div>
       {/* ===== Hero ===== */}
       <section className="relative overflow-hidden border-b border-cyan-500/15">
-        <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:py-16">
+        <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:py-14">
           <div className="animate-fade-in">
-            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300">
-              {zh ? '獨立 · 教育性質 · 與 NASA 無關' : es ? 'Independiente · Educativo · Sin afiliación con la NASA' : 'Independent · Educational · Not affiliated with NASA'}
+            <p className="mb-4 inline-flex flex-wrap items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300">
+              {t('Independent · Educational · Not affiliated with NASA', '獨立 · 教育性質 · 與 NASA 無關', 'Independiente · Educativo · Sin afiliación con la NASA')}
             </p>
-            <h1 className="neon-text text-4xl font-black tracking-wide text-white sm:text-5xl lg:text-6xl">
-              {zh ? '航海家號追蹤器' : es ? 'Rastreador Voyager' : 'Voyager Tracker'}
+            <h1 className="neon-text text-4xl font-black tracking-wide text-white sm:text-5xl">
+              {t('Where are Voyager 1 and Voyager 2 right now?', '航海家一號與二號此刻在哪裡？', '¿Dónde están ahora la Voyager 1 y la Voyager 2?')}
             </h1>
-            <p className="mt-4 max-w-xl text-lg leading-relaxed text-slate-200 sm:text-xl">
-              {zh ? (
-                <>追蹤 NASA 的航海家一號與二號太空船，看它們繼續穿越星際空間的歷史性旅程。</>
-              ) : es ? (
-                <>Sigue a las sondas Voyager 1 y 2 de la NASA en su histórico viaje a través del espacio interestelar.</>
-              ) : (
-                <>Track NASA&rsquo;s Voyager 1 and Voyager 2 spacecraft as they continue their historic journeys through interstellar space.</>
+            <p className="mt-4 max-w-xl text-lg leading-relaxed text-slate-200">
+              {t(
+                'Voyager Tracker continuously calculates how far NASA’s two interstellar probes are from Earth and the Sun — and explains what those numbers mean, how the twins compare, and what they discovered.',
+                '「航海家號追蹤器」持續計算 NASA 兩艘星際探測器與地球、太陽的距離——並說明這些數字的意義、兩艘探測器的差異，以及它們的科學發現。',
+                'El Rastreador Voyager calcula continuamente a qué distancia están de la Tierra y del Sol las dos sondas interestelares de la NASA, y explica qué significan esas cifras, en qué se diferencian las gemelas y qué descubrieron.',
               )}
             </p>
-            <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-slate-400">
-              {zh ? (
-                <>
-                  1977 年由 NASA 發射的航海家一號與二號，是史上執行最久的深空任務。本站追蹤它們與地球、
-                  太陽的距離、速度與星際現況，並說明它們在做什麼、去過哪裡、為何重要。所有數字皆以 NASA/JPL
-                  資料計算並標示為估計值。
-                </>
-              ) : es ? (
-                <>
-                  Lanzadas por la NASA en 1977, las Voyager 1 y 2 son las misiones de espacio profundo
-                  más longevas de la historia. Este sitio sigue su distancia a la Tierra y al Sol, su
-                  velocidad y su estado interestelar, y explica qué hacen, dónde han estado y por qué
-                  importan. Todas las cifras están etiquetadas como estimaciones basadas en datos de NASA/JPL.
-                </>
-              ) : (
-                <>
-                  Launched by NASA in 1977, Voyager 1 and Voyager 2 are the longest-running deep-space
-                  missions in history. This site follows their distance from Earth and the Sun, their
-                  speed and interstellar status — and explains what the probes are doing, where they
-                  have been and why their mission matters. All figures are clearly labelled estimates
-                  built from published NASA/JPL data.
-                </>
-              )}
+            <ClientOnly>
+              <HeroNumbers />
+            </ClientOnly>
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-slate-400">
+              {t(
+                'These are estimates calculated in your browser from NASA/JPL Horizons reference data, not live telemetry from the spacecraft.',
+                '以上是依 NASA/JPL Horizons 參考資料、在您的瀏覽器中計算出的估計值，並非來自探測器的即時遙測。',
+                'Son estimaciones calculadas en tu navegador a partir de datos de referencia de NASA/JPL Horizons, no telemetría en vivo de las naves.',
+              )}{' '}
+              <a href={pageUrl('how-it-works')} className="text-cyan-300 underline underline-offset-2 hover:text-cyan-200">
+                {t('How the numbers are calculated', '數字如何計算', 'Cómo se calculan')}
+              </a>
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-3">
               <a
                 href="#live-tracker"
                 className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 px-5 py-3 text-sm font-bold text-space-950 shadow-lg shadow-cyan-500/25 transition-transform hover:scale-[1.02]"
               >
-                {zh ? '開啟即時追蹤器' : es ? 'Abrir el rastreador' : 'Open live tracker'}
+                {t('Open the tracker', '開啟追蹤器', 'Abrir el rastreador')}
                 <LinkArrow className="h-4 w-4" />
               </a>
               <a
-                href={pageUrl('mission')}
+                href={pageUrl('compare')}
                 className="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-space-900/70 px-5 py-3 text-sm font-semibold text-slate-200 transition-colors hover:border-cyan-400/60 hover:text-white"
               >
-                {zh ? '了解航海家任務' : es ? 'Conocer la misión' : 'Learn about the mission'}
+                {t('Compare Voyager 1 & 2', '比較一號與二號', 'Comparar Voyager 1 y 2')}
+              </a>
+              <a
+                href={pageUrl('tools')}
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-space-900/70 px-5 py-3 text-sm font-semibold text-slate-200 transition-colors hover:border-cyan-400/60 hover:text-white"
+              >
+                {t('Try the calculators', '使用計算工具', 'Probar las calculadoras')}
               </a>
             </div>
           </div>
 
-          {/* 3D spacecraft */}
           <div className="animate-fade-in">
-            <div className="hud-panel relative h-[340px] w-full overflow-hidden rounded-2xl sm:h-[430px]">
-              <Voyager3D />
-              <div className="pointer-events-none absolute bottom-3 left-4 rounded-md border border-cyan-500/20 bg-space-950/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-cyan-300/70 backdrop-blur-sm">
-                {zh ? '拖曳旋轉 · 互動航海家模型' : es ? 'Arrastra para girar · modelo 3D interactivo' : 'Drag to rotate · interactive Voyager model'}
+            <div className="hud-panel relative h-[300px] w-full overflow-hidden rounded-2xl sm:h-[420px]">
+              <ClientOnly>
+                <Suspense fallback={null}>
+                  <Voyager3D />
+                </Suspense>
+              </ClientOnly>
+              <div className="pointer-events-none absolute bottom-3 left-4 rounded-md border border-cyan-500/20 bg-space-950/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-cyan-300/80 backdrop-blur-sm">
+                {t('Drag to rotate · simplified 3D Voyager model', '拖曳旋轉 · 簡化的航海家 3D 模型', 'Arrastra para girar · modelo 3D simplificado')}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ===== Live tracker (both probes) ===== */}
+      {/* ===== Tracker ===== */}
       <div id="live-tracker" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-12 sm:px-6">
         <TrackerSection
           ids={['voyager1', 'voyager2']}
-          title={zh ? '航海家一號與二號即時追蹤器' : es ? 'Rastreador en vivo: Voyager 1 y 2' : 'Voyager 1 & Voyager 2 Live Tracker'}
-          intro={
-            zh
-              ? '兩艘星際探測器的距離、速度與任務現況。數字會隨著太空船以每秒數十公里的速度向外飛行而不斷增加。'
-              : es
-                ? 'Distancia, velocidad y estado de la misión de ambas sondas interestelares. Los números crecen mientras las naves viajan hacia afuera a decenas de kilómetros por segundo.'
-                : 'Distances, speeds and mission status for both interstellar probes. The numbers tick upward as the spacecraft continue outward at tens of kilometres per second.'
-          }
+          title={t('Voyager 1 & Voyager 2 — calculated position right now', '航海家一號與二號——此刻的計算位置', 'Voyager 1 y 2: posición calculada ahora mismo')}
+          intro={t(
+            'Distance, signal delay, speed and mission time for both probes, recalculated about ten times a second. Each card also puts the numbers in context and lists which science instruments NASA still operates.',
+            '兩艘探測器的距離、訊號延遲、速度與任務時間，每秒重新計算約十次。每張卡片也會把數字放進脈絡中比較，並列出 NASA 仍在運作的科學儀器。',
+            'Distancia, retardo de señal, velocidad y tiempo de misión de ambas sondas, recalculados unas diez veces por segundo. Cada tarjeta pone además las cifras en contexto e indica qué instrumentos siguen operando.',
+          )}
         />
       </div>
 
-      {/* ===== What are the Voyagers? ===== */}
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-        <section id="what-are-the-voyagers" className="mb-12 scroll-mt-24">
-          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
-            {zh ? '引言' : es ? 'Introducción' : 'Introduction'}
-          </p>
-          <h2 className="mb-2 text-2xl font-bold tracking-wide text-white sm:text-3xl">
-            {zh ? '什麼是航海家一號與二號？' : es ? '¿Qué son las Voyager 1 y 2?' : 'What are Voyager 1 and Voyager 2?'}
-          </h2>
-          <p className="mb-6 max-w-3xl text-slate-300/90">
-            {zh
-              ? '兩艘近乎相同的機器人太空船，原本只為期四年，如今卻已進入第五個十年的任務。'
-              : es
-                ? 'Dos sondas robóticas casi idénticas, construidas para una misión de cuatro años que ya supera las cinco décadas.'
-                : 'Two nearly identical robotic spacecraft built for a four-year mission that is now in its fifth decade.'}
-          </p>
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="hud-panel rounded-2xl p-6" style={{ borderColor: '#22d3ee40' }}>
-              <p className="mb-2 text-xl font-bold" style={{ color: '#22d3ee' }}>{V1.name}</p>
-              <p className="mb-3 text-sm leading-relaxed text-slate-400">
-                {zh ? '1977 年 9 月 5 日發射 · 美國佛羅里達州卡納維爾角' : es ? 'Lanzada el 5 de septiembre de 1977 · Cabo Cañaveral, Florida' : 'Launched 5 September 1977 · Cape Canaveral, Florida'}
-              </p>
-              <p className="text-[15px] leading-relaxed text-slate-200">
-                {zh
-                  ? '航海家一號先探索木星與土星，再借助土星重力甩向北方。它於 1979 年飛掠木星、1980 年土星、1990 年拍下「蒼藍小點」，並於 2012 年成為第一個進入星際空間的人造物體。'
-                  : es
-                    ? 'La Voyager 1 exploró Júpiter y Saturno y usó la gravedad de Saturno para ir hacia el norte. Sobrevoló Júpiter en 1979, Saturno en 1980, tomó el \u201cpálido punto azul\u201d en 1990 y en 2012 fue el primer objeto humano en el espacio interestelar.'
-                    : 'Voyager 1 explored Jupiter and Saturn, then used Saturn\u2019s gravity to swing north. It flew past Jupiter in 1979, Saturn in 1980, photographed the Pale Blue Dot in 1990, and in 2012 became the first human-made object in interstellar space.'}
-              </p>
-              <p className="mt-4">
-                <a href={pageUrl('voyager-1')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-                  {zh ? '航海家一號任務頁' : es ? 'Página de Voyager 1' : 'Voyager 1 mission page'} <LinkArrow className="h-4 w-4" />
-                </a>
-              </p>
-            </div>
-            <div className="hud-panel rounded-2xl p-6" style={{ borderColor: '#34d39940' }}>
-              <p className="mb-2 text-xl font-bold" style={{ color: '#34d399' }}>{V2.name}</p>
-              <p className="mb-3 text-sm leading-relaxed text-slate-400">
-                {zh ? '1977 年 8 月 20 日發射 · 美國佛羅里達州卡納維爾角' : es ? 'Lanzada el 20 de agosto de 1977 · Cabo Cañaveral, Florida' : 'Launched 20 August 1977 · Cape Canaveral, Florida'}
-              </p>
-              <p className="text-[15px] leading-relaxed text-slate-200">
-                {zh
-                  ? '航海家二號是唯一造訪天王星與海王星的太空船，完成了外行星的「大旅行」，並於 2018 年進入星際空間。'
-                  : es
-                    ? 'La Voyager 2 es la única nave que ha visitado Urano y Neptuno, completando el \u201cGran Tour\u201d, y entró al espacio interestelar en 2018.'
-                    : 'Voyager 2 is the only spacecraft ever to visit Uranus and Neptune, completing the \u201cGrand Tour\u201d, and it entered interstellar space in 2018.'}
-              </p>
-              <p className="mt-4">
-                <a href={pageUrl('voyager-2')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-300 hover:text-emerald-200">
-                  {zh ? '航海家二號任務頁' : es ? 'Página de Voyager 2' : 'Voyager 2 mission page'} <LinkArrow className="h-4 w-4" />
-                </a>
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* ===== Why it matters ===== */}
-        <section id="why-it-matters" className="mb-12 scroll-mt-24">
-          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
-            {zh ? '重要性' : es ? 'Importancia' : 'Significance'}
-          </p>
+      <div className="mx-auto max-w-7xl px-4 py-2 sm:px-6">
+        {/* ===== What is Voyager Tracker ===== */}
+        <section id="what-is-voyager-tracker" className="mb-14 scroll-mt-24">
           <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
-            {zh ? '為什麼航海家任務如此重要？' : es ? '¿Por qué importan las misiones Voyager?' : 'Why Are the Voyager Missions Important?'}
-          </h2>
-          <p className="max-w-4xl leading-relaxed text-slate-300">
-            {zh
-              ? '航海家計畫首次近距離觀察四顆巨行星，徹底改寫了行星科學。木衛一的火山、海王星的超音速風、土星環的精細結構，都由這兩艘探測器揭開或徹底改觀。'
-              : es
-                ? 'El programa Voyager dio las primeras vistas cercanas de cuatro gigantes gaseosos y reescribió la ciencia planetaria. Los volcanes de Ío, los vientos supersónicos de Neptuno o los anillos de Saturno fueron revelados o transformados por estas dos naves.'
-                : 'The Voyager program delivered the first close-up views of four giant planets — reshaping planetary science. Io\u2019s volcanoes, Neptune\u2019s supersonic winds and Saturn\u2019s intricate rings were revealed or transformed by these two spacecraft.'}
-          </p>
-          <p className="mt-3 max-w-4xl leading-relaxed text-slate-300">
-            {zh
-              ? '如今任務進入第二章：兩艘航海家號是唯一正在取樣太陽影響力與銀河之間空間的探測器。工程師正逐一關閉儀器以節省電力，預估至少一艘探測器可持續回傳資料到 2030 年代。'
-              : es
-                ? 'Hoy la misión tiene una segunda vida: las Voyager son las únicas sondas que muestrean el espacio entre la influencia del Sol y la galaxia. Los instrumentos se apagan uno a uno y se espera que al menos una nave siga enviando datos hasta los años 30.'
-                : 'Today the mission has a second life: the Voyagers are the only probes sampling the space between the Sun\u2019s influence and the rest of the galaxy. Instruments are being powered down one by one, and engineers expect at least one spacecraft to keep returning data well into the 2030s.'}
-          </p>
-          <div className="my-6 rounded-xl border border-cyan-500/40 bg-cyan-500/5 p-5 text-sm leading-relaxed text-cyan-100">
-            <p className="mb-1.5 font-semibold text-white">
-              {zh ? '船上還載著…' : es ? 'También a bordo…' : 'Also aboard'}
-            </p>
-            <p>
-              {zh ? (
-                <>每艘航海家號都攜帶一張金唱片，收錄地球的聲音、音樂、問候與影像。{' '}
-                  <a href={pageUrl('golden-record')} className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200">深入了解金唱片 →</a>
-                </>
-              ) : es ? (
-                <>Cada Voyager lleva un Disco de Oro con sonidos, música, saludos e imágenes de la Tierra.{' '}
-                  <a href={pageUrl('golden-record')} className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200">Conoce el Disco de Oro →</a>
-                </>
-              ) : (
-                <>Each Voyager carries a Golden Record — sounds, music, greetings and images of Earth.{' '}
-                  <a href={pageUrl('golden-record')} className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200">Learn more about the Golden Record →</a>
-                </>
-              )}
-            </p>
-          </div>
-        </section>
-
-        {/* ===== Current mission status ===== */}
-        <section id="current-status" className="mb-12 scroll-mt-24">
-          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
-            {zh ? '現在進行式' : es ? 'Ahora mismo' : 'Right now'}
-          </p>
-          <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
-            {zh ? '目前的任務狀態' : es ? 'Estado actual de la misión' : 'Current Mission Status'}
+            {t('What is Voyager Tracker?', '什麼是航海家號追蹤器？', '¿Qué es el Rastreador Voyager?')}
           </h2>
           <div className="grid gap-6 lg:grid-cols-2">
-            <div className="hud-panel rounded-2xl p-6" style={{ borderColor: '#22d3ee40' }}>
-              <p className="font-mono text-xs uppercase tracking-widest text-cyan-400">Voyager 1</p>
-              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-300">
-                {[
-                  zh ? `· 自 ${V1.interstellarEntryDate} 起位於星際空間` : es ? `· En el espacio interestelar desde ${V1.interstellarEntryDate}` : `· In interstellar space since ${V1.interstellarEntryDate}`,
-                  zh ? '· 以約 17 公里/秒遠離太陽' : es ? '· Se aleja del Sol a ~17 km/s' : '· Moving away from the Sun at about 17 km/s',
-                  zh ? '· 仍透過 NASA 深空網路回傳資料' : es ? '· Sigue enviando datos por la Red de Espacio Profundo' : '· Still returning data through NASA\u2019s Deep Space Network',
-                  zh ? '· 訊號單程傳回地球約需一天' : es ? '· La señal tarda casi un día en llegar' : '· Signal travel time to Earth: roughly a day',
-                ].map((item) => <li key={item}>{item}</li>)}
+            <div className="space-y-3 leading-relaxed text-slate-300">
+              <p>
+                {t(
+                  'Voyager Tracker is an independent educational website about NASA’s Voyager 1 and Voyager 2. Its core is a small calculation engine: it takes the position and velocity that NASA/JPL’s Horizons system publishes for each probe and moves them forward in time, together with Earth’s position on its orbit, to estimate where the Voyagers are at this moment.',
+                  '「航海家號追蹤器」是一個關於 NASA 航海家一號與二號的獨立教育網站。它的核心是一個小型計算引擎：取用 NASA/JPL Horizons 系統公布的探測器位置與速度，連同地球在軌道上的位置一起向前推算，估計航海家號此刻的所在位置。',
+                  'El Rastreador Voyager es un sitio educativo independiente sobre las Voyager 1 y 2 de la NASA. Su núcleo es un pequeño motor de cálculo: toma la posición y la velocidad que publica el sistema Horizons de NASA/JPL para cada sonda y las proyecta en el tiempo, junto con la posición de la Tierra en su órbita, para estimar dónde están ahora.',
+                )}
+              </p>
+              <p>
+                {t(
+                  'Around that engine, the site explains the mission in its own words: what each spacecraft did, what scientists learned, why the two probes differ and why the distance from Earth sometimes shrinks. It does not represent NASA or JPL, and it never presents its estimates as official telemetry.',
+                  '圍繞這個引擎，本站以自己的文字解說任務：每艘太空船做了什麼、科學家學到了什麼、兩艘探測器為何不同，以及與地球的距離為何有時會縮小。本站不代表 NASA 或 JPL，也從不把估計值當作官方遙測。',
+                  'Alrededor de ese motor, el sitio explica la misión con sus propias palabras: qué hizo cada nave, qué aprendieron los científicos, por qué difieren las sondas y por qué a veces se reduce la distancia a la Tierra. No representa a la NASA ni a JPL y nunca presenta sus estimaciones como telemetría oficial.',
+                )}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-amber-400/40 bg-amber-400/5 p-5 text-sm leading-relaxed text-amber-50">
+              <p className="mb-2 font-semibold text-white">
+                {t('Official data vs. this site’s estimates', '官方資料與本站估計值的差別', 'Datos oficiales frente a estimaciones')}
+              </p>
+              <ul className="list-disc space-y-1.5 pl-5">
+                <li>{t('Mission dates, encounters and instrument status: taken from NASA/JPL publications and cited on each page.', '任務日期、飛掠事件與儀器狀態：取自 NASA/JPL 公開資料，並在各頁註明出處。', 'Fechas, encuentros y estado de instrumentos: tomados de publicaciones de NASA/JPL y citados en cada página.')}</li>
+                <li>{t('Current distance, speed and light time: calculated here, labelled “estimate”, validated against JPL predictions.', '目前的距離、速度與光行時間：由本站計算，標示為「估計值」，並已與 JPL 預測比對驗證。', 'Distancia, velocidad y tiempo de luz actuales: calculados aquí, marcados como «estimación» y validados con predicciones de JPL.')}</li>
+                <li>{t('Travel-time comparisons in the calculators: hypothetical illustrations only.', '計算工具中的旅行時間比較：僅為假設性示意。', 'Comparaciones de tiempo de viaje en las calculadoras: solo ilustraciones hipotéticas.')}</li>
               </ul>
-              <a href={pageUrl('voyager-1')} className="mt-4 inline-block text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-                {zh ? '航海家一號詳情 →' : es ? 'Detalles de Voyager 1 →' : 'Voyager 1 details →'}
+            </div>
+          </div>
+        </section>
+
+        {/* ===== What you can explore ===== */}
+        <section id="explore" className="mb-14 scroll-mt-24">
+          <h2 className="mb-2 text-2xl font-bold tracking-wide text-white sm:text-3xl">
+            {t('What you can explore', '您可以探索的內容', 'Qué puedes explorar')}
+          </h2>
+          <p className="mb-6 max-w-3xl text-slate-300">
+            {t('Beyond the tracker, each section answers a different question.', '除了追蹤器之外，每個單元都回答一個不同的問題。', 'Además del rastreador, cada sección responde a una pregunta distinta.')}
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {EXPLORE.map((item) => (
+              <a
+                key={item.key}
+                href={pageUrl(item.key)}
+                className="group flex flex-col rounded-2xl border border-slate-700/60 bg-space-900/50 p-5 transition-all hover:border-cyan-400/50"
+              >
+                <span className="mb-2 flex items-center justify-between font-semibold text-white group-hover:text-cyan-300">
+                  {
+                    {
+                      compare: t('Voyager 1 vs Voyager 2', '一號 vs 二號', 'Voyager 1 vs Voyager 2'),
+                      tools: t('Calculators', '計算工具', 'Calculadoras'),
+                      timeline: t('Interactive timeline', '互動式時間軸', 'Cronología interactiva'),
+                      discoveries: t('What Voyager discovered', '航海家的科學發現', 'Qué descubrió Voyager'),
+                      'why-voyager-matters': t('Why Voyager still matters', '航海家為何至今仍重要', 'Por qué Voyager sigue importando'),
+                      'how-it-works': t('How the tracker works', '追蹤器如何運作', 'Cómo funciona el rastreador'),
+                    }[item.key as string]
+                  }
+                  <LinkArrow className="h-4 w-4 text-cyan-400 transition-transform group-hover:translate-x-1" />
+                </span>
+                <span className="text-sm leading-relaxed text-slate-400">{txt(item, locale)}</span>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        {/* ===== The two spacecraft in brief ===== */}
+        <section id="the-spacecraft" className="mb-14 scroll-mt-24">
+          <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
+            {t('Two spacecraft, two different journeys', '兩艘太空船，兩段不同的旅程', 'Dos naves, dos viajes distintos')}
+          </h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="hud-panel rounded-2xl p-6" style={{ borderColor: '#22d3ee40' }}>
+              <h3 className="mb-1 text-xl font-bold text-cyan-300">Voyager 1</h3>
+              <p className="mb-3 font-mono text-xs text-slate-400">{t('Launched 5 September 1977', '1977 年 9 月 5 日發射', 'Lanzada el 5 de septiembre de 1977')}</p>
+              <p className="text-[15px] leading-relaxed text-slate-200">
+                {t(
+                  'Took the faster route: Jupiter in 1979, Saturn and its moon Titan in 1980. The Titan flyby flung it north out of the planets’ plane, ending its planetary tour but setting it on the quickest path out of the solar system. In 1990 it took the “Pale Blue Dot” image of Earth, and in 2012 it became the first human-made object in interstellar space.',
+                  '走較快的路線：1979 年飛掠木星，1980 年飛掠土星與其衛星泰坦。泰坦飛掠把它甩向行星軌道面北方，結束了行星之旅，卻也讓它踏上離開太陽系最快的路徑。1990 年它拍下地球的「蒼藍小點」，2012 年成為第一個進入星際空間的人造物體。',
+                  'Tomó la ruta rápida: Júpiter en 1979, Saturno y su luna Titán en 1980. El sobrevuelo de Titán la lanzó al norte del plano de los planetas, terminando su gira planetaria pero poniéndola en el camino más rápido para salir del sistema solar. En 1990 tomó el «pálido punto azul» y en 2012 fue el primer objeto humano en el espacio interestelar.',
+                )}
+              </p>
+              <a href={pageUrl('voyager-1')} className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
+                {t('Voyager 1 in detail', '航海家一號詳細介紹', 'Voyager 1 en detalle')} <LinkArrow className="h-4 w-4" />
               </a>
             </div>
             <div className="hud-panel rounded-2xl p-6" style={{ borderColor: '#34d39940' }}>
-              <p className="font-mono text-xs uppercase tracking-widest text-emerald-400">Voyager 2</p>
-              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-slate-300">
-                {[
-                  zh ? `· 自 ${V2.interstellarEntryDate} 起位於星際空間` : es ? `· En el espacio interestelar desde ${V2.interstellarEntryDate}` : `· In interstellar space since ${V2.interstellarEntryDate}`,
-                  zh ? '· 以約 15 公里/秒遠離太陽' : es ? '· Se aleja del Sol a ~15 km/s' : '· Moving away from the Sun at about 15 km/s',
-                  zh ? '· 仍透過 NASA 深空網路回傳資料' : es ? '· Sigue enviando datos por la Red de Espacio Profundo' : '· Still returning data through NASA\u2019s Deep Space Network',
-                  zh ? '· 唯一造訪過天王星與海王星的探測器' : es ? '· La única nave que visitó Urano y Neptuno' : '· The only spacecraft to have visited Uranus and Neptune',
-                ].map((item) => <li key={item}>{item}</li>)}
-              </ul>
-              <a href={pageUrl('voyager-2')} className="mt-4 inline-block text-sm font-semibold text-emerald-300 hover:text-emerald-200">
-                {zh ? '航海家二號詳情 →' : es ? 'Detalles de Voyager 2 →' : 'Voyager 2 details →'}
+              <h3 className="mb-1 text-xl font-bold text-emerald-300">Voyager 2</h3>
+              <p className="mb-3 font-mono text-xs text-slate-400">{t('Launched 20 August 1977', '1977 年 8 月 20 日發射', 'Lanzada el 20 de agosto de 1977')}</p>
+              <p className="text-[15px] leading-relaxed text-slate-200">
+                {t(
+                  'Launched first but on a slower path that let it keep going: Jupiter (1979), Saturn (1981), Uranus (1986) and Neptune (1989). It is still the only spacecraft to have visited the two outermost planets. It crossed into interstellar space in 2018, heading south of the planets’ plane.',
+                  '雖然先發射，卻走較慢的路線，得以一路前進：木星（1979）、土星（1981）、天王星（1986）與海王星（1989）。它至今仍是唯一造訪過最外側兩顆行星的太空船，並於 2018 年朝行星軌道面南方進入星際空間。',
+                  'Despegó primero, pero por una ruta más lenta que le permitió seguir: Júpiter (1979), Saturno (1981), Urano (1986) y Neptuno (1989). Sigue siendo la única nave que ha visitado los dos planetas más lejanos. Entró al espacio interestelar en 2018, hacia el sur del plano de los planetas.',
+                )}
+              </p>
+              <a href={pageUrl('voyager-2')} className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-300 hover:text-emerald-200">
+                {t('Voyager 2 in detail', '航海家二號詳細介紹', 'Voyager 2 en detalle')} <LinkArrow className="h-4 w-4" />
               </a>
             </div>
           </div>
-          <p className="mt-4 font-mono text-[11px] text-slate-500">
-            {zh
-              ? '狀態摘要自 NASA/JPL 任務紀錄。確切即時距離請見上方追蹤器。'
-              : es
-                ? 'Estado resumido de los registros de NASA/JPL. Distancias exactas en el rastreador de arriba.'
-                : 'Status summarized from NASA/JPL mission records. Exact live distances are shown in the tracker above.'}
-          </p>
-        </section>
-
-        {/* ===== Timeline preview ===== */}
-        <section id="timeline-preview" className="mb-12 scroll-mt-24">
-          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
-            {zh ? '歷史' : es ? 'Historia' : 'History'}
-          </p>
-          <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
-            {zh ? '航海家任務時間軸' : es ? 'Cronología de la misión' : 'Voyager Mission Timeline'}
-          </h2>
-          <ol className="space-y-3">
-            {(
-              [
-                { y: bi('1977', '1977', '1977'), t: bi('Voyager 2 and Voyager 1 launch.', '航海家二號與一號發射。', 'Se lanzan la Voyager 2 y la Voyager 1.') },
-                { y: bi('1979', '1979', '1979'), t: bi('Both fly past Jupiter; Voyager 1 discovers volcanoes on Io.', '兩艘探測器飛掠木星；航海家一號發現木衛一上的活火山。', 'Ambas sobrevuelan Júpiter; la Voyager 1 descubre volcanes en Ío.') },
-                { y: bi('1980–81', '1980–81', '1980–81'), t: bi('Saturn encounters by Voyager 1, then Voyager 2.', '航海家一號、接著二號飛掠土星。', 'Encuentros con Saturno de la Voyager 1 y luego la 2.') },
-                { y: bi('1986 · 89', '1986 · 89', '1986 · 89'), t: bi('Voyager 2 becomes the only spacecraft to visit Uranus and Neptune.', '航海家二號成為唯一造訪天王星與海王星的太空船。', 'La Voyager 2 se vuelve la única nave en visitar Urano y Neptuno.') },
-                { y: bi('2012 · 18', '2012 · 18', '2012 · 18'), t: bi('Voyager 1, then Voyager 2, enter interstellar space.', '航海家一號、接著二號進入星際空間。', 'La Voyager 1 y luego la 2 entran al espacio interestelar.') },
-                { y: bi('Today', '今日', 'Hoy'), t: bi('Both probes continue to return data from beyond the heliosphere.', '兩艘探測器持續從日球層外回傳資料。', 'Ambas siguen enviando datos desde más allá de la heliosfera.') },
-              ]
-            ).map((row) => (
-              <li key={row.y.en} className="flex gap-4 rounded-xl border border-slate-800 bg-space-900/40 p-4">
-                <span className="shrink-0 font-mono text-sm font-bold text-cyan-300">
-                  {zh ? row.y.zh : es ? row.y.es : row.y.en}
-                </span>
-                <span className="text-sm leading-relaxed text-slate-300">
-                  {zh ? row.t.zh : es ? row.t.es : row.t.en}
-                </span>
-              </li>
-            ))}
-          </ol>
-          <p className="mt-4">
-            <a href={pageUrl('timeline')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-              {zh ? '查看完整時間軸' : es ? 'Ver la cronología completa' : 'View the full mission timeline'} <LinkArrow className="h-4 w-4" />
-            </a>
-          </p>
-        </section>
-
-        {/* ===== Discoveries preview ===== */}
-        <section id="discoveries-preview" className="mb-12 scroll-mt-24">
-          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
-            {zh ? '科學' : es ? 'Ciencia' : 'Science'}
-          </p>
-          <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
-            {zh ? '科學發現' : es ? 'Descubrimientos' : 'Scientific Discoveries'}
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {(
-              [
-                { title: bi('Io\u2019s volcanoes', '木衛一的火山', 'Volcanes en Ío'), text: bi('Voyager 1 photographed erupting volcanoes on Io in 1979.', '1979 年航海家一號拍到木衛一上噴發的火山。', 'La Voyager 1 fotografió volcanes en erupción en Ío en 1979.') },
-                { title: bi('Neptune\u2019s winds', '海王星的風', 'Los vientos de Neptuno'), text: bi('Voyager 2 measured supersonic winds on Neptune.', '航海家二號測得海王星上的超音速風。', 'La Voyager 2 midió vientos supersónicos en Neptuno.') },
-                { title: bi('Interstellar plasma', '星際電漿', 'Plasma interestelar'), text: bi('The Voyagers measured the plasma density between the stars.', '航海家號量測了星際空間的電漿密度。', 'Las Voyager midieron la densidad del plasma entre las estrellas.') },
-              ]
-            ).map((card) => (
-              <div key={card.title.en} className="rounded-xl border border-slate-800 bg-space-900/40 p-5">
-                <h3 className="mb-2 font-semibold text-white">{zh ? card.title.zh : es ? card.title.es : card.title.en}</h3>
-                <p className="text-sm leading-relaxed text-slate-400">{zh ? card.text.zh : es ? card.text.es : card.text.en}</p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-4">
-            <a href={pageUrl('discoveries')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-              {zh ? '探索所有發現' : es ? 'Ver todos los descubrimientos' : 'Explore all discoveries'} <LinkArrow className="h-4 w-4" />
-            </a>
-          </p>
-        </section>
-
-        {/* ===== How it works preview ===== */}
-        <section id="how-it-works-preview" className="mb-12 scroll-mt-24">
-          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
-            {zh ? '方法' : es ? 'Método' : 'Method'}
-          </p>
-          <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
-            {zh ? '航海家號追蹤器如何運作' : es ? 'Cómo funciona el Rastreador' : 'How Voyager Tracker Works'}
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {(
-              [
-                { t: bi('1 · Data source', '1 · 資料來源', '1 · Fuente de datos'), x: bi('Official NASA/JPL references provide baseline distances and cruise speeds.', 'NASA/JPL 官方參考提供基準距離與巡航速度。', 'Las referencias de NASA/JPL aportan distancias base y velocidades de crucero.') },
-                { t: bi('2 · Calculation', '2 · 計算方式', '2 · Cálculo'), x: bi('The baseline is advanced by each probe\u2019s velocity over elapsed time.', '以各探測器速度隨經過時間推進基準值。', 'La línea base se proyecta con la velocidad de cada sonda a lo largo del tiempo.') },
-                { t: bi('3 · Update cycle', '3 · 更新週期', '3 · Ciclo de actualización'), x: bi('Values recalculate in your browser; baselines refresh with new official data.', '數值在你的瀏覽器內重新計算；新官方資料出現時更新基準。', 'Los valores se recalculan en tu navegador; la línea base se actualiza con datos oficiales nuevos.') },
-              ]
-            ).map((card) => (
-              <div key={card.t.en} className="rounded-xl border border-slate-800 bg-space-900/40 p-5">
-                <h3 className="mb-2 font-mono text-sm font-bold text-cyan-300">{zh ? card.t.zh : es ? card.t.es : card.t.en}</h3>
-                <p className="text-sm leading-relaxed text-slate-400">{zh ? card.x.zh : es ? card.x.es : card.x.en}</p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-4">
-            <a href={pageUrl('how-it-works')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-              {zh ? '閱讀完整方法說明' : es ? 'Leer la metodología completa' : 'Read the full methodology'} <LinkArrow className="h-4 w-4" />
-            </a>
-          </p>
         </section>
 
         {/* ===== FAQ preview ===== */}
         <section id="faq-preview" className="mb-12 scroll-mt-24">
-          <p className="mb-2 font-mono text-xs font-semibold uppercase tracking-[0.25em] text-cyan-400/90">
-            {zh ? '問題' : es ? 'Preguntas' : 'Questions'}
-          </p>
           <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
-            {zh ? '常見問題' : es ? 'Preguntas frecuentes' : 'Frequently Asked Questions'}
+            {t('Common questions', '常見問題', 'Preguntas frecuentes')}
           </h2>
           <div className="space-y-3">
-            {(
-              [
-                { q: bi('Where are Voyager 1 and Voyager 2 now?', '航海家一號與二號現在在哪裡？', '¿Dónde están ahora la Voyager 1 y la 2?'), a: bi('Both are in interstellar space — Voyager 1 since 2012 and Voyager 2 since 2018.', '兩者都在星際空間中——一號自 2012 年、二號自 2018 年起。', 'Ambas están en el espacio interestelar — la 1 desde 2012 y la 2 desde 2018.') },
-                { q: bi('How fast are the Voyagers traveling?', '航海家號飛得有多快？', '¿A qué velocidad viajan las Voyager?'), a: bi('Voyager 1 recedes at ~17 km/s and Voyager 2 at about 15 km/s.', '航海家一號以約 17 公里/秒、二號以約 15 公里/秒遠離太陽。', 'La Voyager 1 se aleja a ~17 km/s y la Voyager 2 a unos 15 km/s.') },
-                { q: bi('Are the Voyagers still communicating with Earth?', '航海家號還在與地球通訊嗎？', '¿Las Voyager siguen comunicándose con la Tierra?'), a: bi('Yes — NASA\u2019s Deep Space Network still receives data from both spacecraft.', '是的——NASA 深空網路仍持續接收兩艘探測器的資料。', 'Sí — la Red de Espacio Profundo de la NASA sigue recibiendo datos de ambas.') },
-                { q: bi('Is Voyager Tracker an official NASA website?', '航海家號追蹤器是 NASA 官方網站嗎？', '¿Es este un sitio oficial de la NASA?'), a: bi('No. It is an independent educational project, not affiliated with NASA or JPL.', '不是。它是獨立教育專案，與 NASA 或 JPL 無關。', 'No. Es un proyecto educativo independiente, sin afiliación con NASA o JPL.') },
-              ]
-            ).map((row) => (
+            {faqPreview.map((row) => (
               <details key={row.q.en} className="group rounded-xl border border-slate-800 bg-space-900/40">
-                <summary className="cursor-pointer list-none p-4 font-medium text-slate-100 transition-colors hover:text-cyan-300 marker:hidden">
-                  <span className="mr-2 text-cyan-400">{zh ? '問' : es ? 'P.' : 'Q.'}</span>
-                  {zh ? row.q.zh : es ? row.q.es : row.q.en}
+                <summary className="cursor-pointer p-4 font-medium text-slate-100 transition-colors hover:text-cyan-300">
+                  {txt(row.q, locale)}
                 </summary>
-                <p className="border-t border-slate-800 px-4 py-3 text-sm leading-relaxed text-slate-400">
-                  <span className="mr-2 text-emerald-400">{zh ? '答' : es ? 'R.' : 'A.'}</span>
-                  {zh ? row.a.zh : es ? row.a.es : row.a.en}
-                </p>
+                <p className="border-t border-slate-800 px-4 py-3 text-sm leading-relaxed text-slate-300">{txt(row.a, locale)}</p>
               </details>
             ))}
           </div>
           <p className="mt-4">
             <a href={pageUrl('faq')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
-              {zh ? '瀏覽全部十七個問題' : es ? 'Ver las 17 preguntas' : 'Browse all 17 questions'} <LinkArrow className="h-4 w-4" />
+              {t(`Read all ${FAQ_ITEMS.length} questions`, `閱讀全部 ${FAQ_ITEMS.length} 個問題`, `Leer las ${FAQ_ITEMS.length} preguntas`)} <LinkArrow className="h-4 w-4" />
             </a>
           </p>
         </section>
       </div>
 
-      {/* ===== Related information ===== */}
       <div className="mx-auto max-w-7xl px-4 pb-4 sm:px-6">
-        <RelatedLinks
-          items={['voyager-1', 'voyager-2', 'mission', 'timeline', 'discoveries', 'golden-record']}
-        />
+        <RelatedLinks items={['mission', 'timeline', 'golden-record', 'sources', 'about', 'updates']} />
       </div>
     </div>
   );
 }
-
-
-
-
-
-

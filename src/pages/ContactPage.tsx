@@ -16,17 +16,23 @@ const ISSUE_TITLE_ZH: Record<string, string> = {
   feedback: '網站意見回饋',
   correction: '資料更正請求',
   technical: '技術問題回報',
+  calculation: '計算問題回報',
+  copyright: '著作權疑慮',
 };
 const ISSUE_TITLE_ES: Record<string, string> = {
   feedback: 'Comentarios sobre el sitio',
   correction: 'Solicitud de corrección de datos',
   technical: 'Informe de problema técnico',
+  calculation: 'Problema de cálculo',
+  copyright: 'Aviso de derechos de autor',
 };
 
 const CATEGORY_LABELS: Record<string, { en: string; zh: string; es: string }> = {
   feedback: { en: 'Website feedback', zh: '網站意見回饋', es: 'Comentarios sobre el sitio' },
   correction: { en: 'Data correction request', zh: '資料更正請求', es: 'Solicitud de corrección de datos' },
   technical: { en: 'Technical issue report', zh: '技術問題回報', es: 'Informe de problema técnico' },
+  calculation: { en: 'Calculation or source issue', zh: '計算或資料來源問題', es: 'Problema de cálculo o de fuentes' },
+  copyright: { en: 'Copyright concern', zh: '著作權疑慮', es: 'Aviso de derechos de autor' },
 };
 
 export default function ContactPage() {
@@ -36,7 +42,7 @@ export default function ContactPage() {
   const [message, setMessage] = useState('');
 
   const prefix = zh ? '[航海家號追蹤器]' : es ? '[Rastreador Voyager]' : '[Voyager Tracker]';
-  const catTitle = zh ? ISSUE_TITLE_ZH[category] : es ? ISSUE_TITLE_ES[category] : category;
+  const catTitle = zh ? ISSUE_TITLE_ZH[category] : es ? ISSUE_TITLE_ES[category] : CATEGORY_LABELS[category].en;
   const title = `${prefix} ${catTitle}`;
 
   const categoryLabel = CATEGORY_LABELS[category];
@@ -48,10 +54,10 @@ export default function ContactPage() {
 
   const howTitle = zh ? '意見回饋的運作方式' : es ? 'Cómo funcionan los comentarios' : 'How feedback works';
   const howBody = zh
-    ? '本站沒有表單後端，因此下方表單本身無法「送出」資料。它會幫您準備好訊息，並開啟一個新的 GitHub Issue（公開可見）。'
+    ? '本站沒有表單後端，因此下方表單本身無法「送出」資料。它會幫您準備好訊息，並開啟一個新的 GitHub Issue（公開可見）。需要免費的 GitHub 帳號；由於 Issue 是公開的，請勿填寫個人資料。'
     : es
-      ? 'Este sitio no tiene backend de formularios, por lo que el formulario no puede \u201cenviar\u201d nada por sí solo. Prepara tu mensaje y abre una nueva incidencia en GitHub (visible públicamente).'
-      : 'This website has no form backend, so the form below cannot \u201csend\u201d anything by itself. It prepares a message and opens a new — publicly visible — issue on GitHub.';
+      ? 'Este sitio no tiene backend de formularios, por lo que el formulario no puede \u201cenviar\u201d nada por sí solo. Prepara tu mensaje y abre una nueva incidencia en GitHub (visible públicamente). Hace falta una cuenta gratuita de GitHub y, como las incidencias son públicas, no incluyas datos personales.'
+      : 'This website has no form backend, so the form below cannot \u201csend\u201d anything by itself. It prepares a message and opens a new — publicly visible — issue on GitHub. A free GitHub account is required, and because issues are public, please do not include personal information.';
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
@@ -83,7 +89,8 @@ export default function ContactPage() {
               bi('Report a data problem — wrong distance, date or fact.', '回報資料錯誤——距離、日期或事實有誤。', 'Reporta un problema de datos: distancia, fecha o hecho incorrectos.'),
               bi('Report a technical issue — broken link, layout problem or JavaScript error.', '回報技術問題——壞掉的連結、版面問題或 JavaScript 錯誤。', 'Informa de un problema técnico: enlace roto, problema de diseño o error de JavaScript.'),
               bi('Give feedback — suggestions for new content or tracker improvements.', '提供意見——對新內容或追蹤器改進的建議。', 'Da tu opinión: sugerencias de contenido o mejoras del rastreador.'),
-              bi('Corrections about this site.', '關於本站本身的更正。', 'Correcciones sobre este propio sitio.'),
+              bi('Report a calculation or source issue — a number that disagrees with NASA/JPL, or a reference that is wrong or outdated.', '回報計算或資料來源問題——與 NASA/JPL 不一致的數字，或錯誤、過時的參考資料。', 'Informa de un problema de cálculo o de fuentes: una cifra que no coincide con NASA/JPL o una referencia errónea o desactualizada.'),
+              bi('Raise a copyright concern — if you believe material on this site infringes your rights, describe it and it will be reviewed promptly.', '提出著作權疑慮——若您認為本站內容侵害了您的權利，請加以說明，我們會儘速處理。', 'Plantea un problema de derechos de autor: si crees que algún material infringe tus derechos, descríbelo y se revisará con prontitud.'),
             ]
           ).map((item) => (
             <li key={item.en}>{zh ? item.zh : es ? item.es : item.en}</li>
@@ -128,6 +135,8 @@ export default function ContactPage() {
               <option value="feedback">{CATEGORY_LABELS.feedback[zh ? 'zh' : es ? 'es' : 'en']}</option>
               <option value="correction">{CATEGORY_LABELS.correction[zh ? 'zh' : es ? 'es' : 'en']}</option>
               <option value="technical">{CATEGORY_LABELS.technical[zh ? 'zh' : es ? 'es' : 'en']}</option>
+              <option value="calculation">{CATEGORY_LABELS.calculation[zh ? 'zh' : es ? 'es' : 'en']}</option>
+              <option value="copyright">{CATEGORY_LABELS.copyright[zh ? 'zh' : es ? 'es' : 'en']}</option>
             </select>
           </div>
 
@@ -147,7 +156,7 @@ export default function ContactPage() {
                     ? 'Describe el problema o la sugerencia. Para correcciones de datos, incluye la URL de la página y, si es posible, una referencia.'
                     : 'Describe the issue or suggestion. For data corrections, please include the page URL and, if possible, a reference.'
               }
-              className="w-full rounded-lg border border-slate-700 bg-space-950 px-3 py-2.5 text-sm leading-relaxed text-slate-100 outline-none transition-colors placeholder:text-slate-600 focus:border-cyan-400"
+              className="w-full rounded-lg border border-slate-700 bg-space-950 px-3 py-2.5 text-sm leading-relaxed text-slate-100 outline-none transition-colors placeholder:text-slate-500 focus:border-cyan-400"
             />
           </div>
 
@@ -160,11 +169,12 @@ export default function ContactPage() {
             {zh ? '前往 GitHub 繼續' : es ? 'Continuar en GitHub' : 'Continue on GitHub'}{' '}
             <ExternalLinkIcon className="h-4 w-4" />
           </a>
+          <br className="sm:hidden" />
           <a
             href={ISSUES_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-3 inline-flex items-center gap-2 rounded-xl border border-slate-600 px-5 py-3 text-sm font-semibold text-slate-200 transition-colors hover:border-cyan-400/60"
+            className="mt-3 inline-flex items-center gap-2 rounded-xl border sm:ml-3 sm:mt-0 border-slate-600 px-5 py-3 text-sm font-semibold text-slate-200 transition-colors hover:border-cyan-400/60"
           >
             {zh ? '開啟 Issue 頁面' : es ? 'Abrir la página de incidencias' : 'Open the issue page'}
           </a>

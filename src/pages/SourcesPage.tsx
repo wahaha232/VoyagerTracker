@@ -1,141 +1,141 @@
 /**
  * SourcesPage — /sources.html  (EN / 繁中 / Español)
+ *
+ * Maps every part of the site to the reference that supports it, lists the
+ * primary sources, and states the editorial policy.
  */
 
 import { pageUrl } from '../constants/site';
 import { RelatedLinks } from '../components/ui';
 import { ExternalLinkIcon } from '../components/icons';
-import { BiArticleHeader, BiSection, bi, useEs, useZh } from '../components/content';
+import { BiArticleHeader, BiSection, Paragraph, bi, txt, useLang } from '../components/content';
+import { INSTRUMENT_STATUS_AS_OF } from '../constants/voyagerData';
+import { EPOCH_ISO } from '../data/horizons.generated';
 
-interface Source {
-  name: { en: string; zh: string; es: string };
-  provides: { en: string; zh: string; es: string };
+type Tri = { en: string; zh: string; es: string };
+const T = (en: string, zh: string, es: string): Tri => ({ en, zh, es });
+
+interface Ref {
+  label: string;
   url: string;
 }
 
-const SOURCES: Source[] = [
+const R = {
+  horizons: { label: 'NASA/JPL Horizons System', url: 'https://ssd.jpl.nasa.gov/horizons/' },
+  where: { label: 'NASA — Where Are Voyager 1 and Voyager 2 Now?', url: 'https://science.nasa.gov/mission/voyager/where-are-voyager-1-and-voyager-2-now/' },
+  mission: { label: 'NASA Science — Voyager mission', url: 'https://science.nasa.gov/mission/voyager/' },
+  v1: { label: 'NASA Science — Voyager 1', url: 'https://science.nasa.gov/mission/voyager/voyager-1/' },
+  v2: { label: 'NASA Science — Voyager 2', url: 'https://science.nasa.gov/mission/voyager/voyager-2/' },
+  instruments: { label: 'NASA Science — Voyager instruments', url: 'https://science.nasa.gov/mission/voyager/instruments/' },
+  blog: { label: 'NASA — Voyager mission blog', url: 'https://science.nasa.gov/blogs/voyager/' },
+  golden: { label: 'NASA Science — The Golden Record', url: 'https://science.nasa.gov/mission/voyager/voyager-golden-record-overview/' },
+  pbd: { label: 'NASA Science — Voyager 1’s Pale Blue Dot', url: 'https://science.nasa.gov/resource/voyager-1s-pale-blue-dot/' },
+  v2is: { label: 'NASA — Voyager 2 enters interstellar space (2018)', url: 'https://www.nasa.gov/news-release/nasas-voyager-2-probe-enters-interstellar-space/' },
+  dsn: { label: 'NASA — Deep Space Network', url: 'https://www.nasa.gov/communicating-with-missions/dsn/' },
+  usno: { label: 'U.S. Naval Observatory — Approximate solar coordinates', url: 'https://aa.usno.navy.mil/faq/sun_approx' },
+  eyes: { label: 'NASA Eyes on the Solar System', url: 'https://eyes.nasa.gov/apps/solar-system/' },
+  spdf: { label: 'NASA Space Physics Data Facility (Voyager data archive)', url: 'https://spdf.gsfc.nasa.gov/' },
+} satisfies Record<string, Ref>;
+
+const MAP: { area: Tri; how: Tri; refs: Ref[] }[] = [
   {
-    name: { en: 'NASA Science — Voyager Mission', zh: 'NASA Science — 航海家任務', es: 'NASA Science — Misión Voyager' },
-    provides: {
-      en: 'Mission overview, spacecraft facts, encounter history and news.',
-      zh: '任務總覽、太空船資料、飛掠歷史與新聞。',
-      es: 'Resumen de la misión, datos de las naves, historia de encuentros y noticias.',
-    },
-    url: 'https://science.nasa.gov/mission/voyager/',
+    area: T('Current distance, speed and light time (trackers, compare, tools)', '目前的距離、速度與光行時間（追蹤器、比較頁、計算工具）', 'Distancia, velocidad y tiempo de luz actuales (rastreadores, comparación, herramientas)'),
+    how: T(`Calculated by this site from JPL Horizons state vectors for ${EPOCH_ISO.slice(0, 10)}. Labelled as estimates.`, `由本站依 JPL Horizons ${EPOCH_ISO.slice(0, 10)} 的狀態向量計算，並標示為估計值。`, `Calculado por este sitio a partir de vectores de estado de JPL Horizons del ${EPOCH_ISO.slice(0, 10)}. Marcado como estimación.`),
+    refs: [R.horizons],
   },
   {
-    name: { en: 'NASA — Where Are Voyager 1 and Voyager 2 Now?', zh: 'NASA — 航海家一號與二號現在在哪裡？', es: 'NASA — ¿Dónde están ahora Voyager 1 y 2?' },
-    provides: {
-      en: 'Current official distances from Earth and the Sun for both spacecraft.',
-      zh: '兩艘探測器目前與地球、太陽的官方距離。',
-      es: 'Distancias oficiales actuales de ambas naves a la Tierra y al Sol.',
-    },
-    url: 'https://science.nasa.gov/mission/voyager/where-are-voyager-1-and-voyager-2-now/',
+    area: T('Earth’s position in the model', '模型中的地球位置', 'Posición de la Tierra en el modelo'),
+    how: T('Standard low-precision solar coordinates formula (accurate to about 0.01°).', '標準低精度太陽座標公式（精度約 0.01°）。', 'Fórmula estándar de coordenadas solares de baja precisión (unos 0,01°).'),
+    refs: [R.usno],
   },
   {
-    name: { en: 'NASA Science — Voyager 1', zh: 'NASA Science — 航海家一號', es: 'NASA Science — Voyager 1' },
-    provides: {
-      en: 'Voyager 1 mission profile, instruments and status.',
-      zh: '航海家一號的任務檔案、儀器與現況。',
-      es: 'Perfil de la misión Voyager 1, instrumentos y estado.',
-    },
-    url: 'https://science.nasa.gov/mission/voyager/voyager-1/',
+    area: T('Distance and speed history, charts, “where was Voyager on…?”', '距離與速度歷史、圖表、「某一天航海家在哪裡？」', 'Historial de distancia y velocidad, gráficos, «¿dónde estaba Voyager el…?»'),
+    how: T('Monthly samples downloaded from JPL Horizons and bundled with the site; future months are JPL predictions.', '從 JPL Horizons 下載並隨網站提供的月度樣本；未來月份為 JPL 的預測。', 'Muestras mensuales descargadas de JPL Horizons e incluidas en el sitio; los meses futuros son predicciones de JPL.'),
+    refs: [R.horizons],
   },
   {
-    name: { en: 'NASA Science — Voyager 2', zh: 'NASA Science — 航海家二號', es: 'NASA Science — Voyager 2' },
-    provides: {
-      en: 'Voyager 2 mission profile, instruments and status.',
-      zh: '航海家二號的任務檔案、儀器與現況。',
-      es: 'Perfil de la misión Voyager 2, instrumentos y estado.',
-    },
-    url: 'https://science.nasa.gov/mission/voyager/voyager-2/',
+    area: T('Launch and encounter dates, heliopause crossings', '發射與飛掠日期、穿越日球層頂', 'Fechas de lanzamiento y encuentros, cruces de la heliopausa'),
+    how: T('Taken from NASA mission pages and cross-checked against the Horizons history.', '取自 NASA 任務頁面，並與 Horizons 歷史資料交叉核對。', 'Tomadas de las páginas de misión de la NASA y contrastadas con el historial de Horizons.'),
+    refs: [R.v1, R.v2, R.v2is],
   },
   {
-    name: { en: 'NASA — Voyager Golden Record', zh: 'NASA — 航海家金唱片', es: 'NASA — El Disco de Oro de Voyager' },
-    provides: {
-      en: 'History and full contents of the Golden Record.',
-      zh: '金唱片的歷史與完整內容。',
-      es: 'Historia y contenido completo del Disco de Oro.',
-    },
-    url: 'https://science.nasa.gov/mission/voyager/golden-record-overview/',
+    area: T('Instrument status and power', '儀器狀態與電力', 'Estado de instrumentos y energía'),
+    how: T(`Copied from NASA’s status table and blog posts; last checked ${INSTRUMENT_STATUS_AS_OF}.`, `依 NASA 的狀態表與部落格文章抄錄；最後核對日期：${INSTRUMENT_STATUS_AS_OF}。`, `Copiado de la tabla de estado y el blog de la NASA; última revisión: ${INSTRUMENT_STATUS_AS_OF}.`),
+    refs: [R.where, R.blog, R.instruments],
   },
   {
-    name: { en: 'JPL — Voyager, The Interstellar Mission', zh: 'JPL — 航海家星際任務', es: 'JPL — Voyager, la misión interestelar' },
-    provides: {
-      en: 'Official mission news and details of the interstellar mission phase.',
-      zh: '官方任務新聞與星際任務階段的細節。',
-      es: 'Noticias oficiales de la misión y detalles de la fase interestelar.',
-    },
-    url: 'https://voyager.jpl.nasa.gov/',
+    area: T('Recent mission events (2023 onward) and the Updates log', '近期任務事件（2023 年起）與更新紀錄', 'Eventos recientes (desde 2023) y registro de novedades'),
+    how: T('Summarised in our own words from dated NASA blog posts, each linked where it is used.', '依 NASA 部落格中標有日期的文章，以本站文字整理，並在引用處附上連結。', 'Resumidos con nuestras palabras a partir de entradas fechadas del blog de la NASA, enlazadas donde se usan.'),
+    refs: [R.blog],
   },
   {
-    name: { en: 'NASA Eyes on the Solar System', zh: 'NASA Eyes on the Solar System', es: 'NASA Eyes on the Solar System' },
-    provides: {
-      en: 'An interactive visualisation of the spacecraft positions (handy for cross-checking).',
-      zh: '可互動的太空船位置視覺化工具（便於交叉比對）。',
-      es: 'Una visualización interactiva de las posiciones de las naves (útil para contrastar).',
-    },
-    url: 'https://eyes.nasa.gov/apps/solar-system/#/home',
+    area: T('Scientific discoveries and “Why Voyager still matters”', '科學發現與「航海家為何至今仍重要」', 'Descubrimientos y «Por qué Voyager sigue importando»'),
+    how: T('Original explanations based on NASA mission material; each section names its reference.', '依 NASA 任務資料撰寫的原創解說；每個段落都註明參考資料。', 'Explicaciones originales basadas en material de la NASA; cada sección cita su referencia.'),
+    refs: [R.mission, R.v1, R.v2, R.pbd],
   },
   {
-    name: { en: 'NASA — Voyager Frequently Asked Questions', zh: 'NASA — 航海家常見問題', es: 'NASA — Preguntas frecuentes de Voyager' },
-    provides: {
-      en: 'Official answers used as a factual cross-check for this site\u2019s FAQ.',
-      zh: '官方解答，用於與本站常見問題進行事實交叉比對。',
-      es: 'Respuestas oficiales usadas como contraste para las preguntas frecuentes de este sitio.',
-    },
-    url: 'https://voyager.jpl.nasa.gov/frequently-asked-questions/',
+    area: T('Golden Record', '金唱片', 'Disco de Oro'),
+    how: T('Summary of the record’s purpose and contents; no copyrighted recordings or images are reproduced.', '整理唱片的目的與內容；未重製任何受著作權保護的錄音或影像。', 'Resumen del propósito y contenido del disco; no se reproducen grabaciones ni imágenes con derechos.'),
+    refs: [R.golden],
+  },
+  {
+    area: T('One-light-day milestone date', '一光日里程碑日期', 'Fecha del hito de un día-luz'),
+    how: T('NASA’s published date, shown next to this site’s independently calculated date.', 'NASA 公布的日期，與本站獨立計算的日期並列顯示。', 'La fecha publicada por la NASA, junto a la calculada de forma independiente por este sitio.'),
+    refs: [R.where],
+  },
+  {
+    area: T('Constants', '常數', 'Constantes'),
+    how: T('1 AU = 149,597,870.7 km (IAU 2012 Resolution B2); speed of light 299,792.458 km/s (SI definition); 1 mile = 1.609344 km.', '1 AU = 149,597,870.7 公里（IAU 2012 年 B2 決議）；光速 299,792.458 公里/秒（SI 定義）；1 英里 = 1.609344 公里。', '1 UA = 149 597 870,7 km (Resolución B2 de la UAI, 2012); velocidad de la luz 299 792,458 km/s (definición SI); 1 milla = 1,609344 km.'),
+    refs: [],
   },
 ];
 
-export default function SourcesPage() {
-  const zh = useZh();
-  const es = useEs();
+const FURTHER: Ref[] = [R.eyes, R.dsn, R.spdf];
+
+function RefLinks({ refs }: { refs: Ref[] }) {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
+    <ul className="space-y-1">
+      {refs.map((r) => (
+        <li key={r.url}>
+          <a href={r.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-cyan-300 hover:text-cyan-200">
+            {r.label} <ExternalLinkIcon className="h-3 w-3 shrink-0" />
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+export default function SourcesPage() {
+  const locale = useLang();
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
       <BiArticleHeader
         current="sources"
-        title={bi('Sources & References', '資料來源與參考', 'Fuentes y referencias')}
+        title={bi('Data sources & methodology', '資料來源與方法', 'Fuentes de datos y metodología')}
         intro={bi(
-          'Every figure on this website can be traced to a public reference. Historical facts and mission status come from NASA and JPL; distance and speed figures are derived from their published baselines and labelled as estimates.',
-          '本站的每個數字都能追溯到公開的參考資料。歷史事實與任務現況來自 NASA／JPL；距離與速度則根據其公布的基準推導，並標示為估計值。',
-          'Cada cifra de este sitio puede rastrearse hasta una referencia pública. Los hechos históricos y el estado de la misión provienen de NASA y JPL; las distancias y velocidades se derivan de sus líneas base publicadas y se etiquetan como estimaciones.',
+          'Where each part of this website comes from. Facts are taken from NASA and JPL and cited; calculated values are produced by this site from JPL reference data and labelled as estimates.',
+          '本網站各部分內容的出處。事實取自 NASA 與 JPL 並註明來源；計算值則由本站依 JPL 參考資料產生，並標示為估計值。',
+          'De dónde procede cada parte de este sitio. Los datos se toman de la NASA y JPL y se citan; los valores calculados los produce este sitio a partir de datos de referencia de JPL y se marcan como estimaciones.',
         )}
       />
 
-      <BiSection
-        id="official"
-        kicker={bi('Primary references', '主要參考資料', 'Referencias principales')}
-        title={bi('NASA / JPL sources', 'NASA / JPL 來源', 'Fuentes de NASA / JPL')}
-      >
+      <BiSection id="map" title={bi('Which source supports which part of the site', '各部分內容依據哪些資料來源', 'Qué fuente respalda cada parte del sitio')}>
         <div className="overflow-x-auto rounded-xl border border-slate-800">
-          <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+          <table className="w-full min-w-[720px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-slate-700 bg-space-900/70 font-mono text-xs uppercase tracking-wider text-slate-400">
-                <th className="px-4 py-3">{zh ? '來源' : es ? 'Fuente' : 'Source'}</th>
-                <th className="px-4 py-3">{zh ? '提供的資訊' : es ? 'Qué proporciona' : 'What it provides'}</th>
-                <th className="px-4 py-3">{zh ? '連結' : es ? 'Enlace' : 'Link'}</th>
+                <th scope="col" className="px-4 py-3">{txt(T('Part of the site', '網站內容', 'Parte del sitio'), locale)}</th>
+                <th scope="col" className="px-4 py-3">{txt(T('How it is produced', '產生方式', 'Cómo se obtiene'), locale)}</th>
+                <th scope="col" className="px-4 py-3">{txt(T('References', '參考資料', 'Referencias'), locale)}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800">
-              {SOURCES.map((s) => (
-                <tr key={s.url} className="align-top">
-                  <td className="px-4 py-3 font-medium text-slate-100">
-                    {zh ? s.name.zh : es ? s.name.es : s.name.en}
-                  </td>
-                  <td className="px-4 py-3 leading-relaxed text-slate-400">
-                    {zh ? s.provides.zh : es ? s.provides.es : s.provides.en}
-                  </td>
-                  <td className="px-4 py-3">
-                    <a
-                      href={s.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 whitespace-nowrap font-semibold text-cyan-300 hover:text-cyan-200"
-                    >
-                      {zh ? '前往' : es ? 'Visitar' : 'Visit'} <ExternalLinkIcon className="h-3.5 w-3.5" />
-                    </a>
-                  </td>
+            <tbody className="divide-y divide-slate-800 align-top">
+              {MAP.map((row) => (
+                <tr key={row.area.en}>
+                  <th scope="row" className="px-4 py-3 font-medium text-slate-100">{txt(row.area, locale)}</th>
+                  <td className="px-4 py-3 leading-relaxed text-slate-300">{txt(row.how, locale)}</td>
+                  <td className="px-4 py-3 text-xs">{row.refs.length ? <RefLinks refs={row.refs} /> : <span className="text-slate-400">—</span>}</td>
                 </tr>
               ))}
             </tbody>
@@ -143,61 +143,66 @@ export default function SourcesPage() {
         </div>
       </BiSection>
 
-      <BiSection
-        id="methodology"
-        kicker={bi('Methodology', '方法', 'Metodología')}
-        title={bi('How we use these sources', '我們如何使用這些來源', 'Cómo usamos estas fuentes')}
-      >
-        <p className="max-w-4xl leading-relaxed text-slate-300">
-          {zh ? (
-            <>
-              我們不會複製 NASA 的頁面。歷史事件皆以本站自己的文字重新撰寫，並與上述參考資料交叉比對。
-              「即時追蹤器」上的距離，則以 NASA/JPL 基準值與探測器公布速度向前推估——完整公式請見
-              <a href={pageUrl('how-it-works')} className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200">
-                資料與計算方法
-              </a>
-              頁。
-            </>
-          ) : es ? (
-            <>
-              No copiamos páginas de la NASA. Los hechos históricos se redactan con nuestras
-              propias palabras y se contrastan con las referencias anteriores. Las distancias del
-              rastreador en vivo se proyectan con las líneas base de NASA/JPL — la fórmula completa
-              está en la página de{' '}
-              <a href={pageUrl('how-it-works')} className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200">
-                datos y metodología
-              </a>
-              .
-            </>
-          ) : (
-            <>
-              We do not copy NASA pages. Historical events are re-written in our own words and
-              cross-checked against the references above. Distances on the live trackers use the
-              NASA/JPL baseline values projected forward — the exact formula is documented on the{' '}
-              <a href={pageUrl('how-it-works')} className="text-cyan-300 underline decoration-cyan-500/40 underline-offset-2 hover:text-cyan-200">
-                How It Works
-              </a>{' '}
-              page.
-            </>
+      <BiSection id="methodology" title={bi('Methodology in brief', '方法摘要', 'Metodología en breve')}>
+        <Paragraph
+          value={bi(
+            'The trackers take each probe’s position and velocity from JPL Horizons, move them forward in time under the Sun’s and planets’ gravity, place Earth on its orbit with a standard formula, and measure the straight-line distances. The result was checked against JPL’s own predicted distances for 2024–2031 and agrees to within about 40,000 km. The full derivation, validation table and limitations are on the How It Works page.',
+            '追蹤器從 JPL Horizons 取得每艘探測器的位置與速度，依太陽與行星的引力向前推算時間，再以標準公式把地球放到它的軌道上，最後量測直線距離。結果已與 JPL 自己預測的 2024–2031 年距離比對，誤差在約 4 萬公里以內。完整推導、驗證表格與限制，請見「運作原理」頁。',
+            'Los rastreadores toman la posición y velocidad de cada sonda de JPL Horizons, las avanzan en el tiempo bajo la gravedad del Sol y los planetas, sitúan la Tierra en su órbita con una fórmula estándar y miden las distancias en línea recta. El resultado se comparó con las distancias previstas por JPL para 2024–2031 y coincide con un margen de unos 40 000 km. La derivación completa, la tabla de validación y los límites están en Cómo funciona.',
           )}
+        />
+        <p className="mt-3">
+          <a href={pageUrl('how-it-works')} className="text-cyan-300 underline underline-offset-2 hover:text-cyan-200">
+            {txt(T('Read the full methodology →', '閱讀完整方法說明 →', 'Leer la metodología completa →'), locale)}
+          </a>
         </p>
       </BiSection>
 
-      <div className="my-6 rounded-xl border border-cyan-500/40 bg-cyan-500/5 p-5 text-sm leading-relaxed text-cyan-100">
-        <p className="mb-1.5 font-semibold text-white">
-          {zh ? '圖片版權' : es ? 'Crédito de imágenes' : 'Image credit'}
-        </p>
-        <p>
-          {zh
-            ? '本站使用的 NASA/JPL-Caltech 圖片，會在使用的當下標示出處，且僅從 NASA 官方圖庫連結。'
-            : es
-              ? 'Las imágenes de NASA/JPL-Caltech usadas en este sitio se acreditan en el punto de uso y se enlazan solo desde las bibliotecas oficiales de la NASA.'
-              : 'NASA/JPL-Caltech imagery used on this site is credited at the point of use and hotlinked only from official NASA image sources.'}
-        </p>
-      </div>
+      <BiSection id="policy" title={bi('Editorial policy', '編輯原則', 'Política editorial')}>
+        <ul className="max-w-4xl list-disc space-y-2 pl-5 text-slate-300">
+          <li>{txt(T('Text is written for this site; NASA pages are used as references, not copied.', '文字皆為本站撰寫；NASA 的頁面僅作為參考，不會被複製。', 'Los textos se escriben para este sitio; las páginas de la NASA se usan como referencia, no se copian.'), locale)}</li>
+          <li>{txt(T('Every calculated value is labelled as an estimate; nothing is presented as live NASA telemetry.', '每個計算值都標示為估計值；沒有任何內容被呈現為 NASA 的即時遙測。', 'Cada valor calculado se marca como estimación; nada se presenta como telemetría en vivo de la NASA.'), locale)}</li>
+          <li>{txt(T('Mission news is added only when NASA/JPL has published it, with the date and a link.', '只有在 NASA/JPL 公布後才加入任務消息，並附上日期與連結。', 'Solo se añaden noticias publicadas por NASA/JPL, con fecha y enlace.'), locale)}</li>
+          <li>{txt(T('The site contains no NASA photographs; the spacecraft model and all charts are drawn by the site itself.', '本站未使用 NASA 照片；太空船模型與所有圖表皆由本站自行繪製。', 'El sitio no contiene fotografías de la NASA; el modelo de la nave y todos los gráficos los dibuja el propio sitio.'), locale)}</li>
+          <li>
+            {txt(T('Errors are corrected and logged on the', '錯誤會被更正並記錄在', 'Los errores se corrigen y registran en'), locale)}{' '}
+            <a href={pageUrl('updates')} className="text-cyan-300 underline underline-offset-2">
+              {txt(T('Updates page', '更新紀錄頁', 'la página de Novedades'), locale)}
+            </a>
+            {txt(T('; please report problems via the', '；如發現問題，請透過', '; informa de problemas en'), locale)}{' '}
+            <a href={pageUrl('contact')} className="text-cyan-300 underline underline-offset-2">
+              {txt(T('Contact page', '聯絡我們頁面', 'Contacto'), locale)}
+            </a>
+            {txt(T('.', '回報。', '.'), locale)}
+          </li>
+        </ul>
+      </BiSection>
 
-      <RelatedLinks items={['about', 'how-it-works', 'faq', 'updates', 'contact']} />
+      <BiSection id="further" title={bi('Further exploration', '延伸探索', 'Para explorar más')}>
+        <Paragraph
+          value={bi(
+            'Official tools and archives for readers who want to go deeper — for example, to compare this site’s numbers with NASA’s own visualisation or to look at the raw science data.',
+            '提供給想深入了解的讀者的官方工具與資料庫——例如把本站數字與 NASA 自己的視覺化工具比對，或查看原始科學資料。',
+            'Herramientas y archivos oficiales para quien quiera profundizar, por ejemplo para comparar las cifras de este sitio con la visualización de la NASA o consultar los datos científicos originales.',
+          )}
+        />
+        <div className="mt-3 text-sm">
+          <RefLinks refs={FURTHER} />
+        </div>
+      </BiSection>
+
+      <p className="rounded-xl border border-slate-800 bg-space-900/50 p-4 text-xs leading-relaxed text-slate-400">
+        {txt(
+          T(
+            'Voyager Tracker is an independent, unofficial educational project. It is not affiliated with, endorsed by, or sponsored by NASA or the Jet Propulsion Laboratory (JPL). Citing NASA/JPL sources does not imply endorsement.',
+            '「航海家號追蹤器」是獨立、非官方的教育專案，與 NASA 或噴射推進實驗室（JPL）沒有任何關聯，也未獲其背書或贊助。引用 NASA/JPL 資料並不代表獲得其認可。',
+            'El Rastreador Voyager es un proyecto educativo independiente y no oficial. No está afiliado, respaldado ni patrocinado por la NASA ni por el Jet Propulsion Laboratory (JPL). Citar fuentes de NASA/JPL no implica respaldo.',
+          ),
+          locale,
+        )}
+      </p>
+
+      <RelatedLinks items={['how-it-works', 'about', 'updates', 'faq', 'contact']} />
     </div>
   );
 }
-
