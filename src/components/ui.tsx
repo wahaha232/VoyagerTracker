@@ -33,7 +33,7 @@ export function ArticleHeader({
   items.push({ name: pageLabel(current, locale) });
 
   return (
-    <header className="animate-fade-in mb-10">
+    <header className="mb-10">
       <nav aria-label="Breadcrumb" className="mb-4 font-mono text-[11px] uppercase tracking-widest text-cyan-400/80">
         {items.map((item, i) => (
           <span key={`${item.name}-${i}`}>

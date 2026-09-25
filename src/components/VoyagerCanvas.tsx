@@ -81,9 +81,8 @@ export default function VoyagerCanvas({ telemetry, locale, t }: VoyagerCanvasPro
     if (!canvas || !ctx) return;
     const at = minute * 60_000;
 
-    const draw = () => {
+    const draw = (width: number, height: number) => {
       const dpr = window.devicePixelRatio || 1;
-      const { width, height } = canvas.getBoundingClientRect();
       if (width === 0 || height === 0) return;
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
@@ -128,12 +127,16 @@ export default function VoyagerCanvas({ telemetry, locale, t }: VoyagerCanvasPro
       ctx.font = mono(9);
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
-      for (const o of ORBITS) {
+      // The outer orbits are only a few pixels apart on the log scale, so each
+      // label sits at a different angle on the left of its ring instead of in
+      // one row.
+      ORBITS.forEach((o, i) => {
         const r = auToRadius(o.au, size);
         ring(ctx, cx, cy, r, COLORS.orbit, 1);
+        const a = ((i - (ORBITS.length - 1) / 2) * 20 * Math.PI) / 180;
         ctx.fillStyle = COLORS.orbitLabel;
-        ctx.fillText(o.name[locale], cx - r - 3, cy);
-      }
+        ctx.fillText(o.name[locale], cx - r * Math.cos(a) - 3, cy + r * Math.sin(a));
+      });
 
       // Earth orbit and Earth's actual position today.
       const earthR = auToRadius(1, size);
@@ -200,9 +203,11 @@ export default function VoyagerCanvas({ telemetry, locale, t }: VoyagerCanvasPro
       ctx.fillText(t.canvas.scaleNote, 10, height - 6);
     };
 
-    draw();
-    window.addEventListener('resize', draw);
-    return () => window.removeEventListener('resize', draw);
+    // The observer reports the size after layout (no forced reflow) and fires
+    // once on observe, then whenever the canvas itself is resized.
+    const ro = new ResizeObserver(([entry]) => draw(entry.contentRect.width, entry.contentRect.height));
+    ro.observe(canvas);
+    return () => ro.disconnect();
   }, [minute, t, locale]);
 
   const describe =

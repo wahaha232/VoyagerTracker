@@ -22,33 +22,41 @@ import type { Locale } from '../types/voyager';
 
 const tr = (locale: Locale, en: string, zh: string, es: string) => txt({ en, zh, es }, locale);
 
-/** Two-line live summary shown in the hero (client-only). */
-function HeroNumbers() {
+/**
+ * Two-line summary per probe shown in the hero. Without `live` (prerendered
+ * HTML, before the browser computes the values) the same cards show dashes of
+ * the same width — the font is monospaced — so nothing shifts when the numbers
+ * appear.
+ */
+function HeroCards({ live }: { live?: ReturnType<typeof useVoyagerLive> }) {
   const locale = useLang();
-  const live = useVoyagerLive(250);
   return (
     <dl className="mt-6 grid max-w-xl grid-cols-2 gap-3">
       {(['voyager1', 'voyager2'] as const).map((id) => {
-        const v = live[id];
+        const v = live?.[id];
+        const km = v ? formatNumber(v.earthDistanceKm / (locale === 'zh-TW' ? 1e8 : 1e9), locale, locale === 'zh-TW' ? 2 : 3) : locale === 'zh-TW' ? '---.--' : '--.---';
+        const hours = v ? formatNumber(v.lightTimeSeconds / 3600, locale, 2) : '--.--';
         return (
           <div key={id} className="rounded-xl border border-slate-700/60 bg-space-900/60 p-3">
             <dt className={`font-mono text-xs font-bold uppercase tracking-widest ${id === 'voyager1' ? 'text-cyan-300' : 'text-emerald-300'}`}>
               {id === 'voyager1' ? 'Voyager 1' : 'Voyager 2'}
             </dt>
-            <dd className="mt-1 font-mono text-lg font-semibold text-white">
-              {locale === 'zh-TW'
-                ? `${formatNumber(v.earthDistanceKm / 1e8, locale, 2)} 億公里`
-                : `${formatNumber(v.earthDistanceKm / 1e9, locale, 3)} ${tr(locale, 'billion km', '', 'mil millones de km')}`}
+            <dd className={`mt-1 font-mono text-lg font-semibold ${v ? 'text-white' : 'text-slate-400'}`}>
+              {locale === 'zh-TW' ? `${km} 億公里` : `${km} ${tr(locale, 'billion km', '', 'mil millones de km')}`}
             </dd>
             <dd className="font-mono text-xs text-slate-300">
-              {tr(locale, 'from Earth · signal delay', '距地球 · 訊號延遲', 'de la Tierra · retardo')}{' '}
-              {formatNumber(v.lightTimeSeconds / 3600, locale, 2)} {tr(locale, 'h', '小時', 'h')}
+              {tr(locale, 'from Earth · signal delay', '距地球 · 訊號延遲', 'de la Tierra · retardo')} {hours} {tr(locale, 'h', '小時', 'h')}
             </dd>
           </div>
         );
       })}
     </dl>
   );
+}
+
+/** Live version of the hero cards (client-only). */
+function HeroNumbers() {
+  return <HeroCards live={useVoyagerLive(250)} />;
 }
 
 const EXPLORE: { key: PageKey; en: string; zh: string; es: string }[] = [
@@ -100,7 +108,7 @@ export default function HomePage() {
       {/* ===== Hero ===== */}
       <section className="relative overflow-hidden border-b border-cyan-500/15">
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:py-14">
-          <div className="animate-fade-in">
+          <div>
             <p className="mb-4 inline-flex flex-wrap items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300">
               {t('Independent · Educational · Not affiliated with NASA', '獨立 · 教育性質 · 與 NASA 無關', 'Independiente · Educativo · Sin afiliación con la NASA')}
             </p>
@@ -114,7 +122,7 @@ export default function HomePage() {
                 'El Rastreador Voyager calcula continuamente a qué distancia están de la Tierra y del Sol las dos sondas interestelares de la NASA, y explica qué significan esas cifras, en qué se diferencian las gemelas y qué descubrieron.',
               )}
             </p>
-            <ClientOnly>
+            <ClientOnly fallback={<HeroCards />}>
               <HeroNumbers />
             </ClientOnly>
             <p className="mt-4 max-w-xl text-sm leading-relaxed text-slate-400">
@@ -150,7 +158,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="animate-fade-in">
+          <div>
             <div className="hud-panel relative h-[300px] w-full overflow-hidden rounded-2xl sm:h-[420px]">
               <ClientOnly>
                 <ModelSlot />
