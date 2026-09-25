@@ -59,11 +59,19 @@ export default function PrivacyPage() {
         title={bi('Cookies', 'Cookie', 'Cookies')}
       >
         <Paragraph
-          value={bi(
-            'This website does not set its own cookies. If advertising or third-party embeds are added in the future, those services may set cookies, and this policy will be updated before they are enabled.',
-            '本站不會自行設定 Cookie。若未來加入廣告或第三方嵌入內容，該服務可能設定 Cookie，而本站會先更新本政策後才啟用。',
-            'Este sitio no establece cookies propias. Si en el futuro se añaden anuncios o contenidos incrustados de terceros, esos servicios podrían establecer cookies y esta política se actualizará antes de activarlos.',
-          )}
+          value={
+            __ADSENSE_ENABLED__
+              ? bi(
+                  'This website does not set its own cookies. The pages load Google AdSense, which may set advertising cookies as described under Advertising below.',
+                  '本站不會自行設定 Cookie。頁面會載入 Google AdSense，該服務可能設定廣告 Cookie，詳見下方「廣告」一節。',
+                  'Este sitio no establece cookies propias. Las páginas cargan Google AdSense, que puede establecer cookies publicitarias, como se explica en Publicidad más abajo.',
+                )
+              : bi(
+                  'This website does not set its own cookies. If advertising or third-party embeds are added in the future, those services may set cookies, and this policy will be updated before they are enabled.',
+                  '本站不會自行設定 Cookie。若未來加入廣告或第三方嵌入內容，該服務可能設定 Cookie，而本站會先更新本政策後才啟用。',
+                  'Este sitio no establece cookies propias. Si en el futuro se añaden anuncios o contenidos incrustados de terceros, esos servicios podrían establecer cookies y esta política se actualizará antes de activarlos.',
+                )
+          }
         />
       </BiSection>
 

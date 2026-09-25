@@ -22,6 +22,16 @@ const CONTENT_REVIEWED = '2026-09-25';
 const SITE_UPDATES: { date: string; title: Tri; detail: Tri; reason?: Tri; affected?: Tri }[] = [
   {
     date: '2026-09-25',
+    title: T('Google AdSense code added', '加入 Google AdSense 程式碼', 'Se añade el código de Google AdSense'),
+    detail: T(
+      'The pages now load the Google AdSense script, so Google can review the site and, if it is approved, show ads. The Privacy Policy was updated first to describe the advertising cookies and how to opt out of personalised ads. The calculations, content and tools are unchanged, and the site itself still collects no personal data.',
+      '頁面現在會載入 Google AdSense 指令碼，讓 Google 審核本站，若通過審核即可顯示廣告。本站已先更新隱私權政策，說明廣告 Cookie 以及如何停用個人化廣告。計算、內容與工具皆未改變，本站本身仍不收集任何個人資料。',
+      'Las páginas cargan ahora el script de Google AdSense, para que Google pueda revisar el sitio y, si lo aprueba, mostrar anuncios. Antes se actualizó la Política de privacidad para describir las cookies publicitarias y cómo desactivar los anuncios personalizados. Los cálculos, el contenido y las herramientas no cambian, y el sitio sigue sin recopilar datos personales.',
+    ),
+    affected: T('All pages, Privacy', '所有頁面、隱私權政策', 'Todas las páginas, Privacidad'),
+  },
+  {
+    date: '2026-09-25',
     title: T('Faster pages and a self-hosted font', '頁面載入更快、字型改由本站提供', 'Páginas más rápidas y fuente alojada en el sitio'),
     detail: T(
       'Pages now show their text before the interactive parts start, the 3D model loads automatically only on large screens (a button loads it elsewhere), and live counters pause when they are off-screen or the tab is hidden. The monospace font is now served from this site instead of Google Fonts. Pages shared on social media now show a preview image with the calculated distances and their date.',

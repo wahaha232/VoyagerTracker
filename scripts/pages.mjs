@@ -229,4 +229,4 @@ export const pageHref =(p) => (p.key === 'home' ? SITE_URL : `${SITE_URL}${p.fil
  * visitors in the EEA/UK/Switzerland, set up a Google-certified consent
  * message (AdSense → Privacy & messaging).
  */
-export const ADSENSE_CLIENT = '';
+export const ADSENSE_CLIENT = 'ca-pub-1512317781873771';
