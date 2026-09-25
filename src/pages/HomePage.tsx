@@ -15,6 +15,8 @@ import { RelatedLinks } from '../components/ui';
 import { txt, useLang } from '../components/content';
 import { useVoyagerLive, formatNumber } from '../hooks/useVoyagerLive';
 import { FAQ_ITEMS } from './FaqPage';
+import DistanceGeometry from '../components/DistanceGeometry';
+import SourceBadge from '../components/SourceBadge';
 import type { Locale } from '../types/voyager';
 
 const Voyager3D = lazy(() => import('../components/Voyager3D'));
@@ -92,7 +94,7 @@ const EXPLORE: { key: PageKey; en: string; zh: string; es: string }[] = [
 export default function HomePage() {
   const locale = useLang();
   const t = (en: string, zh: string, es: string) => tr(locale, en, zh, es);
-  const faqPreview = FAQ_ITEMS.slice(0, 4);
+  const faqPreview = FAQ_ITEMS.slice(0, 6);
 
   return (
     <div>
@@ -181,7 +183,7 @@ export default function HomePage() {
         {/* ===== What is Voyager Tracker ===== */}
         <section id="what-is-voyager-tracker" className="mb-14 scroll-mt-24">
           <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
-            {t('What is Voyager Tracker?', '什麼是航海家號追蹤器？', '¿Qué es el Rastreador Voyager?')}
+            {t('Why Voyager Tracker?', '為什麼需要航海家號追蹤器？', '¿Por qué el Rastreador Voyager?')}
           </h2>
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="space-y-3 leading-relaxed text-slate-300">
@@ -204,6 +206,12 @@ export default function HomePage() {
               <p className="mb-2 font-semibold text-white">
                 {t('Official data vs. this site’s estimates', '官方資料與本站估計值的差別', 'Datos oficiales frente a estimaciones')}
               </p>
+              <p className="mb-3 flex flex-wrap gap-1.5">
+                <SourceBadge kind="official" />
+                <SourceBadge kind="calculated" />
+                <SourceBadge kind="hypothetical" />
+                <SourceBadge kind="educational" />
+              </p>
               <ul className="list-disc space-y-1.5 pl-5">
                 <li>{t('Mission dates, encounters and instrument status: taken from NASA/JPL publications and cited on each page.', '任務日期、飛掠事件與儀器狀態：取自 NASA/JPL 公開資料，並在各頁註明出處。', 'Fechas, encuentros y estado de instrumentos: tomados de publicaciones de NASA/JPL y citados en cada página.')}</li>
                 <li>{t('Current distance, speed and light time: calculated here, labelled “estimate”, validated against JPL predictions.', '目前的距離、速度與光行時間：由本站計算，標示為「估計值」，並已與 JPL 預測比對驗證。', 'Distancia, velocidad y tiempo de luz actuales: calculados aquí, marcados como «estimación» y validados con predicciones de JPL.')}</li>
@@ -211,6 +219,59 @@ export default function HomePage() {
               </ul>
             </div>
           </div>
+        </section>
+
+        <section id="what-it-adds" className="mb-14 scroll-mt-24">
+          <h2 className="mb-2 text-2xl font-bold tracking-wide text-white sm:text-3xl">
+            {t('What this site adds to the public record', '本站在公開資料之外增加了什麼', 'Qué añade este sitio a la información pública')}
+          </h2>
+          <p className="mb-5 max-w-3xl text-slate-300">
+            {t(
+              'NASA and JPL publish the mission facts and the trajectory data. Voyager Tracker combines them with its own calculations and explanations in one place:',
+              'NASA 與 JPL 公布了任務事實與軌道資料。本站把這些資料與自己的計算、解說整合在同一個地方：',
+              'La NASA y JPL publican los datos de la misión y de la trayectoria. El Rastreador Voyager los combina en un solo lugar con sus propios cálculos y explicaciones:',
+            )}
+          </p>
+          <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              [t('Current estimated position', '目前的估計位置', 'Posición estimada actual'), t('Recalculated in your browser, validated against JPL.', '在您的瀏覽器中重新計算，並與 JPL 比對驗證。', 'Recalculada en tu navegador y validada con JPL.'), 'live-tracker'],
+              [t('Distance history, 1977–2034', '1977–2034 年距離歷史', 'Historial de distancia, 1977–2034'), t('A chart and a Date Explorer built on JPL monthly data.', '以 JPL 月度資料製作的圖表與日期探索器。', 'Un gráfico y un explorador de fechas con datos mensuales de JPL.'), 'tools.html#on-this-date'],
+              [t('Voyager 1 vs Voyager 2', '航海家一號 vs 二號', 'Voyager 1 frente a Voyager 2'), t('Side by side, with the reasons they differ.', '並列比較，並說明兩者為何不同。', 'Lado a lado, con las razones de sus diferencias.'), 'compare.html'],
+              [t('Signal delay you can feel', '可以體會的訊號延遲', 'Un retardo de señal que se entiende'), t('Send a message and watch it travel.', '送出一則訊息，看著它前進。', 'Envía un mensaje y míralo viajar.'), 'tools.html#communication'],
+              [t('Human-scale comparisons', '人類尺度的比較', 'Comparaciones a escala humana'), t('A log-scale ruler from 1 km to a light-year.', '從 1 公里到 1 光年的對數尺規。', 'Una regla logarítmica de 1 km a un año luz.'), 'tools.html#scale'],
+              [t('Sourced timeline', '附出處的時間軸', 'Cronología con fuentes'), t('Every event with context, significance and a link.', '每個事件都有背景、意義與連結。', 'Cada evento con contexto, importancia y enlace.'), 'timeline.html'],
+              [t('Transparent method', '透明的方法', 'Método transparente'), t('Formulas, validation results and limits, published.', '公開公式、驗證結果與限制。', 'Fórmulas, validación y límites publicados.'), 'how-it-works.html'],
+              [t('Labelled data', '標示清楚的資料', 'Datos etiquetados'), t('Official, calculated, hypothetical and educational values marked.', '官方、計算、假設與教學示意數值皆有標示。', 'Valores oficiales, calculados, hipotéticos y didácticos marcados.'), 'how-it-works.html#labels'],
+            ].map(([title, body, href], i) => (
+              <li key={href as string}>
+                <a
+                  href={(href as string).includes('.html') ? `${import.meta.env.BASE_URL}${href}` : `#${href}`}
+                  className="block h-full rounded-xl border border-slate-700/60 bg-space-900/50 p-4 transition-colors hover:border-cyan-400/50"
+                >
+                  <span className="font-mono text-xs text-cyan-300">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="mt-1 block font-semibold text-white">{title}</span>
+                  <span className="mt-1 block text-sm leading-relaxed text-slate-400">{body}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* ===== Why the Earth distance wobbles ===== */}
+        <section id="why-distance-changes" className="mb-14 scroll-mt-24">
+          <h2 className="mb-2 text-2xl font-bold tracking-wide text-white sm:text-3xl">
+            {t('Why does the distance from Earth rise and fall?', '為什麼與地球的距離會忽增忽減？', '¿Por qué la distancia a la Tierra sube y baja?')}
+          </h2>
+          <p className="mb-5 max-w-3xl text-slate-300">
+            {t(
+              'The two distances on the tracker are measured from different places. The Sun stays put at the centre; Earth circles it once a year. Move Earth through the year below and watch the difference.',
+              '追蹤器上的兩個距離，是從不同的地方量起的。太陽固定在中心，地球每年繞它一圈。拖動下方的地球走過一年，看看兩者的差異如何變化。',
+              'Las dos distancias del rastreador se miden desde lugares distintos. El Sol está fijo en el centro; la Tierra lo rodea una vez al año. Mueve la Tierra a lo largo del año y observa la diferencia.',
+            )}
+          </p>
+          <ClientOnly fallback={<p className="text-sm text-slate-400">{t('This interactive diagram runs in your browser (JavaScript required).', '此互動圖在您的瀏覽器中執行（需要 JavaScript）。', 'Este diagrama interactivo funciona en tu navegador (requiere JavaScript).')}</p>}>
+            <DistanceGeometry />
+          </ClientOnly>
         </section>
 
         {/* ===== What you can explore ===== */}
@@ -289,16 +350,15 @@ export default function HomePage() {
           <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
             {t('Common questions', '常見問題', 'Preguntas frecuentes')}
           </h2>
-          <div className="space-y-3">
-            {faqPreview.map((row) => (
-              <details key={row.q.en} className="group rounded-xl border border-slate-800 bg-space-900/40">
-                <summary className="cursor-pointer p-4 font-medium text-slate-100 transition-colors hover:text-cyan-300">
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {faqPreview.map((row, i) => (
+              <li key={row.q.en}>
+                <a href={`${pageUrl('faq')}#q${i + 1}`} className="block rounded-xl border border-slate-800 bg-space-900/40 p-4 font-medium text-slate-100 transition-colors hover:border-cyan-400/50 hover:text-cyan-300">
                   {txt(row.q, locale)}
-                </summary>
-                <p className="border-t border-slate-800 px-4 py-3 text-sm leading-relaxed text-slate-300">{txt(row.a, locale)}</p>
-              </details>
+                </a>
+              </li>
             ))}
-          </div>
+          </ul>
           <p className="mt-4">
             <a href={pageUrl('faq')} className="inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300 hover:text-cyan-200">
               {t(`Read all ${FAQ_ITEMS.length} questions`, `閱讀全部 ${FAQ_ITEMS.length} 個問題`, `Leer las ${FAQ_ITEMS.length} preguntas`)} <LinkArrow className="h-4 w-4" />

@@ -52,7 +52,7 @@ export default function Header({ current }: HeaderProps) {
         <a
           href={pageUrl('home')}
           aria-current={current === 'home' ? 'page' : undefined}
-          className="flex shrink-0 items-center gap-3"
+          className="flex shrink-0 items-center gap-2 sm:gap-3"
           aria-label={es ? 'Inicio del Rastreador Voyager' : zh ? '航海家號追蹤器首頁' : 'Voyager Tracker home'}
         >
           <span className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-emerald-500 text-space-950 shadow-lg shadow-cyan-500/30">
@@ -60,7 +60,7 @@ export default function Header({ current }: HeaderProps) {
             <span className="absolute -inset-1 -z-10 rounded-xl bg-cyan-500/25 blur-md" aria-hidden="true" />
           </span>
           <span className="hidden leading-tight min-[360px]:block">
-            <span className="neon-text block text-base font-bold tracking-[0.15em] text-white">
+            <span className="neon-text block text-base font-bold tracking-wide text-white sm:tracking-[0.15em]">
               {es ? 'Rastreador Voyager' : zh ? '航海家號追蹤器' : 'Voyager Tracker'}
             </span>
             <span className="hidden font-mono text-[11px] tracking-wider text-cyan-300/80 sm:block xl:hidden 2xl:block">
@@ -88,7 +88,7 @@ export default function Header({ current }: HeaderProps) {
         </nav>
 
         {/* Language + mobile menu controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {select}
           <select
             id="lang-select"

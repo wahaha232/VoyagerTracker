@@ -24,6 +24,8 @@ interface World {
   name: Tri;
   when: Tri;
   craft: Tri;
+  /** What was known before Voyager arrived. */
+  before: Tri;
   topics: Topic[];
   takeaway: Tri;
   source: { label: string; url: string };
@@ -35,6 +37,7 @@ const WORLDS: World[] = [
     name: T('Jupiter', '木星', 'Júpiter'),
     when: T('March and July 1979', '1979 年 3 月與 7 月', 'Marzo y julio de 1979'),
     craft: T('Voyager 1 and Voyager 2', '航海家一號與二號', 'Voyager 1 y Voyager 2'),
+    before: T('Pioneer 10 and 11 had flown past in 1973–74, returning the first close images and dangerous radiation readings, but the large moons were still little more than blurry discs with known sizes and orbits.', '先鋒十號與十一號曾在 1973–74 年飛掠，傳回第一批近距離影像與危險的輻射讀數；但各大衛星除了大小與軌道外，仍只是模糊的圓盤。', 'Las Pioneer 10 y 11 habían pasado en 1973–74, con las primeras imágenes cercanas y lecturas de radiación peligrosas, pero las grandes lunas seguían siendo discos borrosos de tamaño y órbita conocidos.'),
     topics: [
       {
         name: T('Atmosphere and storms', '大氣與風暴', 'Atmósfera y tormentas'),
@@ -60,6 +63,7 @@ const WORLDS: World[] = [
     name: T('Saturn', '土星', 'Saturno'),
     when: T('November 1980 and August 1981', '1980 年 11 月與 1981 年 8 月', 'Noviembre de 1980 y agosto de 1981'),
     craft: T('Voyager 1 and Voyager 2', '航海家一號與二號', 'Voyager 1 y Voyager 2'),
+    before: T('Pioneer 11 had passed in 1979 and found the thin F ring. From the ground, astronomers knew Titan had an atmosphere containing methane, but not how thick it was or what lay beneath.', '先鋒十一號曾於 1979 年飛過，發現了細窄的 F 環。從地面觀測，天文學家已知泰坦有含甲烷的大氣，但不知道它有多厚、底下有什麼。', 'La Pioneer 11 había pasado en 1979 y halló el delgado anillo F. Desde tierra se sabía que Titán tenía una atmósfera con metano, pero no su espesor ni qué había debajo.'),
     topics: [
       {
         name: T('Rings', '光環', 'Anillos'),
@@ -85,6 +89,7 @@ const WORLDS: World[] = [
     name: T('Uranus', '天王星', 'Urano'),
     when: T('24 January 1986', '1986 年 1 月 24 日', '24 de enero de 1986'),
     craft: T('Voyager 2 only', '僅航海家二號', 'Solo la Voyager 2'),
+    before: T('Uranus was known only through telescopes: five moons, a strongly tilted spin axis, and narrow rings discovered in 1977 when they briefly dimmed a background star. Its day length and magnetic field were unknown.', '天王星只能透過望遠鏡了解：五顆衛星、極度傾斜的自轉軸，以及 1977 年因短暫遮蔽背景恆星而被發現的細窄光環。它一天有多長、有沒有磁場，都還是未知。', 'Urano solo se conocía por telescopio: cinco lunas, un eje muy inclinado y anillos estrechos descubiertos en 1977 al atenuar una estrella de fondo. Se desconocían la duración de su día y su campo magnético.'),
     topics: [
       {
         name: T('Unusual rotation', '特殊的自轉', 'Rotación inusual'),
@@ -110,6 +115,7 @@ const WORLDS: World[] = [
     name: T('Neptune', '海王星', 'Neptuno'),
     when: T('25 August 1989', '1989 年 8 月 25 日', '25 de agosto de 1989'),
     craft: T('Voyager 2 only', '僅航海家二號', 'Solo la Voyager 2'),
+    before: T('Two moons were known, Triton and Nereid, and observations of stars passing behind Neptune had hinted at partial ring arcs. Almost nothing was known about its weather.', '當時只知道兩顆衛星——海衛一與海衛二；觀測恆星從海王星後方經過時，曾暗示有不完整的環弧。對它的天氣幾乎一無所知。', 'Se conocían dos lunas, Tritón y Nereida, y las estrellas ocultadas por Neptuno sugerían arcos de anillos parciales. Casi nada se sabía de su clima.'),
     topics: [
       {
         name: T('Winds and atmosphere', '風與大氣', 'Vientos y atmósfera'),
@@ -135,6 +141,7 @@ const WORLDS: World[] = [
     name: T('The heliosphere and interstellar space', '日球層與星際空間', 'La heliosfera y el espacio interestelar'),
     when: T('2004 onwards', '2004 年至今', 'Desde 2004'),
     craft: T('Voyager 1 and Voyager 2', '航海家一號與二號', 'Voyager 1 y Voyager 2'),
+    before: T('Nobody knew how far the heliosphere extended; published estimates of the heliopause ranged from a few tens to well over a hundred AU, and its boundaries had never been measured directly.', '沒有人知道日球層延伸得多遠；已發表的日球層頂距離估計，從數十 AU 到遠超過一百 AU 都有，而它的邊界也從未被直接量測過。', 'Nadie sabía hasta dónde llegaba la heliosfera; las estimaciones publicadas de la heliopausa iban de unas decenas a más de cien UA, y sus límites nunca se habían medido directamente.'),
     topics: [
       {
         name: T('Termination shock', '終端激波', 'Choque de terminación'),
@@ -185,7 +192,11 @@ export default function DiscoveriesPage() {
           <p className="mt-1 font-mono text-xs uppercase tracking-widest text-cyan-300">
             {txt(w.when, locale)} · {txt(w.craft, locale)}
           </p>
-          <div className="mt-5 space-y-4">
+          <div className="mt-4 rounded-xl border border-slate-700/60 bg-space-950/50 p-4 text-sm leading-relaxed">
+            <p className="font-mono text-xs uppercase tracking-wider text-amber-200">{txt(T('Before Voyager', '航海家之前', 'Antes de Voyager'), locale)}</p>
+            <p className="mt-1 text-slate-300">{txt(w.before, locale)}</p>
+          </div>
+          <div className="mt-4 space-y-4">
             {w.topics.map((tp) => (
               <article key={tp.name.en} className="rounded-xl border border-slate-800 bg-space-900/40 p-5">
                 <h3 className="mb-3 text-lg font-semibold text-white">{txt(tp.name, locale)}</h3>
@@ -199,7 +210,7 @@ export default function DiscoveriesPage() {
             ))}
           </div>
           <p className="mt-4 rounded-xl border-l-4 border-emerald-400/70 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-50">
-            <span className="font-semibold">{txt(T('Remember: ', '記住這點：', 'Para recordar: '), locale)}</span>
+            <span className="font-semibold">{txt(T('After Voyager — remember: ', '航海家之後——記住這點：', 'Después de Voyager, para recordar: '), locale)}</span>
             {txt(w.takeaway, locale)}
           </p>
           <p className="mt-2 text-xs text-slate-400">

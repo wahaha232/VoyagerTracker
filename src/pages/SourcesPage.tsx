@@ -37,6 +37,12 @@ const R = {
   spdf: { label: 'NASA Space Physics Data Facility (Voyager data archive)', url: 'https://spdf.gsfc.nasa.gov/' },
 } satisfies Record<string, Ref>;
 
+/**
+ * Date every external link on the site was last requested and confirmed to
+ * load (scripts/check-site.mjs --external), and the linked content re-read.
+ */
+const SOURCES_CHECKED = '2026-09-25';
+
 const MAP: { area: Tri; how: Tri; refs: Ref[] }[] = [
   {
     area: T('Current distance, speed and light time (trackers, compare, tools)', '目前的距離、速度與光行時間（追蹤器、比較頁、計算工具）', 'Distancia, velocidad y tiempo de luz actuales (rastreadores, comparación, herramientas)'),
@@ -122,12 +128,13 @@ export default function SourcesPage() {
 
       <BiSection id="map" title={bi('Which source supports which part of the site', '各部分內容依據哪些資料來源', 'Qué fuente respalda cada parte del sitio')}>
         <div className="overflow-x-auto rounded-xl border border-slate-800">
-          <table className="w-full min-w-[720px] border-collapse text-left text-sm">
+          <table className="w-full min-w-[820px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-slate-700 bg-space-900/70 font-mono text-xs uppercase tracking-wider text-slate-400">
                 <th scope="col" className="px-4 py-3">{txt(T('Part of the site', '網站內容', 'Parte del sitio'), locale)}</th>
                 <th scope="col" className="px-4 py-3">{txt(T('How it is produced', '產生方式', 'Cómo se obtiene'), locale)}</th>
                 <th scope="col" className="px-4 py-3">{txt(T('References', '參考資料', 'Referencias'), locale)}</th>
+                <th scope="col" className="px-4 py-3">{txt(T('Last checked', '最後核對', 'Última revisión'), locale)}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 align-top">
@@ -136,12 +143,24 @@ export default function SourcesPage() {
                   <th scope="row" className="px-4 py-3 font-medium text-slate-100">{txt(row.area, locale)}</th>
                   <td className="px-4 py-3 leading-relaxed text-slate-300">{txt(row.how, locale)}</td>
                   <td className="px-4 py-3 text-xs">{row.refs.length ? <RefLinks refs={row.refs} /> : <span className="text-slate-400">—</span>}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-slate-300">{row.refs.length ? <time dateTime={SOURCES_CHECKED}>{SOURCES_CHECKED}</time> : '—'}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </BiSection>
+
+      <p className="-mt-8 mb-12 text-xs text-slate-400">
+        {txt(
+          T(
+            '“Last checked” is the date each link was requested and found to load, and its content re-read against what this site says.',
+            '「最後核對」是指該連結最近一次被實際請求並確認可開啟、且其內容已與本站說法重新比對的日期。',
+            '«Última revisión» es la fecha en que se solicitó cada enlace, se comprobó que carga y se contrastó su contenido con lo que dice este sitio.',
+          ),
+          locale,
+        )}
+      </p>
 
       <BiSection id="methodology" title={bi('Methodology in brief', '方法摘要', 'Metodología en breve')}>
         <Paragraph

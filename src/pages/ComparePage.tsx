@@ -12,6 +12,7 @@ import { pageUrl } from '../constants/site';
 import { RelatedLinks } from '../components/ui';
 import ClientOnly from '../components/ClientOnly';
 import HistoryChart from '../components/HistoryChart';
+import RouteExplorer from '../components/RouteExplorer';
 import { BiArticleHeader, BiSection, bi, txt, useLang } from '../components/content';
 import { AU_KM, estimate, spacecraftState } from '../lib/ephemeris';
 import { elapsedYearsDays } from '../lib/context';
@@ -149,6 +150,22 @@ const FACTS: { label: Tri; v1: Tri; v2: Tri }[] = [
 
 const WHY: { title: Tri; body: Tri }[] = [
   {
+    title: T('Why did Voyager 1 reach interstellar space first?', '為什麼航海家一號先進入星際空間？', '¿Por qué la Voyager 1 llegó antes al espacio interestelar?'),
+    body: T(
+      'Mostly because it was faster and had a head start: it left the planets behind in 1980, nine years before Voyager 2 finished at Neptune. The heliopause is also not a sphere — Voyager 2 crossed it about 2.6 AU closer to the Sun, in a different direction — so arrival order depends on both speed and the shape of the boundary.',
+      '主要是因為它比較快，而且領先起跑：它在 1980 年就離開了行星區域，比航海家二號結束海王星飛掠早了九年。此外，日球層頂並不是正球體——航海家二號在另一個方向、離太陽近約 2.6 AU 處就穿越了——因此抵達順序同時取決於速度與邊界的形狀。',
+      'Sobre todo porque era más rápida y salió con ventaja: dejó atrás los planetas en 1980, nueve años antes de que la Voyager 2 terminara en Neptuno. Además, la heliopausa no es una esfera —la Voyager 2 la cruzó unas 2,6 UA más cerca del Sol, en otra dirección—, así que el orden depende de la velocidad y de la forma del límite.',
+    ),
+  },
+  {
+    title: T('Why do their signal delays differ?', '為什麼兩者的訊號延遲不同？', '¿Por qué sus retardos de señal son distintos?'),
+    body: T(
+      'Signal delay is simply distance from Earth divided by the speed of light, so the farther probe has the longer delay — today roughly 24 hours for Voyager 1 and 20 for Voyager 2. Both delays also rise and fall a little over the year as Earth moves around its orbit; the table above shows the current values.',
+      '訊號延遲就是「與地球的距離 ÷ 光速」，所以較遠的探測器延遲較長——目前航海家一號約 24 小時，二號約 20 小時。兩者的延遲也會隨地球公轉而在一年中略為增減；目前數值見上表。',
+      'El retardo de señal es la distancia a la Tierra dividida por la velocidad de la luz, así que la sonda más lejana tiene más retardo: hoy unas 24 horas la Voyager 1 y 20 la Voyager 2. Ambos suben y bajan un poco durante el año por el movimiento orbital de la Tierra; la tabla de arriba muestra los valores actuales.',
+    ),
+  },
+  {
     title: T('Why did the second launch end up in front?', '為什麼較晚發射的反而跑在前面？', '¿Por qué la segunda en despegar va delante?'),
     body: T(
       'The names describe arrival order, not launch order. Voyager 1 left 16 days after Voyager 2 but on a faster, more direct path to Jupiter. According to the JPL Horizons data used on this site, it was already farther from the Sun than its twin before the end of 1977, and it reached Jupiter four months earlier.',
@@ -218,6 +235,20 @@ export default function ComparePage() {
         )}
       >
         <HistoryChart />
+      </BiSection>
+
+      <BiSection
+        id="routes"
+        title={bi('Two routes, stop by stop', '兩條路線，逐站比較', 'Dos rutas, parada a parada')}
+        lead={bi(
+          'Choose a spacecraft and a stop to see where it was and how the flyby changed its speed. Voyager 1’s route ends at Saturn; Voyager 2 kept going to Uranus and Neptune.',
+          '選擇探測器與停靠點，看看它當時在哪裡，以及飛掠如何改變它的速度。航海家一號的行星路線止於土星；航海家二號則繼續前往天王星與海王星。',
+          'Elige una nave y una parada para ver dónde estaba y cómo cambió su velocidad el sobrevuelo. La ruta planetaria de la Voyager 1 termina en Saturno; la Voyager 2 siguió hasta Urano y Neptuno.',
+        )}
+      >
+        <ClientOnly fallback={<p className="text-sm text-slate-400">{txt(T('The route explorer runs in your browser (JavaScript required).', '路線探索器在您的瀏覽器中執行（需要 JavaScript）。', 'El explorador de rutas funciona en tu navegador (requiere JavaScript).'), locale)}</p>}>
+          <RouteExplorer />
+        </ClientOnly>
       </BiSection>
 
       <BiSection id="facts" title={bi('Mission facts compared', '任務事實比較', 'Datos de la misión comparados')}>

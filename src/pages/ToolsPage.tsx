@@ -13,7 +13,12 @@ import { pageUrl } from '../constants/site';
 import { RelatedLinks } from '../components/ui';
 import ClientOnly from '../components/ClientOnly';
 import { BiArticleHeader, bi, txt, useLang } from '../components/content';
-import { AU_KM, C_KM_S, estimate, historicalSunAu } from '../lib/ephemeris';
+import { AU_KM, C_KM_S, estimate } from '../lib/ephemeris';
+import { chipCls, durationText, Field, fmtN, inputCls, parseNonNegative, Result } from '../components/tools/toolUi';
+import { CompareDates, DateExplorer } from '../components/tools/DateTools';
+import ScaleExplorer from '../components/tools/ScaleExplorer';
+import CommDelay from '../components/tools/CommDelay';
+import SourceBadge from '../components/SourceBadge';
 import {
   LIGHT_YEAR_KM,
   PROXIMA_LY,
@@ -22,11 +27,9 @@ import {
   convert,
   elapsedYearsDays,
   formatBig,
-  splitDuration,
   travelYears,
   type UnitKey,
 } from '../lib/context';
-import type { Locale } from '../types/voyager';
 
 type Tri = { en: string; zh: string; es: string };
 const T = (en: string, zh: string, es: string): Tri => ({ en, zh, es });
@@ -103,33 +106,6 @@ function Tool({
   );
 }
 
-const inputCls =
-  'min-h-[44px] w-full rounded-lg border border-slate-600 bg-space-900 px-3 font-mono text-sm text-slate-100 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/40';
-const chipCls =
-  'min-h-[36px] rounded-full border border-slate-600 px-3 text-xs font-medium text-slate-200 hover:border-cyan-400 hover:text-white';
-
-function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: ReactNode }) {
-  return (
-    <div>
-      <label htmlFor={htmlFor} className="mb-1 block text-xs font-semibold uppercase tracking-wider text-slate-400">
-        {label}
-      </label>
-      {children}
-    </div>
-  );
-}
-
-const fmtN = (v: number, locale: Locale, d = 2) =>
-  Number.isFinite(v) ? new Intl.NumberFormat(locale, { maximumFractionDigits: d }).format(v) : '—';
-
-function durationText(seconds: number, locale: Locale) {
-  const d = splitDuration(seconds);
-  const u = locale === 'zh-TW' ? ['天', '小時', '分', '秒'] : locale === 'es' ? ['d', 'h', 'min', 's'] : ['d', 'h', 'min', 's'];
-  if (seconds < 1) return `${fmtN(seconds, locale, 3)} ${u[3]}`;
-  const parts = [d.days && `${d.days} ${u[0]}`, (d.days || d.hours) && `${d.hours} ${u[1]}`, `${d.minutes} ${u[2]}`, `${d.seconds} ${u[3]}`];
-  return parts.filter(Boolean).join(' ');
-}
-
 /* ------------------------------------------------------------------ */
 /* 1. Light-time calculator                                             */
 /* ------------------------------------------------------------------ */
@@ -138,8 +114,9 @@ function LightTime() {
   const locale = useLang();
   const [value, setValue] = useState('1');
   const [unit, setUnit] = useState<UnitKey>('au');
-  const km = Number(value) * UNITS[unit];
-  const valid = Number.isFinite(km) && km >= 0;
+  const parsed = parseNonNegative(value);
+  const valid = parsed !== null;
+  const km = valid ? parsed * UNITS[unit] : NaN;
   const now = Date.now();
   const presets: { label: Tri; km: number }[] = [
     { label: T('Moon (average)', '月球（平均）', 'Luna (media)'), km: 384_400 },
@@ -176,6 +153,9 @@ function LightTime() {
           </button>
         ))}
       </div>
+      {!valid && value.trim() !== '' && (
+        <p className="mt-3 text-sm text-amber-200" role="alert">{txt(T('Enter a distance of zero or more.', '請輸入大於或等於零的距離。', 'Introduce una distancia de cero o más.'), locale)}</p>
+      )}
       <div className="mt-4 grid gap-3 sm:grid-cols-2" aria-live="polite">
         <Result
           label={txt(T('One-way light time', '單程光行時間', 'Tiempo de luz (ida)'), locale)}
@@ -190,16 +170,6 @@ function LightTime() {
   );
 }
 
-function Result({ label, value, sub }: { label: string; value: string; sub?: string }) {
-  return (
-    <div className="rounded-xl border border-slate-700/60 bg-space-900/60 p-4">
-      <p className="font-mono text-[11px] uppercase tracking-widest text-slate-400">{label}</p>
-      <p className="mt-1 break-words font-mono text-lg font-semibold text-white">{value}</p>
-      {sub && <p className="mt-0.5 text-xs text-slate-400">{sub}</p>}
-    </div>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 /* 2. Distance converter                                                */
 /* ------------------------------------------------------------------ */
@@ -209,7 +179,7 @@ function Converter() {
   const [value, setValue] = useState('');
   const [unit, setUnit] = useState<UnitKey>('km');
   const initial = useMemo(() => String(Math.round(estimate('voyager1', Date.now()).earthKm)), []);
-  const v = Number(value === '' ? initial : value);
+  const v = (value === '' ? Number(initial) : parseNonNegative(value)) ?? NaN;
   return (
     <div>
       <div className="grid gap-3 sm:grid-cols-[1fr_1fr]">
@@ -239,73 +209,6 @@ function Converter() {
           ))}
         </tbody>
       </table>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* 3. Where was Voyager on a date?                                      */
-/* ------------------------------------------------------------------ */
-
-function OnThisDate() {
-  const locale = useLang();
-  const [date, setDate] = useState('2000-01-01');
-  const ms = Date.parse(`${date}T12:00:00Z`);
-  const now = Date.now();
-  const launches = { voyager1: Date.parse('1977-09-05T12:00:00Z'), voyager2: Date.parse('1977-08-20T12:00:00Z') };
-  const rows = (['voyager1', 'voyager2'] as const).map((id) => {
-    const au = Number.isFinite(ms) ? historicalSunAu(id, ms) : null;
-    const today = estimate(id, now).sunKm / AU_KM;
-    return { id, au, today, before: ms < launches[id], age: ms >= launches[id] ? elapsedYearsDays(launches[id], ms) : null };
-  });
-  return (
-    <div>
-      <div className="grid gap-3 sm:grid-cols-[1fr_2fr] sm:items-end">
-        <Field label={txt(T('Date (e.g. your birthday)', '日期（例如您的生日）', 'Fecha (p. ej., tu cumpleaños)'), locale)} htmlFor="od-date">
-          <input id="od-date" type="date" min="1977-08-20" max="2034-12-01" className={inputCls} value={date} onChange={(e) => setDate(e.target.value)} />
-        </Field>
-        <div className="flex flex-wrap gap-2">
-          {[
-            { d: '1990-02-14', l: T('Pale Blue Dot', '蒼藍小點', 'Pálido punto azul') },
-            { d: '2012-08-25', l: T('V1 enters interstellar space', '一號進入星際空間', 'V1 entra al espacio interestelar') },
-            { d: '2030-01-01', l: T('1 Jan 2030 (predicted)', '2030 年 1 月 1 日（預測）', '1 ene 2030 (previsto)') },
-          ].map((p) => (
-            <button key={p.d} type="button" className={chipCls} onClick={() => setDate(p.d)}>
-              {txt(p.l, locale)}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2" aria-live="polite">
-        {rows.map((r) => (
-          <div key={r.id} className="rounded-xl border border-slate-700/60 bg-space-900/60 p-4">
-            <p className={`font-mono text-xs font-bold uppercase tracking-widest ${r.id === 'voyager1' ? 'text-cyan-300' : 'text-emerald-300'}`}>
-              {r.id === 'voyager1' ? 'Voyager 1' : 'Voyager 2'}
-            </p>
-            {r.before ? (
-              <p className="mt-1 text-sm text-slate-300">{txt(T('Not launched yet on this date.', '這一天尚未發射。', 'Aún no se había lanzado en esa fecha.'), locale)}</p>
-            ) : r.au === null ? (
-              <p className="mt-1 text-sm text-slate-300">{txt(T('Outside the data range (Aug 1977 – Dec 2034).', '超出資料範圍（1977 年 8 月至 2034 年 12 月）。', 'Fuera del rango de datos (ago 1977 – dic 2034).'), locale)}</p>
-            ) : (
-              <>
-                <p className="mt-1 font-mono text-lg font-semibold text-white">
-                  {fmtN(r.au, locale, 2)} AU · {fmtN((r.au * AU_KM) / 1e9, locale, 2)} {txt(T('billion km', '十億公里', 'mil millones de km'), locale)}
-                </p>
-                <p className="text-xs text-slate-300">
-                  {txt(T('from the Sun', '距太陽', 'del Sol'), locale)} · {fmtN((r.au / r.today) * 100, locale, 1)}%{' '}
-                  {txt(T('of today’s distance', '相當於今天距離的比例', 'de la distancia actual'), locale)}
-                </p>
-                {r.age && (
-                  <p className="text-xs text-slate-400">
-                    {txt(T('Mission age that day', '當天任務已執行', 'Edad de la misión ese día'), locale)}: {r.age.years}{' '}
-                    {txt(T('years', '年', 'años'), locale)} {r.age.days} {txt(T('days', '天', 'días'), locale)}
-                  </p>
-                )}
-              </>
-            )}
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
@@ -341,6 +244,7 @@ function TravelTime() {
           <input id="tt-custom" className={inputCls} inputMode="decimal" placeholder="e.g. 1500" value={custom} onChange={(ev) => setCustom(ev.target.value)} />
         </Field>
       </div>
+      <p className="mt-3"><SourceBadge kind="hypothetical" note={txt(T('constant speed, straight line', '固定速度、直線前進', 'velocidad constante, línea recta'), locale)} /></p>
       <p className="mt-3 text-xs text-slate-400">
         {txt(T('Distance used', '使用的距離', 'Distancia usada'), locale)}: {fmtN(e.earthKm / 1e9, locale, 2)}{' '}
         {txt(T('billion km (from Earth, today’s estimate)', '十億公里（距地球，今日估計值）', 'mil millones de km (desde la Tierra, estimación de hoy)'), locale)}
@@ -396,9 +300,9 @@ export default function ToolsPage() {
         current="tools"
         title={bi('Voyager calculators', '航海家計算工具', 'Calculadoras Voyager')}
         intro={bi(
-          'Numbers like “25 billion kilometres” are hard to picture. These four calculators use the same model as the tracker to turn Voyager’s distance into things you can reason about: signal delay, familiar units, your own dates and everyday speeds.',
-          '「250 億公里」這樣的數字很難想像。這四個計算工具使用與追蹤器相同的模型，把航海家的距離轉換成您能理解的形式：訊號延遲、熟悉的單位、您自己的日期，以及日常生活中的速度。',
-          'Cifras como «25 000 millones de km» son difíciles de imaginar. Estas cuatro calculadoras usan el mismo modelo que el rastreador para convertir la distancia de Voyager en algo razonable: retardo de señal, unidades conocidas, tus propias fechas y velocidades cotidianas.',
+          'Numbers like “25 billion kilometres” are hard to picture. These seven tools use the same model as the tracker to turn Voyager’s distance into things you can reason about: signal delay, a message you can send, familiar units, your own dates, a scale ruler and everyday speeds.',
+          '「250 億公里」這樣的數字很難想像。這七個工具使用與追蹤器相同的模型，把航海家的距離轉換成您能理解的形式：訊號延遲、一則可以實際送出的訊息、熟悉的單位、您自己的日期、尺度尺規，以及日常生活中的速度。',
+          'Cifras como «25 000 millones de km» son difíciles de imaginar. Estas siete herramientas usan el mismo modelo que el rastreador para convertir la distancia de Voyager en algo razonable: retardo de señal, un mensaje que puedes enviar, unidades conocidas, tus propias fechas, una regla de escala y velocidades cotidianas.',
         )}
       />
 
@@ -406,7 +310,10 @@ export default function ToolsPage() {
         {[
           ['light-time', T('Light-time calculator', '光行時間計算器', 'Tiempo de luz')],
           ['converter', T('Distance converter', '距離單位換算', 'Conversor de distancia')],
-          ['on-this-date', T('Where was Voyager on…?', '某一天航海家在哪裡？', '¿Dónde estaba Voyager el…?')],
+          ['communication', T('Communication delay', '通訊延遲模擬', 'Retardo de comunicación')],
+          ['on-this-date', T('Date Explorer', '日期探索器', 'Explorador de fechas')],
+          ['compare-dates', T('Compare two dates', '比較兩個日期', 'Comparar dos fechas')],
+          ['scale', T('Scale explorer', '尺度探索', 'Explorador de escala')],
           ['travel-time', T('Hypothetical travel time', '假設性旅行時間', 'Tiempo de viaje hipotético')],
         ].map(([id, label]) => (
           <a key={id as string} href={`#${id}`} className={chipCls + ' inline-flex items-center'}>
@@ -443,6 +350,33 @@ export default function ToolsPage() {
       </Tool>
 
       <Tool
+        id="communication"
+        title={T('Communication delay: send a message to Voyager', '通訊延遲：送一則訊息給航海家', 'Retardo de comunicación: envía un mensaje a Voyager')}
+        what={T(
+          'What would it be like to talk to a spacecraft more than 20 billion km away? Send a message now and watch it travel: it will not arrive for most of a day, and an answer would take just as long to come back. Real-time conversation is impossible.',
+          '與 200 多億公里外的太空船通話會是什麼感覺？現在就送出一則訊息，看著它前進：它將近一天後才會抵達，而回覆也要同樣久才能回來。即時對話根本不可能。',
+          '¿Cómo sería hablar con una nave a más de 20 000 millones de km? Envía un mensaje ahora y míralo viajar: tardará casi un día en llegar y la respuesta, lo mismo en volver. Una conversación en tiempo real es imposible.',
+        )}
+        method={T(
+          'The one-way delay is the calculated Earth distance at the moment you press the button divided by the speed of light; the earliest reply time adds the same delay again.',
+          '單程延遲 = 按下按鈕那一刻計算出的地球距離 ÷ 光速；最早的回覆時間再加上相同的延遲。',
+          'El retardo de ida es la distancia calculada a la Tierra en el momento de pulsar, dividida por la velocidad de la luz; la respuesta más temprana suma el mismo retardo otra vez.',
+        )}
+        example={T(
+          'That is why the Voyager team plans commands days in advance and checks the result two days later: every action is a letter, not a phone call.',
+          '這就是為什麼航海家團隊要提前數天規劃指令，並在兩天後才確認結果：每一個動作都像寄一封信，而不是打一通電話。',
+          'Por eso el equipo Voyager planifica las órdenes con días de antelación y comprueba el resultado dos días después: cada acción es una carta, no una llamada.',
+        )}
+        limits={T(
+          'The reply time is a physical minimum. Real operations also depend on Deep Space Network antenna schedules and on the spacecraft’s own timing, and the Earth distance changes slightly while a signal is travelling.',
+          '回覆時間是物理上的最小值。實際運作還取決於深空網路天線的排程與太空船本身的時序，而且訊號傳送期間，地球距離也會略有變化。',
+          'El tiempo de respuesta es un mínimo físico. Las operaciones reales dependen además del calendario de antenas de la Red de Espacio Profundo y del propio calendario de la nave, y la distancia a la Tierra cambia un poco mientras viaja la señal.',
+        )}
+      >
+        <CommDelay />
+      </Tool>
+
+      <Tool
         id="converter"
         title={T('Distance converter', '距離單位換算', 'Conversor de distancia')}
         what={T(
@@ -471,29 +405,83 @@ export default function ToolsPage() {
 
       <Tool
         id="on-this-date"
-        title={T('Where was Voyager on…?', '某一天，航海家在哪裡？', '¿Dónde estaba Voyager el…?')}
+        title={T('Voyager Date Explorer', '航海家日期探索器', 'Explorador de fechas Voyager')}
         what={T(
-          'Pick any date from August 1977 to 2034 — a birthday, an anniversary, a historic day — and see how far each probe was from the Sun and how old the mission was.',
-          '選擇 1977 年 8 月到 2034 年之間的任何日期——生日、紀念日或歷史性的一天——看看當天兩艘探測器離太陽多遠，以及任務已進行多久。',
-          'Elige cualquier fecha entre agosto de 1977 y 2034 —un cumpleaños, un aniversario, un día histórico— y mira a qué distancia del Sol estaba cada sonda y cuánto llevaba la misión.',
+          'Pick any date from August 1977 to 2034 — a birthday, an anniversary, a historic day — and see where both probes were: distance from Earth and from the Sun, signal delay, speed, mission age, and what the mission was doing around then.',
+          '選擇 1977 年 8 月到 2034 年之間的任何日期——生日、紀念日或歷史性的一天——看看兩艘探測器當時在哪裡：與地球及太陽的距離、訊號延遲、速度、任務已執行多久，以及那段時間任務在做什麼。',
+          'Elige cualquier fecha entre agosto de 1977 y 2034 —un cumpleaños, un aniversario, un día histórico— y mira dónde estaban ambas sondas: distancia a la Tierra y al Sol, retardo de señal, velocidad, edad de la misión y qué hacía la misión por entonces.',
         )}
         method={T(
-          'Interpolates between monthly heliocentric distances from JPL Horizons bundled with this site. Dates after today use JPL’s predicted trajectory.',
-          '在本站內建的 JPL Horizons 月度日心距離資料之間進行內插。今天之後的日期使用 JPL 預測的軌道。',
-          'Interpola entre las distancias heliocéntricas mensuales de JPL Horizons incluidas en el sitio. Las fechas posteriores a hoy usan la trayectoria prevista por JPL.',
+          'For 2024–2031 the live model is used. For other dates the spacecraft’s position is interpolated between monthly JPL Horizons vectors and Earth is placed with the same orbit formula, so the distance from Earth includes Earth’s position on that day. Events come only from this site’s sourced timeline (within ±4 months).',
+          '2024–2031 年使用即時模型。其他日期則在 JPL Horizons 的月度位置向量之間內插探測器位置，並以相同的軌道公式放置地球，因此地球距離包含了地球當天的位置。事件只取自本站有出處的時間軸（前後 4 個月內）。',
+          'Para 2024–2031 se usa el modelo en vivo. Para otras fechas la posición de la nave se interpola entre vectores mensuales de JPL Horizons y la Tierra se sitúa con la misma fórmula orbital, así que la distancia a la Tierra incluye su posición ese día. Los eventos salen solo de la cronología con fuentes del sitio (±4 meses).',
         )}
         example={T(
-          'On 14 February 1990, when it took the Pale Blue Dot image, Voyager 1 was about 40 AU — some 6 billion km — from the Sun.',
-          '1990 年 2 月 14 日拍攝「蒼藍小點」時，航海家一號距太陽約 40 AU——約 60 億公里。',
-          'El 14 de febrero de 1990, al tomar el pálido punto azul, la Voyager 1 estaba a unas 40 UA —unos 6000 millones de km— del Sol.',
+          'On 14 February 1990, when it took the Pale Blue Dot image, Voyager 1 was about 40 AU — some 6 billion km — from the Sun, and its signals took about 5.5 hours to reach Earth.',
+          '1990 年 2 月 14 日拍攝「蒼藍小點」時，航海家一號距太陽約 40 AU——約 60 億公里——訊號約需 5.5 小時才能傳回地球。',
+          'El 14 de febrero de 1990, al tomar el pálido punto azul, la Voyager 1 estaba a unas 40 UA —unos 6000 millones de km— del Sol, y sus señales tardaban unas 5,5 horas en llegar a la Tierra.',
         )}
         limits={T(
-          'Monthly sampling smooths out the fastest changes during planetary flybys, where distance can differ from the interpolated value by a small fraction of an AU. Shows distance from the Sun, not from Earth.',
-          '月度取樣會抹平行星飛掠期間最快速的變化，那時實際距離可能與內插值相差零點幾個 AU。本工具顯示的是與太陽的距離，而非與地球的距離。',
-          'El muestreo mensual suaviza los cambios más rápidos durante los sobrevuelos, donde la distancia puede diferir del valor interpolado en una pequeña fracción de UA. Muestra la distancia al Sol, no a la Tierra.',
+          'Checked against JPL’s own distances every 10 days: after 1990 the difference stays under about 35,000 km, but during the 1977–1989 planetary flybys monthly interpolation can be off by a few million km. Dates after today are JPL predictions.',
+          '以 JPL 每 10 天一筆的距離比對：1990 年後誤差都在約 3.5 萬公里以內，但在 1977–1989 年行星飛掠期間，月度內插可能相差數百萬公里。今天之後的日期屬於 JPL 的預測。',
+          'Comparado con las distancias de JPL cada 10 días: desde 1990 la diferencia se mantiene por debajo de unos 35 000 km, pero durante los sobrevuelos de 1977–1989 la interpolación mensual puede desviarse unos millones de km. Las fechas posteriores a hoy son predicciones de JPL.',
         )}
       >
-        <OnThisDate />
+        <DateExplorer />
+      </Tool>
+
+      <Tool
+        id="compare-dates"
+        title={T('Compare two dates', '比較兩個日期', 'Comparar dos fechas')}
+        what={T(
+          'How much did the Voyagers move between two dates — say, between Voyager 1’s interstellar crossing and today? Pick any two dates to see how each distance and the signal delay changed.',
+          '兩個日期之間，航海家號移動了多少？例如從航海家一號進入星際空間到今天。選擇任意兩個日期，看看各項距離與訊號延遲如何變化。',
+          '¿Cuánto se movieron las Voyager entre dos fechas, por ejemplo entre el cruce interestelar de la Voyager 1 y hoy? Elige dos fechas para ver cómo cambiaron las distancias y el retardo de señal.',
+        )}
+        method={T(
+          'Each date is calculated as in the Date Explorer; the table shows B minus A. The average rate is the change in Sun distance divided by the time between the dates.',
+          '每個日期的計算方式與日期探索器相同；表格顯示 B 減去 A 的結果。平均變化率為太陽距離的變化量除以兩日期相隔的時間。',
+          'Cada fecha se calcula como en el explorador de fechas; la tabla muestra B menos A. El ritmo medio es el cambio de la distancia al Sol dividido por el tiempo entre fechas.',
+        )}
+        example={T(
+          'From 25 August 2012 to late 2026, Voyager 1’s distance from the Sun grew by roughly 50 AU, an average of about 17 km/s.',
+          '從 2012 年 8 月 25 日到 2026 年底，航海家一號與太陽的距離增加了約 50 AU，平均約每秒 17 公里。',
+          'Del 25 de agosto de 2012 a finales de 2026, la distancia de la Voyager 1 al Sol creció unas 50 UA, a una media de unos 17 km/s.',
+        )}
+        limits={T(
+          'The difference between two distances is not the length of the path flown. The Earth distance also contains Earth’s yearly swing, so compare Sun distances when you want the probe’s own progress.',
+          '兩個距離之差並不等於飛行路徑的長度。地球距離也包含地球一年一度的起伏，若想看探測器本身的前進量，請比較太陽距離。',
+          'La diferencia entre dos distancias no es la longitud del camino recorrido. La distancia a la Tierra incluye además la oscilación anual terrestre; compara las distancias al Sol para ver el avance propio de la sonda.',
+        )}
+      >
+        <CompareDates />
+      </Tool>
+
+      <Tool
+        id="scale"
+        title={T('Scale explorer: how far is that?', '尺度探索：那到底有多遠？', 'Explorador de escala: ¿cuánto es eso?')}
+        what={T(
+          'Put Voyager’s distance on one ruler with things you know — a trip around Earth, the Moon, the Sun, Neptune — and with the light-day and light-year used for the stars.',
+          '把航海家的距離放在同一把尺上，與您熟悉的東西並列——繞地球一圈、月球、太陽、海王星——也與描述恆星距離時使用的光日、光年並列。',
+          'Coloca la distancia de Voyager en una sola regla junto a cosas conocidas —una vuelta a la Tierra, la Luna, el Sol, Neptuno— y junto al día-luz y el año luz que se usan para las estrellas.',
+        )}
+        method={T(
+          'A logarithmic scale: equal steps mean multiplying by the same factor (here ×1,000 per tick). Voyager values are the current calculated distances from Earth; the others are standard reference values.',
+          '對數尺度：每一個等距刻度代表乘上相同倍數（此處每格 ×1,000）。航海家的數值是目前計算出的地球距離；其他則是標準參考值。',
+          'Escala logarítmica: pasos iguales significan multiplicar por el mismo factor (aquí ×1000 por marca). Los valores de Voyager son las distancias actuales calculadas desde la Tierra; los demás son valores de referencia estándar.',
+        )}
+        example={T(
+          'Voyager 1 is roughly 67,000 times farther away than the Moon, yet still only about 0.3% of a light-year.',
+          '航海家一號的距離約是月球的 67,000 倍，卻仍只有約 0.3% 光年。',
+          'La Voyager 1 está unas 67 000 veces más lejos que la Luna y, aun así, solo a un 0,3 % de un año luz.',
+        )}
+        limits={T(
+          'Reference values are rounded averages (the Moon’s distance varies by about 10%, Neptune’s by a few percent). A log scale is ideal for comparison but makes large gaps look small.',
+          '參考值為四捨五入的平均值（月球距離約有 10% 的變化，海王星則有幾個百分點）。對數尺度很適合比較，但會讓巨大的差距看起來很小。',
+          'Los valores de referencia son medias redondeadas (la distancia a la Luna varía un 10 %, la de Neptuno unos pocos por ciento). La escala logarítmica es ideal para comparar, pero hace que grandes distancias parezcan pequeñas.',
+        )}
+      >
+        <ScaleExplorer />
       </Tool>
 
       <Tool

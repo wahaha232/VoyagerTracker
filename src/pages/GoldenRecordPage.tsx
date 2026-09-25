@@ -3,16 +3,9 @@
  */
 
 import { RelatedLinks } from '../components/ui';
-import { BiArticleHeader, BiSection, bi, CardGrid, Paragraph, useEs, useZh } from '../components/content';
+import { BiArticleHeader, BiSection, bi, Paragraph, useEs, useZh } from '../components/content';
+import GoldenRecordExplorer from '../components/GoldenRecordExplorer';
 
-const CONTENTS: { title: { en: string; zh: string; es: string }; text: { en: string; zh: string; es: string } }[] = [
-  { title: { en: 'Greetings', zh: '問候語', es: 'Saludos' }, text: { en: 'Spoken greetings in 55 human languages, plus a greeting from whales.', zh: '五十五種人類語言的問候，還有一段來自鯨魚的問候。', es: 'Saludos hablados en 55 idiomas humanos, además de un saludo de las ballenas.' } },
-  { title: { en: 'Sounds of Earth', zh: '地球之聲', es: 'Sonidos de la Tierra' }, text: { en: 'Natural sounds — wind, thunder, surf, birds — and sounds of human activity.', zh: '自然之聲——風、雷、海浪、鳥鳴——以及人類活動的聲音。', es: 'Sonidos naturales — viento, truenos, olas, aves — y sonidos de la actividad humana.' } },
-  { title: { en: 'Music', zh: '音樂', es: 'Música' }, text: { en: 'Around 90 minutes of music from many cultures and eras, including Bach, Beethoven and Chuck Berry.', zh: '約九十分鐘、來自多元文化與時代的音樂，包括巴哈、貝多芬與查克·貝里。', es: 'Unos 90 minutos de música de muchas culturas y épocas, incluidos Bach, Beethoven y Chuck Berry.' } },
-  { title: { en: 'Images', zh: '影像', es: 'Imágenes' }, text: { en: '115 analogue-encoded images showing science, human anatomy, daily life, art and places on Earth.', zh: '一百一十五張以類比方式編碼的影像，涵蓋科學、人體、日常生活、藝術與地球各地。', es: '115 imágenes codificadas en analógico: ciencia, anatomía humana, vida diaria, arte y lugares de la Tierra.' } },
-  { title: { en: 'Scientific information', zh: '科學資訊', es: 'Información científica' }, text: { en: 'A map of pulsars pointing back to the Sun and a drawing of the hydrogen atom — Earth\u2019s cosmic address.', zh: '一張能反推太陽位置的脈衝星地圖，以及氫原子的示意圖——地球在宇宙中的地址。', es: 'Un mapa de púlsares que apunta de vuelta al Sol y un dibujo del átomo de hidrógeno — la dirección cósmica de la Tierra.' } },
-  { title: { en: 'How to play it', zh: '如何播放', es: 'Cómo reproducirlo' }, text: { en: 'An engraved diagram explains the playback speed and how to decode the images and audio.', zh: '唱片上的蝕刻圖示說明了播放速度，以及如何解讀影像與聲音。', es: 'Un diagrama grabado explica la velocidad de reproducción y cómo decodificar imágenes y audio.' } },
-];
 
 export default function GoldenRecordPage() {
   const zh = useZh();
@@ -56,7 +49,7 @@ export default function GoldenRecordPage() {
         kicker={bi('What is on it', '收錄內容', 'Qué contiene')}
         title={bi('What the record contains', '唱片裡有什麼', 'Qué contiene el disco')}
       >
-        <CardGrid items={CONTENTS} />
+        <GoldenRecordExplorer />
       </BiSection>
 
       <BiSection
@@ -98,9 +91,9 @@ export default function GoldenRecordPage() {
       <BiSection id="voices" title={bi('Greetings and languages', '問候與語言', 'Saludos e idiomas')}>
         <Paragraph
           value={bi(
-            'The spoken greetings range from ancient languages such as Sumerian and Akkadian to modern ones spoken by billions, with many regional languages in between. They are short and simple — most amount to “hello” or “greetings from Earth”. The record also carries a spoken message from United Nations Secretary-General Kurt Waldheim and a printed statement from U.S. President Jimmy Carter.',
-            '口說問候涵蓋了蘇美語、阿卡德語等古代語言，到如今有數十億人使用的現代語言，中間還包括許多地方語言。這些問候簡短樸實——大多相當於「你好」或「來自地球的問候」。唱片也收錄了聯合國秘書長庫爾特．華德翰的口述訊息，以及美國總統吉米．卡特的書面聲明。',
-            'Los saludos hablados van desde lenguas antiguas como el sumerio y el acadio hasta idiomas modernos que hablan miles de millones de personas, con muchas lenguas regionales entre medias. Son breves y sencillos: casi todos equivalen a «hola» o «saludos desde la Tierra». El disco lleva también un mensaje hablado del secretario general de la ONU, Kurt Waldheim, y una declaración escrita del presidente estadounidense Jimmy Carter.',
+            'The spoken greetings range from ancient Akkadian, spoken in Sumer about 6,000 years ago, to modern ones spoken by billions, with many regional languages in between. They are short and simple — most amount to “hello” or “greetings from Earth”. The record also carries messages from United Nations Secretary-General Kurt Waldheim and U.S. President Jimmy Carter.',
+            '口說問候涵蓋了約 6,000 年前通行於蘇美地區的古代阿卡德語，到如今有數十億人使用的現代語言，中間還包括許多地方語言。這些問候簡短樸實——大多相當於「你好」或「來自地球的問候」。唱片也收錄了聯合國秘書長庫爾特．華德翰與美國總統吉米．卡特的訊息。',
+            'Los saludos hablados van desde el antiguo acadio, hablado en Sumer hace unos 6000 años, hasta idiomas modernos que hablan miles de millones de personas, con muchas lenguas regionales entre medias. Son breves y sencillos: casi todos equivalen a «hola» o «saludos desde la Tierra». El disco lleva también mensajes del secretario general de la ONU, Kurt Waldheim, y del presidente estadounidense Jimmy Carter.',
           )}
         />
       </BiSection>

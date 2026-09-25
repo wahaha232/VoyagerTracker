@@ -11,7 +11,7 @@ import { RelatedLinks } from '../components/ui';
 import { ExternalLinkIcon } from '../components/icons';
 import { BiArticleHeader, BiSection, Paragraph, bi, txt, useLang } from '../components/content';
 import { EPOCH_ISO } from '../data/horizons.generated';
-import { LIGHT_DAY_MODEL_ISO, VALIDATED_ON, VALIDATION } from '../data/validation-summary.generated';
+import { HISTORY_VALIDATION, LIGHT_DAY_MODEL_ISO, SPOT_CHECKS, VALIDATED_ON, VALIDATION } from '../data/validation-summary.generated';
 import { INSTRUMENT_STATUS_AS_OF } from '../constants/voyagerData';
 
 type Tri = { en: string; zh: string; es: string };
@@ -113,7 +113,39 @@ const LABELS: { name: Tri; meaning: Tri }[] = [
   { name: T('Official', '官方資料', 'Oficial'), meaning: T('Published by NASA/JPL and cited: mission dates, encounters, instrument status, JPL Horizons reference vectors.', '由 NASA/JPL 公布並註明出處：任務日期、飛掠事件、儀器狀態、JPL Horizons 參考向量。', 'Publicado por NASA/JPL y citado: fechas, encuentros, estado de instrumentos, vectores de referencia de JPL Horizons.') },
   { name: T('Calculated / estimated', '計算／估計', 'Calculado / estimado'), meaning: T('Produced by this site’s model from official reference data: current distances, speeds, light times, milestones, separation between the probes.', '由本站模型依官方參考資料產生：目前的距離、速度、光行時間、里程碑、兩艘探測器的間距。', 'Producido por el modelo del sitio a partir de datos oficiales: distancias, velocidades, tiempos de luz, hitos y separación entre las sondas.') },
   { name: T('Historical data', '歷史資料', 'Datos históricos'), meaning: T('JPL Horizons monthly samples used in charts and the date calculator; future months are JPL predictions.', '圖表與日期計算器所用的 JPL Horizons 月度樣本；未來月份為 JPL 的預測。', 'Muestras mensuales de JPL Horizons usadas en gráficos y en la calculadora de fechas; los meses futuros son predicciones de JPL.') },
+  { name: T('Educational', '教學示意', 'Didáctico'), meaning: T('Explanatory diagrams such as the Earth-orbit schematic and the scale ruler. They illustrate an idea and are not drawn to scale unless stated.', '說明用的示意圖，例如地球軌道示意圖與尺度尺規。它們用來解釋概念，除非另有說明，否則並非等比例繪製。', 'Diagramas explicativos, como el esquema de la órbita terrestre y la regla de escala. Ilustran una idea y no están a escala salvo que se indique.') },
   { name: T('Hypothetical', '假設性', 'Hipotético'), meaning: T('“What if” comparisons such as travel time at airliner speed. Illustrations of scale, not predictions.', '「如果……會怎樣」的比較，例如以客機速度前往所需的時間。僅用於說明尺度，並非預測。', 'Comparaciones del tipo «¿y si…?», como el tiempo de viaje en avión. Ilustraciones de escala, no predicciones.') },
+];
+
+/** Only real, dated methodology changes (see the git history for details). */
+const CHANGELOG: { version: string; date: string; text: Tri }[] = [
+  {
+    version: 'v1',
+    date: '2026-09-05',
+    text: T(
+      'Fixed 2026 starting distances advanced at a constant speed; distance from Earth assumed equal to distance from the Sun. Later found to be about 5–6 AU off.',
+      '以固定的 2026 年起始距離、配合固定速度推進；並假設與地球的距離等於與太陽的距離。後來發現偏差約 5–6 AU。',
+      'Distancias iniciales fijas de 2026 avanzadas a velocidad constante; distancia a la Tierra igual a la distancia al Sol. Luego se vio que se desviaba unas 5–6 UA.',
+    ),
+  },
+  {
+    version: 'v2',
+    date: '2026-09-25',
+    text: T(
+      'JPL Horizons barycentric state vectors propagated with a third-order Taylor series; Sun offset from the barycentre and Earth’s orbit modelled; validated against JPL for 2024–2031.',
+      '改用 JPL Horizons 的質心狀態向量，並以三階泰勒級數推算；納入太陽相對質心的偏移與地球公轉；以 2024–2031 年 JPL 資料驗證。',
+      'Vectores de estado baricéntricos de JPL Horizons propagados con una serie de Taylor de tercer orden; desplazamiento solar y órbita terrestre modelados; validado con JPL para 2024–2031.',
+    ),
+  },
+  {
+    version: 'v2.1',
+    date: '2026-09-25',
+    text: T(
+      'Monthly JPL position vectors added so the distance from Earth and the signal delay can be reconstructed for any date from 1977 to 2034 (Date Explorer, Compare two dates); this reconstruction is validated separately against JPL, with results published below.',
+      '加入 JPL 月度位置向量，使 1977 至 2034 年任何日期的地球距離與訊號延遲都能重建（日期探索器、兩日期比較）；此重建另外與 JPL 比對驗證，結果公布於下方。',
+      'Se añadieron vectores de posición mensuales de JPL para reconstruir la distancia a la Tierra y el retardo de señal de cualquier fecha entre 1977 y 2034 (explorador y comparación de fechas); esta reconstrucción se valida aparte con JPL y los resultados se publican abajo.',
+    ),
+  },
 ];
 
 export default function HowItWorksPage() {
@@ -245,6 +277,94 @@ export default function HowItWorksPage() {
             {txt(T('Updates', '更新紀錄', 'Novedades'), locale)}
           </a>
         </p>
+      </BiSection>
+
+      <BiSection
+        id="spot-checks"
+        title={bi('Spot checks: JPL reference vs this tracker', '抽樣核對：JPL 參考值 vs 本追蹤器', 'Comprobaciones: referencia de JPL frente a este rastreador')}
+        lead={bi(
+          'The distance from Earth on 1 January of each year, as given by JPL Horizons and as calculated by this site. Generated automatically by the validation script.',
+          '每年 1 月 1 日與地球的距離：JPL Horizons 的數值與本站計算值並列。由驗證腳本自動產生。',
+          'La distancia a la Tierra el 1 de enero de cada año, según JPL Horizons y según el cálculo de este sitio. Generado automáticamente por el script de validación.',
+        )}
+      >
+        <div className="overflow-x-auto rounded-xl border border-slate-800">
+          <table className="w-full min-w-[600px] border-collapse text-left text-sm">
+            <caption className="sr-only">{txt(T('Spot checks against JPL Horizons', '與 JPL Horizons 的抽樣核對', 'Comprobaciones frente a JPL Horizons'), locale)}</caption>
+            <thead>
+              <tr className="border-b border-slate-700 bg-space-900/70 font-mono text-xs uppercase tracking-wider text-slate-400">
+                <th scope="col" className="px-4 py-3">{txt(T('Spacecraft · date', '探測器 · 日期', 'Nave · fecha'), locale)}</th>
+                <th scope="col" className="px-4 py-3">{txt(T('JPL Horizons (km)', 'JPL Horizons（公里）', 'JPL Horizons (km)'), locale)}</th>
+                <th scope="col" className="px-4 py-3">{txt(T('This tracker (km)', '本追蹤器（公里）', 'Este rastreador (km)'), locale)}</th>
+                <th scope="col" className="px-4 py-3">{txt(T('Difference', '差異', 'Diferencia'), locale)}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800 font-mono text-slate-200">
+              {SPOT_CHECKS.map((r) => (
+                <tr key={r.craft + r.date}>
+                  <th scope="row" className="px-4 py-2 font-normal">{r.craft === 'voyager1' ? 'Voyager 1' : 'Voyager 2'} · {r.date}</th>
+                  <td className="px-4 py-2">{fmt(r.jplKm)}</td>
+                  <td className="px-4 py-2">{fmt(r.modelKm)}</td>
+                  <td className="px-4 py-2">{r.modelKm >= r.jplKm ? '+' : '−'}{fmt(Math.abs(r.modelKm - r.jplKm))} km</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </BiSection>
+
+      <BiSection
+        id="history-validation"
+        title={bi('Accuracy of the historical reconstruction', '歷史重建的準確度', 'Precisión de la reconstrucción histórica')}
+        lead={bi(
+          'The Date Explorer and the two-date comparison rebuild the distance from Earth for any date from monthly JPL positions. Compared with JPL’s own distances every 10 days:',
+          '日期探索器與兩日期比較，會以 JPL 月度位置重建任何日期的地球距離。與 JPL 每 10 天一筆的距離相比：',
+          'El explorador de fechas y la comparación de dos fechas reconstruyen la distancia a la Tierra de cualquier fecha a partir de posiciones mensuales de JPL. Comparado con las distancias de JPL cada 10 días:',
+        )}
+      >
+        <div className="overflow-x-auto rounded-xl border border-slate-800">
+          <table className="w-full min-w-[600px] border-collapse text-left text-sm">
+            <thead>
+              <tr className="border-b border-slate-700 bg-space-900/70 font-mono text-xs uppercase tracking-wider text-slate-400">
+                <th scope="col" className="px-4 py-3">{txt(T('Period', '期間', 'Periodo'), locale)}</th>
+                <th scope="col" className="px-4 py-3 text-cyan-300">{txt(T('Voyager 1 median / max', '一號 中位數／最大', 'Voyager 1 mediana / máx.'), locale)}</th>
+                <th scope="col" className="px-4 py-3 text-emerald-300">{txt(T('Voyager 2 median / max', '二號 中位數／最大', 'Voyager 2 mediana / máx.'), locale)}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800 font-mono text-slate-200">
+              {HISTORY_VALIDATION.voyager1.map((row, i) => (
+                <tr key={row.period}>
+                  <th scope="row" className="px-4 py-2 font-normal">{row.period}</th>
+                  <td className="px-4 py-2">{fmt(row.medianErrKm)} / {fmt(row.maxErrKm)} km</td>
+                  <td className="px-4 py-2">{fmt(HISTORY_VALIDATION.voyager2[i].medianErrKm)} / {fmt(HISTORY_VALIDATION.voyager2[i].maxErrKm)} km</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-3 max-w-4xl text-sm leading-relaxed text-slate-400">
+          {txt(
+            T(
+              'The large maximum in 1977–1989 happens around the planetary flybys, when the spacecraft’s path bends sharply within days and a straight line between two monthly samples cannot follow it. Outside those weeks the reconstruction stays within a few tens of thousands of kilometres.',
+              '1977–1989 年的巨大最大值出現在行星飛掠前後：那時探測器的路徑在幾天內急遽轉彎，而兩個月度樣本之間的直線無法跟上。在那幾週以外，重建誤差都在數萬公里以內。',
+              'El gran máximo de 1977–1989 se produce cerca de los sobrevuelos, cuando la trayectoria se curva bruscamente en pocos días y una recta entre dos muestras mensuales no puede seguirla. Fuera de esas semanas la reconstrucción se mantiene en unas decenas de miles de km.',
+            ),
+            locale,
+          )}
+        </p>
+      </BiSection>
+
+      <BiSection id="changelog" title={bi('Methodology changelog', '方法變更紀錄', 'Registro de cambios de la metodología')}>
+        <ol className="space-y-3">
+          {CHANGELOG.map((c) => (
+            <li key={c.version} className="rounded-xl border border-slate-800 bg-space-900/40 p-4">
+              <p className="font-mono text-xs uppercase tracking-widest text-cyan-300">
+                {c.version} · <time dateTime={c.date}>{c.date}</time>
+              </p>
+              <p className="mt-1 text-sm leading-relaxed text-slate-300">{txt(c.text, locale)}</p>
+            </li>
+          ))}
+        </ol>
       </BiSection>
 
       <BiSection id="limitations" title={bi('Limitations', '限制', 'Limitaciones')}>

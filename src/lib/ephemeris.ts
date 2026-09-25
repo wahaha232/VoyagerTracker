@@ -18,7 +18,7 @@
  * browser, in the build-time prerender and in the validation script.
  */
 
-import { EPOCH_ISO, EPOCH_STATE, HISTORY, SUN_BARY, SUN_TABLE_START } from '../data/horizons.generated';
+import { EPOCH_ISO, EPOCH_STATE, HISTORY, HISTORY_POS, SUN_BARY, SUN_TABLE_START } from '../data/horizons.generated';
 
 export type CraftId = 'voyager1' | 'voyager2';
 
@@ -151,25 +151,81 @@ export function estimate(id: CraftId, utcMs: number): Estimate {
   };
 }
 
+/** Unix ms of each monthly history row, cached per spacecraft. */
+const HISTORY_MS: Record<CraftId, number[]> = {
+  voyager1: HISTORY.voyager1.map((r) => Date.parse(`${r[0]}T00:00:00Z`)),
+  voyager2: HISTORY.voyager2.map((r) => Date.parse(`${r[0]}T00:00:00Z`)),
+};
+
+/** First and last instant covered by the monthly JPL history. */
+export function historyRange(id: CraftId): { startMs: number; endMs: number } {
+  const t = HISTORY_MS[id];
+  return { startMs: t[0], endMs: t[t.length - 1] };
+}
+
+/** Bracketing row indices and interpolation fraction, or null outside the data. */
+function bracket(id: CraftId, utcMs: number): { lo: number; hi: number; f: number } | null {
+  const t = HISTORY_MS[id];
+  if (utcMs < t[0] || utcMs > t[t.length - 1]) return null;
+  let lo = 0;
+  let hi = t.length - 1;
+  while (hi - lo > 1) {
+    const mid = (lo + hi) >> 1;
+    if (t[mid] <= utcMs) lo = mid;
+    else hi = mid;
+  }
+  return { lo, hi, f: t[hi] === t[lo] ? 0 : (utcMs - t[lo]) / (t[hi] - t[lo]) };
+}
+
 /**
  * Heliocentric distance (AU) on any date using the JPL monthly history,
  * linearly interpolated. Returns null outside the covered range.
  */
 export function historicalSunAu(id: CraftId, utcMs: number): number | null {
+  const b = bracket(id, utcMs);
+  if (!b) return null;
   const rows = HISTORY[id];
-  const t = (row: [string, number, number]) => Date.parse(`${row[0]}T00:00:00Z`);
-  if (utcMs < t(rows[0]) || utcMs > t(rows[rows.length - 1])) return null;
-  let lo = 0;
-  let hi = rows.length - 1;
-  while (hi - lo > 1) {
-    const mid = (lo + hi) >> 1;
-    if (t(rows[mid]) <= utcMs) lo = mid;
-    else hi = mid;
-  }
-  const t0 = t(rows[lo]);
-  const t1 = t(rows[hi]);
-  const f = t1 === t0 ? 0 : (utcMs - t0) / (t1 - t0);
-  return rows[lo][1] + (rows[hi][1] - rows[lo][1]) * f;
+  return rows[b.lo][1] + (rows[b.hi][1] - rows[b.lo][1]) * b.f;
+}
+
+/**
+ * Estimate for any date covered by the JPL monthly history (launch → 2034):
+ * the spacecraft's heliocentric position is interpolated between monthly
+ * JPL vectors and Earth is placed with the same analytic formula as the
+ * live model. Accuracy is lower than the live model near planetary flybys
+ * (see scripts/validate-model.ts). Returns null outside the data range.
+ */
+export function historicalEstimate(id: CraftId, utcMs: number): Omit<Estimate, 'rangeRateKmS'> | null {
+  const b = bracket(id, utcMs);
+  if (!b) return null;
+  const p = HISTORY_POS[id];
+  const r = [0, 1, 2].map((k) => (p[b.lo][k] + (p[b.hi][k] - p[b.lo][k]) * b.f) * AU_KM) as Vec;
+  const e = earthHeliocentric(utcMs);
+  const rows = HISTORY[id];
+  const earthKm = norm(sub(r, e));
+  return {
+    sunKm: norm(r),
+    earthKm,
+    speedSunKmS: rows[b.lo][2] + (rows[b.hi][2] - rows[b.lo][2]) * b.f,
+    lightTimeS: earthKm / C_KM_S,
+    utcMs,
+  };
+}
+
+/** Period in which the live model is validated against JPL (see validate-model.ts). */
+export const MODEL_VALID = { startMs: Date.UTC(2024, 0, 1), endMs: Date.UTC(2032, 0, 1) };
+
+/**
+ * Best available estimate for any instant: the live propagation model
+ * inside its validated period, otherwise the JPL monthly history.
+ */
+export function estimateAt(
+  id: CraftId,
+  utcMs: number,
+): (Omit<Estimate, 'rangeRateKmS'> & { method: 'model' | 'history' }) | null {
+  if (utcMs >= MODEL_VALID.startMs && utcMs < MODEL_VALID.endMs) return { ...estimate(id, utcMs), method: 'model' };
+  const h = historicalEstimate(id, utcMs);
+  return h ? { ...h, method: 'history' } : null;
 }
 
 /**

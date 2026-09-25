@@ -1,56 +1,77 @@
 /**
- * validate-model.ts — compare the tracker model against JPL Horizons.
+ * validate-model.ts — compare the tracker's calculations with JPL Horizons.
  *
- * Reads scripts/validation.generated.json (geocentric range every 5 days,
- * 2024–2031, written by fetch-horizons.mjs) and reports how far the
- * browser model drifts from JPL's ephemeris.
+ * Reads scripts/validation.generated.json (written by fetch-horizons.mjs):
+ *   <craft>          geocentric range every 5 days, 2024–2031 → live model
+ *   <craft>_history  geocentric range every 10 days, launch–2034
+ *                    → historical reconstruction used by the date tools
+ * and writes src/data/validation-summary.generated.ts, which the How It
+ * Works page displays. Fails if the live model drifts beyond 100,000 km.
  *
  * Usage:  npm run validate
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
-import { AU_KM, estimate, whenEarthDistanceReaches, type CraftId } from '../src/lib/ephemeris';
+import { AU_KM, estimate, historicalEstimate, whenEarthDistanceReaches, type CraftId } from '../src/lib/ephemeris';
 
-const data = JSON.parse(readFileSync('scripts/validation.generated.json', 'utf8')) as Record<
-  CraftId,
-  { jd: number; rangeKm: number; rangeRateKmS: number }[]
->;
+type Row = { jd: number; rangeKm: number; rangeRateKmS?: number };
+const data = JSON.parse(readFileSync('scripts/validation.generated.json', 'utf8')) as Record<string, Row[]>;
 
 const TDB_MINUS_UTC_MS = 69_184;
+const toUtc = (jd: number) => (jd - 2_440_587.5) * 86_400_000 - TDB_MINUS_UTC_MS;
+const CRAFT: CraftId[] = ['voyager1', 'voyager2'];
+
 let failed = false;
 const summary: Record<string, { year: number; maxErrKm: number }[]> = {};
+const history: Record<string, { period: string; maxErrKm: number; medianErrKm: number }[]> = {};
+const samples: { craft: CraftId; date: string; jplKm: number; modelKm: number }[] = [];
 
-for (const id of ['voyager1', 'voyager2'] as CraftId[]) {
-  const rows: { year: number; err: number; rrErr: number }[] = data[id].map((row) => {
-    const utcMs = (row.jd - 2_440_587.5) * 86_400_000 - TDB_MINUS_UTC_MS;
-    const est = estimate(id, utcMs);
-    return {
-      year: new Date(utcMs).getUTCFullYear(),
-      err: est.earthKm - row.rangeKm,
-      rrErr: est.rangeRateKmS - row.rangeRateKmS,
-    };
-  });
-  const byYear = new Map<number, { maxErr: number; maxRr: number }>();
-  for (const r of rows) {
-    if (r.year < 2024 || r.year > 2031) continue; // partial years at the ends
-    const cur = byYear.get(r.year) ?? { maxErr: 0, maxRr: 0 };
-    cur.maxErr = Math.max(cur.maxErr, Math.abs(r.err));
-    cur.maxRr = Math.max(cur.maxRr, Math.abs(r.rrErr));
-    byYear.set(r.year, cur);
+for (const id of CRAFT) {
+  // --- Live model, 2024–2031 -------------------------------------------------
+  const byYear = new Map<number, number>();
+  let worst2528 = 0;
+  for (const row of data[id]) {
+    const utc = toUtc(row.jd);
+    const year = new Date(utc).getUTCFullYear();
+    if (year < 2024 || year > 2031) continue; // partial years at the ends
+    const err = Math.abs(estimate(id, utc).earthKm - row.rangeKm);
+    byYear.set(year, Math.max(byYear.get(year) ?? 0, err));
+    if (year >= 2025 && year <= 2028) worst2528 = Math.max(worst2528, err);
+    // One sample per January 1st for the published spot-check table.
+    const d = new Date(utc + TDB_MINUS_UTC_MS);
+    if (d.getUTCMonth() === 0 && d.getUTCDate() <= 5) {
+      samples.push({ craft: id, date: d.toISOString().slice(0, 10), jplKm: Math.round(row.rangeKm), modelKm: Math.round(estimate(id, utc).earthKm) });
+    }
   }
-  console.log(`\n${id}: max |model − JPL| geocentric range by year`);
-  for (const [year, v] of byYear) {
-    console.log(
-      `  ${year}: ${Math.round(v.maxErr).toLocaleString('en-US').padStart(9)} km  (${(v.maxErr / AU_KM).toFixed(6)} AU)   range-rate ±${v.maxRr.toFixed(3)} km/s`,
-    );
-  }
-  summary[id] = [...byYear].map(([year, v]) => ({ year, maxErrKm: Math.round(v.maxErr) }));
-  // Acceptance: within 100,000 km (< 0.001 AU) for 2025–2028.
-  const worst = Math.max(...rows.filter((r) => r.year >= 2025 && r.year <= 2028).map((r) => Math.abs(r.err)));
-  if (worst > 100_000) {
-    console.error(`  FAIL: ${id} worst 2025–2028 error ${Math.round(worst)} km`);
+  summary[id] = [...byYear].map(([year, e]) => ({ year, maxErrKm: Math.round(e) }));
+  console.log(`\n${id}: live model, max |model − JPL| geocentric range by year`);
+  for (const r of summary[id]) console.log(`  ${r.year}: ${r.maxErrKm.toLocaleString('en-US').padStart(9)} km`);
+  if (worst2528 > 100_000) {
+    console.error(`  FAIL: ${id} worst 2025–2028 error ${Math.round(worst2528)} km`);
     failed = true;
   }
+
+  // --- Historical reconstruction, launch–2034, by period --------------------
+  const periods: [string, number, number][] = [
+    ['1977–1989 (planetary flybys)', 1977, 1989],
+    ['1990–1999', 1990, 1999],
+    ['2000–2009', 2000, 2009],
+    ['2010–2019', 2010, 2019],
+    ['2020–2034', 2020, 2034],
+  ];
+  const errs = (data[`${id}_history`] ?? [])
+    .map((row) => {
+      const utc = toUtc(row.jd);
+      const h = historicalEstimate(id, utc);
+      return h ? { year: new Date(utc).getUTCFullYear(), err: Math.abs(h.earthKm - row.rangeKm) } : null;
+    })
+    .filter((x): x is { year: number; err: number } => x !== null);
+  history[id] = periods.map(([period, a, b]) => {
+    const e = errs.filter((x) => x.year >= a && x.year <= b).map((x) => x.err).sort((p, q) => p - q);
+    return { period, maxErrKm: Math.round(e[e.length - 1] ?? 0), medianErrKm: Math.round(e[Math.floor(e.length / 2)] ?? 0) };
+  });
+  console.log(`${id}: historical reconstruction vs JPL (10-day samples)`);
+  for (const h of history[id]) console.log(`  ${h.period.padEnd(30)} median ${h.medianErrKm.toLocaleString('en-US').padStart(10)} km   max ${h.maxErrKm.toLocaleString('en-US').padStart(11)} km`);
 }
 
 // Milestone cross-check: NASA says Voyager 1 reaches one light-day on 2026-11-18.
@@ -62,10 +83,15 @@ if (failed) process.exit(1);
 
 writeFileSync(
   'src/data/validation-summary.generated.ts',
-  `/** AUTO-GENERATED by scripts/validate-model.ts — model vs JPL Horizons geocentric range. */
+  `/** AUTO-GENERATED by scripts/validate-model.ts — tracker calculations vs JPL Horizons geocentric range. */
 export const VALIDATED_ON = '${new Date().toISOString().slice(0, 10)}';
 export const LIGHT_DAY_MODEL_ISO = '${t ? new Date(t).toISOString() : ''}';
+/** Live model: largest error per year, 5-day samples. */
 export const VALIDATION: Record<'voyager1' | 'voyager2', { year: number; maxErrKm: number }[]> = ${JSON.stringify(summary)};
+/** Historical reconstruction (date tools): error by period, 10-day samples. */
+export const HISTORY_VALIDATION: Record<'voyager1' | 'voyager2', { period: string; maxErrKm: number; medianErrKm: number }[]> = ${JSON.stringify(history)};
+/** Spot checks: JPL geocentric range vs this model on 1 January of each year (km). */
+export const SPOT_CHECKS: { craft: 'voyager1' | 'voyager2'; date: string; jplKm: number; modelKm: number }[] = ${JSON.stringify(samples)};
 `,
 );
-console.log('\nValidation passed.');
+console.log(`\nValidation passed (AU = ${AU_KM} km).`);

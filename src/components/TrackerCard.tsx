@@ -13,6 +13,7 @@ import type { LiveTelemetry, Locale, SpacecraftMeta, Translation } from '../type
 import { INSTRUMENTS, INSTRUMENT_STATUS, INSTRUMENT_STATUS_AS_OF } from '../constants/voyagerData';
 import { formatNumber } from '../hooks/useVoyagerLive';
 import { KM_PER_MILE, PLANET_AU, elapsedYearsDays, splitDuration } from '../lib/context';
+import SourceBadge from './SourceBadge';
 
 interface TrackerCardProps {
   meta: SpacecraftMeta;
@@ -60,7 +61,16 @@ const L = {
     es: 'Estimación calculada — no es telemetría de la NASA',
   },
   miles: { en: 'miles', zh: '英里', es: 'millas' },
+  basis: { en: 'from JPL Horizons data', zh: '依 JPL Horizons 資料', es: 'con datos de JPL Horizons' },
+  calcAt: { en: 'Calculated at', zh: '計算時間', es: 'Calculado a las' },
+  arrives: { en: 'A signal sent now arrives on', zh: '此刻送出的訊號抵達時間：', es: 'Una señal enviada ahora llega el' },
 };
+
+/** UTC time (and optionally date) for display. */
+function utcClock(ms: number, withDate = false): string {
+  const iso = new Date(ms).toISOString();
+  return withDate ? `${iso.slice(0, 10)} ${iso.slice(11, 16)}` : iso.slice(11, 19);
+}
 
 /** A single metric tile with an icon, label, value and optional detail lines. */
 function MetricRow({
@@ -142,6 +152,12 @@ export default function TrackerCard({ meta, telemetry, locale, t }: TrackerCardP
         </div>
       </header>
 
+      <div className="flex flex-wrap items-center gap-2 px-5 pt-4 text-[11px] text-slate-400">
+        <SourceBadge kind="calculated" note={pick(L.basis, locale)} />
+        <span>
+          {pick(L.calcAt, locale)} <time dateTime={new Date(telemetry.timestampMs).toISOString()}>{utcClock(telemetry.timestampMs)}</time> UTC
+        </span>
+      </div>
       <div className="grid flex-1 grid-cols-1 gap-3 p-5 sm:grid-cols-2">
         <MetricRow
           icon={<Globe size={18} />}
@@ -164,7 +180,7 @@ export default function TrackerCard({ meta, telemetry, locale, t }: TrackerCardP
           icon={<Timer size={18} />}
           label={t.metrics.lightTime}
           value={hms(one)}
-          sub={[`${pick(L.roundTrip, locale)}: ${hms(round)}`]}
+          sub={[`${pick(L.roundTrip, locale)}: ${hms(round)}`, `${pick(L.arrives, locale)} ${utcClock(telemetry.timestampMs + telemetry.lightTimeSeconds * 1000, true)} UTC`]}
           accent={accent}
         />
         <MetricRow
@@ -194,6 +210,7 @@ export default function TrackerCard({ meta, telemetry, locale, t }: TrackerCardP
       </div>
 
       <div className="border-t border-slate-700/50 px-5 py-4">
+        <p className="mb-2"><SourceBadge kind="official" note="NASA/JPL" /></p>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <div className="flex items-center gap-2 rounded-lg border border-slate-700/40 bg-space-950/40 px-3 py-2">
             <CalendarDays size={14} className="text-slate-400" aria-hidden="true" />
@@ -213,7 +230,7 @@ export default function TrackerCard({ meta, telemetry, locale, t }: TrackerCardP
       </div>
 
       <div className="border-t border-slate-700/50 px-5 py-4">
-        <p className="font-mono text-sm font-semibold text-slate-200">{t.metrics.activeInstruments}</p>
+        <p className="flex flex-wrap items-center gap-2 font-mono text-sm font-semibold text-slate-200">{t.metrics.activeInstruments} <SourceBadge kind="official" note="NASA" /></p>
         <p className="mb-3 font-mono text-[11px] text-slate-400">
           {pick(L.instrumentsNote, locale)} {INSTRUMENT_STATUS_AS_OF}
         </p>

@@ -11,7 +11,7 @@ import { RelatedLinks } from '../components/ui';
 import { ExternalLinkIcon } from '../components/icons';
 import { BiArticleHeader, BiSection, bi, txt, useLang } from '../components/content';
 import { INSTRUMENT_STATUS_AS_OF } from '../constants/voyagerData';
-import { EVENTS } from './TimelinePage';
+import { EVENTS } from '../data/events';
 
 type Tri = { en: string; zh: string; es: string };
 const T = (en: string, zh: string, es: string): Tri => ({ en, zh, es });
@@ -19,9 +19,22 @@ const T = (en: string, zh: string, es: string): Tri => ({ en, zh, es });
 /** Date the mission facts on this site were last checked against NASA sources. */
 const CONTENT_REVIEWED = '2026-09-25';
 
-const SITE_UPDATES: { date: string; title: Tri; detail: Tri }[] = [
+const SITE_UPDATES: { date: string; title: Tri; detail: Tri; reason?: Tri; affected?: Tri }[] = [
   {
     date: '2026-09-25',
+    title: T('Historical data, new explorers and data labels', '歷史資料、新探索工具與資料標籤', 'Datos históricos, nuevos exploradores y etiquetas de datos'),
+    detail: T(
+      'Monthly JPL position vectors were added so the distance from Earth and the signal delay can be shown for any date from 1977 to 2034. New: Date Explorer with sourced events, Compare two dates, Scale explorer, Communication delay simulator, the interactive Earth-orbit diagram on the home page, a route explorer on the Compare page, a Golden Record category explorer, and Official / Calculated / Hypothetical / Educational labels on the data.',
+      '加入 JPL 月度位置向量，讓 1977 至 2034 年任何日期的地球距離與訊號延遲都能顯示。新增：附出處事件的日期探索器、兩日期比較、尺度探索、通訊延遲模擬、首頁的互動式地球軌道圖、比較頁的路線探索器、金唱片分類探索，以及資料上的「官方／本站計算／假設性／教學示意」標籤。',
+      'Se añadieron vectores de posición mensuales de JPL para mostrar la distancia a la Tierra y el retardo de señal de cualquier fecha entre 1977 y 2034. Novedades: explorador de fechas con eventos con fuentes, comparación de dos fechas, explorador de escala, simulador de retardo de comunicación, el diagrama interactivo de la órbita terrestre en la portada, un explorador de rutas en Comparar, un explorador del Disco de Oro y etiquetas Oficial / Calculado / Hipotético / Didáctico.',
+    ),
+    reason: T('Earlier tools could only show distance from the Sun for past dates, and it was not always clear which values were official and which were calculated.', '先前的工具只能顯示過去日期與太陽的距離，而且哪些數值是官方、哪些是計算，並不總是清楚。', 'Las herramientas anteriores solo mostraban la distancia al Sol en fechas pasadas y no siempre quedaba claro qué valores eran oficiales y cuáles calculados.'),
+    affected: T('Tools, Compare, Home, Science, Golden Record, How It Works, FAQ, Sources', '計算工具、比較、首頁、科學發現、金唱片、運作原理、常見問題、資料來源', 'Herramientas, Comparar, Portada, Ciencia, Disco de Oro, Cómo funciona, Preguntas, Fuentes'),
+  },
+  {
+    date: '2026-09-25',
+    reason: T('The previous figures were several AU wrong and one claim on this page was untrue.', '先前的數字偏差數個 AU，且本頁有一則說法不實。', 'Las cifras anteriores estaban varias UA equivocadas y una afirmación de esta página era falsa.'),
+    affected: T('All trackers, Voyager 1 and 2 pages, FAQ, Updates', '所有追蹤器、航海家一號與二號頁、常見問題、更新紀錄', 'Todos los rastreadores, páginas de Voyager 1 y 2, Preguntas, Novedades'),
     title: T('Correction: new calculation model and corrected figures', '更正：新的計算模型與修正後的數字', 'Corrección: nuevo modelo de cálculo y cifras corregidas'),
     detail: T(
       'The trackers previously started from a fixed 2026 estimate of 165.5 AU (Voyager 1) and 138.5 AU (Voyager 2) and treated the distance from Earth as equal to the distance from the Sun. Checked against JPL Horizons, those starting values were about 6 AU and 5 AU too low. An earlier entry on this page said the baseline had been verified against NASA values; that statement was wrong and has been withdrawn. The trackers now propagate JPL Horizons state vectors and model Earth’s orbit, and the result has been validated against JPL (see How It Works). The instrument lists were also corrected to match NASA’s current status.',
@@ -119,6 +132,22 @@ export default function UpdatesPage() {
               </p>
               <h3 className="mt-1 text-lg font-semibold text-white">{txt(u.title, locale)}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-slate-300">{txt(u.detail, locale)}</p>
+              {(u.reason || u.affected) && (
+                <dl className="mt-3 grid gap-x-4 gap-y-1 text-xs sm:grid-cols-[130px_1fr]">
+                  {u.reason && (
+                    <>
+                      <dt className="font-mono uppercase tracking-wider text-slate-400">{txt(T('Reason', '原因', 'Motivo'), locale)}</dt>
+                      <dd className="text-slate-300">{txt(u.reason, locale)}</dd>
+                    </>
+                  )}
+                  {u.affected && (
+                    <>
+                      <dt className="font-mono uppercase tracking-wider text-slate-400">{txt(T('Affected', '影響範圍', 'Afecta a'), locale)}</dt>
+                      <dd className="text-slate-300">{txt(u.affected, locale)}</dd>
+                    </>
+                  )}
+                </dl>
+              )}
             </article>
           ))}
         </div>

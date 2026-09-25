@@ -19,7 +19,7 @@ Live site: https://wahaha232.github.io/VoyagerTracker/
 | `compare.html` | Voyager 1 vs 2: live comparison, 1977–2035 distance/speed chart, why they differ |
 | `timeline.html` | Interactive, filterable timeline; every event has context and a source |
 | `discoveries.html` | Science by destination: what Voyager saw and why it matters |
-| `tools.html` | Light-time calculator, unit converter, "where was Voyager on…?", travel time |
+| `tools.html` | Communication delay, Date Explorer, compare two dates, scale explorer, light time, converter, travel time |
 | `mission.html`, `golden-record.html`, `why-voyager-matters.html` | Background articles |
 | `how-it-works.html` | The calculation model, validation table and limitations |
 | `sources.html` | Which reference supports which part of the site |
@@ -68,9 +68,15 @@ npm install
 npm run dev        # development server
 npm run build      # gen-html → type-check → client build → SSR build → prerender
 npm run check      # static checks on dist/ (add -- --external for link checks)
+npm test           # calculation-engine and input-handling tests
 npm run preview    # serve dist/ at http://localhost:4173/VoyagerTracker/
 npm run deploy     # build and publish dist/ to the gh-pages branch
 ```
+
+## Audit documents
+
+`docs/PROJECT_AUDIT_V2.md`, `docs/ADSENSE_VALUE_AUDIT_V2.md`, `docs/CALCULATION_ENGINE_AUDIT.md` and
+`docs/ADSENSE_VALUE_REPORT_V2.md` record what was measured, changed and verified in the V2 work.
 
 ## Attribution
 

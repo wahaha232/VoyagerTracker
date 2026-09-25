@@ -158,6 +158,19 @@ export default function TrackerSection({
         </div>
       )}
 
+      <nav aria-label={zh ? '深入了解這些數字' : es ? 'Explora estas cifras' : 'Explore these numbers'} className="mt-6 flex flex-wrap gap-2">
+        {[
+          { href: `${pageUrl('tools')}#communication`, label: zh ? '訊號延遲代表什麼？' : es ? '¿Qué significa el retardo de señal?' : 'What does the signal delay mean?' },
+          { href: `${pageUrl('compare')}#why-different`, label: zh ? '為什麼一號比較遠？' : es ? '¿Por qué la Voyager 1 está más lejos?' : 'Why is Voyager 1 farther away?' },
+          { href: `${pageUrl('tools')}#on-this-date`, label: zh ? '其他日期它們在哪裡？' : es ? '¿Dónde estaban en otra fecha?' : 'Where were they on another date?' },
+          { href: `${pageUrl('how-it-works')}#calculation`, label: zh ? '這些數字如何計算？' : es ? '¿Cómo se calculan?' : 'How are these calculated?' },
+        ].map((l) => (
+          <a key={l.href} href={l.href} className="inline-flex min-h-[36px] items-center rounded-full border border-slate-600 px-3 text-xs font-medium text-slate-200 hover:border-cyan-400 hover:text-white">
+            {l.label} →
+          </a>
+        ))}
+      </nav>
+
       <p className="mt-5 font-mono text-[11px] leading-relaxed tracking-wide text-slate-400">
         {zh ? (
           <>

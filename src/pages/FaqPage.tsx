@@ -115,6 +115,22 @@ export const FAQ_ITEMS: QA[] = [
     ),
   },
   {
+    q: bi('Why can’t anyone talk to Voyager in real time?', '為什麼沒辦法與航海家即時通話？', '¿Por qué no se puede hablar con Voyager en tiempo real?'),
+    a: bi(
+      `Because radio travels at the speed of light and the probes are so far away. On ${AS_OF} a signal needed about ${d1.lh.en} hours to reach Voyager 1 and ${d2.lh.en} hours to reach Voyager 2, so the team sends carefully prepared command sequences and waits for the results. Nothing can be corrected “live”; a mistake is only discovered after the round trip.`,
+      `因為無線電以光速傳播，而探測器又非常遙遠。${AS_OF} 當天，訊號約需 ${d1.lh.zh} 小時才能抵達航海家一號、${d2.lh.zh} 小時抵達二號，因此團隊只能送出事先仔細準備的指令序列，再等待結果。沒有任何事能「即時」修正；錯誤要等訊號往返一趟之後才會被發現。`,
+      `Porque la radio viaja a la velocidad de la luz y las sondas están muy lejos. El ${AS_OF} una señal tardaba unas ${d1.lh.es} horas en llegar a la Voyager 1 y ${d2.lh.es} horas a la Voyager 2, así que el equipo envía secuencias de órdenes preparadas con cuidado y espera los resultados. Nada se corrige «en directo»; un error solo se descubre tras el viaje de ida y vuelta.`,
+    ),
+  },
+  {
+    q: bi('What is round-trip light time?', '什麼是往返光行時間？', '¿Qué es el tiempo de luz de ida y vuelta?'),
+    a: bi(
+      'One-way light time is how long a signal takes from Earth to the spacecraft (or back). Round-trip light time is both legs together: the minimum time between sending a command and seeing the spacecraft’s response. For Voyager 1 it is now about two days. The Communication delay tool on the Tools page lets you start a signal and follow it.',
+      '單程光行時間是訊號從地球傳到太空船（或反向）所需的時間。往返光行時間則是去程與回程加總：也就是從送出指令到看見太空船回應的最短時間。以航海家一號而言，目前約為兩天。計算工具頁的「通訊延遲模擬」可以讓您送出一道訊號並追蹤它。',
+      'El tiempo de luz de ida es lo que tarda una señal de la Tierra a la nave (o al revés). El de ida y vuelta suma ambos trayectos: el tiempo mínimo entre enviar una orden y ver la respuesta de la nave. Para la Voyager 1 hoy son unos dos días. La herramienta de retardo de comunicación permite enviar una señal y seguirla.',
+    ),
+  },
+  {
     q: bi('What is interstellar space?', '什麼是星際空間？', '¿Qué es el espacio interestelar?'),
     a: bi(
       'The Sun blows a wind of charged particles that carves a bubble, the heliosphere, in the thin gas between the stars. Its outer boundary is the heliopause. Beyond it, the surrounding plasma comes mostly from other stars rather than the Sun — that region is interstellar space. Voyager 1 crossed at about 122 AU in 2012 and Voyager 2 at about 119 AU in 2018. Both are still well inside the Oort Cloud, the distant shell of icy bodies bound to the Sun.',
@@ -144,6 +160,22 @@ export const FAQ_ITEMS: QA[] = [
       'They are not aimed at any star. NASA estimates that in about 40,000 years Voyager 1 will pass within about 1.6 light-years of the star Gliese 445, and Voyager 2 within about 1.7 light-years of Ross 248 — still enormous distances. After that they will circle the centre of the Milky Way, essentially forever.',
       '它們並非朝向任何恆星飛行。NASA 估計約 4 萬年後，航海家一號將在約 1.6 光年的距離內經過恆星 Gliese 445，航海家二號則在約 1.7 光年內經過 Ross 248——仍是極遠的距離。此後它們將繞著銀河系中心運行，幾乎永遠持續下去。',
       'No se dirigen a ninguna estrella. La NASA estima que dentro de unos 40 000 años la Voyager 1 pasará a unos 1,6 años luz de la estrella Gliese 445, y la Voyager 2 a unos 1,7 años luz de Ross 248: distancias aún enormes. Después orbitarán el centro de la Vía Láctea prácticamente para siempre.',
+    ),
+  },
+  {
+    q: bi('How does the Date Explorer work?', '日期探索器如何運作？', '¿Cómo funciona el explorador de fechas?'),
+    a: bi(
+      'For dates between 2024 and 2031 it uses the same live model as the tracker. For other dates it interpolates between monthly positions downloaded from JPL Horizons and places Earth on its orbit for that day, so it can show the distance from Earth, the distance from the Sun and the signal delay for any date from 1977 to 2034. Compared with JPL’s own distances, it is within about 35,000 km after 1990 but can be off by a few million km during the 1977–1989 planetary flybys. Events are taken only from the sourced timeline on this site.',
+      '在 2024 至 2031 年之間，它使用與追蹤器相同的即時模型。其他日期則在從 JPL Horizons 下載的月度位置之間內插，並把地球放在當天的軌道位置上，因此能顯示 1977 至 2034 年間任何日期的地球距離、太陽距離與訊號延遲。與 JPL 自己的距離相比，1990 年後誤差約在 3.5 萬公里以內，但在 1977–1989 年行星飛掠期間可能相差數百萬公里。事件只取自本站附有出處的時間軸。',
+      'Entre 2024 y 2031 usa el mismo modelo en vivo que el rastreador. Para otras fechas interpola entre posiciones mensuales descargadas de JPL Horizons y sitúa la Tierra en su órbita ese día, así que muestra la distancia a la Tierra, al Sol y el retardo de señal de cualquier fecha entre 1977 y 2034. Comparado con las distancias de JPL, el error es de unos 35 000 km desde 1990, pero puede ser de unos millones de km durante los sobrevuelos de 1977–1989. Los eventos salen solo de la cronología con fuentes del sitio.',
+    ),
+  },
+  {
+    q: bi('How are the travel-time comparisons calculated?', '旅行時間的比較如何計算？', '¿Cómo se calculan las comparaciones de tiempo de viaje?'),
+    a: bi(
+      'They divide today’s calculated distance from Earth by a constant speed — walking, driving, an airliner and so on — assuming a straight line and no stops. They are hypothetical and are labelled as such: real spacecraft follow curved paths, use gravity assists and never travel at constant speed.',
+      '它們把今天計算出的地球距離除以一個固定速度——步行、開車、客機等——並假設直線前進、中途不停。這些都是假設性計算，也如此標示：真實的太空船沿彎曲路徑飛行、利用重力助推，而且從不以固定速度前進。',
+      'Dividen la distancia calculada de hoy a la Tierra entre una velocidad constante —a pie, en coche, en avión, etc.— suponiendo línea recta y sin paradas. Son hipotéticas y así se indican: las naves reales siguen trayectorias curvas, usan asistencias gravitatorias y nunca viajan a velocidad constante.',
     ),
   },
   {
@@ -183,7 +215,7 @@ export default function FaqPage() {
       <BiSection id="questions" title={bi('Questions and answers', '問題與解答', 'Preguntas y respuestas')}>
         <div className="space-y-3">
           {FAQ_ITEMS.map((item, i) => (
-            <details key={item.q.en} className="group rounded-xl border border-slate-800 bg-space-900/40 open:border-cyan-500/40">
+            <details key={item.q.en} id={`q${i + 1}`} className="group scroll-mt-24 rounded-xl border border-slate-800 bg-space-900/40 open:border-cyan-500/40">
               <summary className="cursor-pointer p-4 font-medium text-slate-100 transition-colors hover:text-cyan-300">
                 <span className="mr-2 font-mono text-xs font-bold text-cyan-300">{String(i + 1).padStart(2, '0')}</span>
                 {txt(item.q, locale)}

@@ -41,9 +41,19 @@ async function horizons(params) {
     CSV_FORMAT: "'YES'",
     ...Object.fromEntries(Object.entries(params).map(([k, v]) => [k, `'${v}'`])),
   });
-  const res = await fetch(`${API}?${q}`);
-  if (!res.ok) throw new Error(`Horizons HTTP ${res.status}`);
-  const text = await res.text();
+  let text;
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const res = await fetch(`${API}?${q}`);
+      if (!res.ok) throw new Error(`Horizons HTTP ${res.status}`);
+      text = await res.text();
+      break;
+    } catch (err) {
+      if (attempt >= 4) throw err;
+      console.warn(`Horizons request failed (${err.message}); retrying (${attempt}/3)…`);
+      await new Promise((r) => setTimeout(r, 3000 * attempt));
+    }
+  }
   const block = text.split('$$SOE')[1]?.split('$$EOE')[0];
   if (!block) throw new Error(`No ephemeris block returned:\n${text.slice(0, 800)}`);
   return block
@@ -93,6 +103,22 @@ for (const [key, { id, start }] of Object.entries(CRAFT)) {
       Number(Math.hypot(vx, vy, vz).toFixed(2)),
     ];
   });
+  // Same samples as heliocentric position vectors (AU), so the browser can
+  // work out the distance from Earth on any past or future date.
+  out.positions = out.positions ?? {};
+  out.positions[key] = rows.map((row) => row.v.slice(0, 3).map((n) => Number((n / AU_KM).toFixed(5))));
+
+  // 2b. Geocentric range every 10 days over the whole mission, used only to
+  //     validate the historical Earth-distance reconstruction.
+  const geoHistory = await horizons({
+    COMMAND: id,
+    CENTER: '500@399',
+    START_TIME: start,
+    STOP_TIME: '2035-01-01',
+    STEP_SIZE: '10d',
+    VEC_TABLE: '3',
+  });
+  validation[`${key}_history`] = geoHistory.map((row) => ({ jd: row.jd, rangeKm: row.v[7] }));
 
   // 3. Geocentric range every 5 days, 2024 → 2032, for model validation only.
   const geo = await horizons({
@@ -146,6 +172,9 @@ export const SUN_BARY: [number, number, number][] = ${JSON.stringify(sun)};
  * Dates after the generation date are JPL's predicted trajectory.
  */
 export const HISTORY: Record<'voyager1' | 'voyager2', [string, number, number][]> = ${JSON.stringify(out.history)};
+
+/** Heliocentric ecliptic-J2000 position (AU) for each HISTORY row, same order. */
+export const HISTORY_POS: Record<'voyager1' | 'voyager2', [number, number, number][]> = ${JSON.stringify(out.positions)};
 `;
 
 writeFileSync(resolve(ROOT, 'src/data/horizons.generated.ts'), ts);
