@@ -22,6 +22,16 @@ const CONTENT_REVIEWED = '2026-09-25';
 const SITE_UPDATES: { date: string; title: Tri; detail: Tri; reason?: Tri; affected?: Tri }[] = [
   {
     date: '2026-09-25',
+    title: T('Faster pages and a self-hosted font', '頁面載入更快、字型改由本站提供', 'Páginas más rápidas y fuente alojada en el sitio'),
+    detail: T(
+      'Pages now show their text before the interactive parts start, the 3D model loads automatically only on large screens (a button loads it elsewhere), and live counters pause when they are off-screen or the tab is hidden. The monospace font is now served from this site instead of Google Fonts. Pages shared on social media now show a preview image with the calculated distances and their date.',
+      '頁面現在會先顯示文字、再啟動互動功能；3D 模型只在大螢幕上自動載入（其他裝置可按按鈕載入）；即時數字在畫面外或分頁隱藏時會暫停更新。等寬字型改由本站提供，不再從 Google Fonts 載入。分享到社群網站時，會顯示附有計算距離與日期的預覽圖。',
+      'Las páginas muestran ahora su texto antes de que arranquen las partes interactivas, el modelo 3D solo se carga automáticamente en pantallas grandes (en las demás, con un botón) y los contadores se detienen fuera de pantalla o con la pestaña oculta. La fuente monoespaciada se sirve ahora desde este sitio en lugar de Google Fonts. Al compartir una página en redes sociales aparece una imagen de vista previa con las distancias calculadas y su fecha.',
+    ),
+    affected: T('All pages, Privacy', '所有頁面、隱私權政策', 'Todas las páginas, Privacidad'),
+  },
+  {
+    date: '2026-09-25',
     title: T('Historical data, new explorers and data labels', '歷史資料、新探索工具與資料標籤', 'Datos históricos, nuevos exploradores y etiquetas de datos'),
     detail: T(
       'Monthly JPL position vectors were added so the distance from Earth and the signal delay can be shown for any date from 1977 to 2034. New: Date Explorer with sourced events, Compare two dates, Scale explorer, Communication delay simulator, the interactive Earth-orbit diagram on the home page, a route explorer on the Compare page, a Golden Record category explorer, and Official / Calculated / Hypothetical / Educational labels on the data.',

@@ -220,3 +220,13 @@ export const NOT_FOUND = {
 };
 
 export const pageHref =(p) => (p.key === 'home' ? SITE_URL : `${SITE_URL}${p.file}`);
+
+/**
+ * Google AdSense publisher ID ("ca-pub-…"). Leave empty to build the site
+ * without any advertising code. When set, gen-html.mjs adds the official
+ * AdSense script to every page and the Privacy Policy switches its
+ * advertising section to describe ads as active. Before enabling for
+ * visitors in the EEA/UK/Switzerland, set up a Google-certified consent
+ * message (AdSense → Privacy & messaging).
+ */
+export const ADSENSE_CLIENT = '';

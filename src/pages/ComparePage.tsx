@@ -216,7 +216,7 @@ export default function ComparePage() {
       <BiSection id="now" title={bi('Side by side, right now', '此刻的並列比較', 'Lado a lado, ahora mismo')}>
         <ClientOnly
           fallback={
-            <p className="rounded-xl border border-slate-800 p-5 text-sm text-slate-400">
+            <p className="min-h-[760px] rounded-xl border border-slate-800 p-5 text-sm text-slate-400 md:min-h-[520px]">
               {txt(T('The live comparison is calculated in your browser (JavaScript required).', '即時比較會在您的瀏覽器中計算（需要 JavaScript）。', 'La comparación se calcula en tu navegador (requiere JavaScript).'), locale)}
             </p>
           }
@@ -246,7 +246,7 @@ export default function ComparePage() {
           'Elige una nave y una parada para ver dónde estaba y cómo cambió su velocidad el sobrevuelo. La ruta planetaria de la Voyager 1 termina en Saturno; la Voyager 2 siguió hasta Urano y Neptuno.',
         )}
       >
-        <ClientOnly fallback={<p className="text-sm text-slate-400">{txt(T('The route explorer runs in your browser (JavaScript required).', '路線探索器在您的瀏覽器中執行（需要 JavaScript）。', 'El explorador de rutas funciona en tu navegador (requiere JavaScript).'), locale)}</p>}>
+        <ClientOnly fallback={<p className="min-h-[640px] text-sm text-slate-400 md:min-h-[400px]">{txt(T('The route explorer runs in your browser (JavaScript required).', '路線探索器在您的瀏覽器中執行（需要 JavaScript）。', 'El explorador de rutas funciona en tu navegador (requiere JavaScript).'), locale)}</p>}>
           <RouteExplorer />
         </ClientOnly>
       </BiSection>

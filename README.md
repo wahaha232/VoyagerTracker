@@ -63,12 +63,17 @@ The site is a Vite + React + TypeScript multi-page app, prerendered to static HT
 - `scripts/check-site.mjs` — checks metadata, canonicals, headings, JSON-LD, internal links;
   `--external` also requests every external link
 
+Advertising is off by default. `ADSENSE_CLIENT` in `scripts/pages.mjs` takes the owner's own
+`ca-pub-…` ID; setting it adds the AdSense loader to every page and switches the Privacy page's
+advertising section to the matching text. Set up a consent tool for EEA/UK visitors first.
+
 ```bash
 npm install
 npm run dev        # development server
 npm run build      # gen-html → type-check → client build → SSR build → prerender
 npm run check      # static checks on dist/ (add -- --external for link checks)
 npm test           # calculation-engine and input-handling tests
+npm run og         # regenerate public/og-image.png (share image) from the model
 npm run preview    # serve dist/ at http://localhost:4173/VoyagerTracker/
 npm run deploy     # build and publish dist/ to the gh-pages branch
 ```

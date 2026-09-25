@@ -88,9 +88,9 @@ export default function PrivacyPage() {
       >
         <Paragraph
           value={bi(
-            'The pages load fonts from Google Fonts. When your browser requests those fonts, Google receives the standard request information your browser sends. Some pages link to NASA and GitHub websites; opening those links takes you to third-party services governed by their own privacy policies.',
-            '頁面會從 Google Fonts 載入字型。您的瀏覽器請求這些字型時，Google 會收到瀏覽器自動傳送的標準請求資訊。部分頁面會連結到 NASA 與 GitHub 網站；開啟這些連結將前往受其各自隱私政策規範的第三方服務。',
-            'Las páginas cargan fuentes de Google Fonts. Cuando tu navegador solicita esas fuentes, Google recibe la información estándar que envía tu navegador. Algunas páginas enlazan a NASA y GitHub; al abrirlos vas a servicios de terceros regidos por sus propias políticas.',
+            'Fonts are served from this site itself, not from a third-party font service. Some pages link to NASA and GitHub websites; opening those links takes you to third-party services governed by their own privacy policies.',
+            '字型由本網站自行提供，不經由第三方字型服務載入。部分頁面會連結到 NASA 與 GitHub 網站；開啟這些連結將前往受其各自隱私政策規範的第三方服務。',
+            'Las fuentes se sirven desde este mismo sitio, no desde un servicio de fuentes externo. Algunas páginas enlazan a NASA y GitHub; al abrirlos vas a servicios de terceros regidos por sus propias políticas.',
           )}
         />
       </BiSection>
@@ -100,21 +100,17 @@ export default function PrivacyPage() {
         kicker={bi('Advertising', '廣告', 'Publicidad')}
         title={bi('Advertising (AdSense)', '廣告（AdSense）', 'Publicidad (AdSense)')}
       >
-        <Paragraph
-          value={bi(
-            'At the time of writing this page, the site does not display Google AdSense or any other advertising. If advertising is added, ad cookies and personalised-ad settings would be governed by Google\u2019s policies, and this page would be updated to say so clearly.',
-            '截至本頁撰寫時，本站未顯示 Google AdSense 或任何其他廣告。若未來加入廣告，廣告 Cookie 與個人化廣告設定將受 Google 政策規範，本頁也會明確更新說明。',
-            'Mientras se redacta esta página, el sitio no muestra Google AdSense ni ninguna otra publicidad. Si se añade publicidad, las cookies de anuncios y la personalización se regirán por las políticas de Google y esta página se actualizará para decirlo con claridad.',
-          )}
-        />
-        <Paragraph
-          className="mt-3 max-w-4xl leading-relaxed text-slate-300"
-          value={bi(
-            'If Google AdSense is enabled in the future, the following will apply and this section will be updated to confirm it: third-party vendors, including Google, use cookies to serve ads based on a user’s prior visits to this and other websites; Google’s advertising cookies enable it and its partners to serve ads based on those visits; and you can opt out of personalised advertising in Google’s Ads Settings. Visitors in regions that require it would be asked for consent before such cookies are used.',
-            '若未來啟用 Google AdSense，將適用以下說明，屆時本節也會更新確認：包括 Google 在內的第三方供應商會使用 Cookie，依使用者先前造訪本站或其他網站的紀錄放送廣告；Google 的廣告 Cookie 讓 Google 及其合作夥伴能依這些造訪紀錄放送廣告；您可以在 Google 的「廣告設定」中停用個人化廣告。在法規要求的地區，使用這類 Cookie 之前會先徵求訪客同意。',
-            'Si en el futuro se activa Google AdSense, se aplicará lo siguiente y esta sección se actualizará para confirmarlo: proveedores externos, incluido Google, usan cookies para mostrar anuncios según las visitas previas del usuario a este y otros sitios; las cookies publicitarias de Google les permiten a Google y a sus socios mostrar anuncios basados en esas visitas; y puedes desactivar la publicidad personalizada en la Configuración de anuncios de Google. En las regiones que lo exigen, se pediría consentimiento antes de usar esas cookies.',
-          )}
-        />
+        {__ADSENSE_ENABLED__ ? (
+          <Paragraph
+            value={bi(
+              'This site displays advertising provided by Google AdSense. Third-party vendors, including Google, use cookies to serve ads based on a user’s prior visits to this and other websites. Google’s use of advertising cookies enables it and its partners to serve ads based on those visits. You can opt out of personalised advertising in Google’s Ads Settings. Where the law requires it, visitors are asked for consent through Google’s consent message before these cookies are used. The site itself still collects no personal data.',
+              '本站顯示由 Google AdSense 提供的廣告。包括 Google 在內的第三方供應商會使用 Cookie，依使用者先前造訪本站或其他網站的紀錄放送廣告。Google 使用廣告 Cookie，讓 Google 及其合作夥伴能依這些造訪紀錄放送廣告。您可以在 Google 的「廣告設定」中停用個人化廣告。在法律要求的地區，使用這些 Cookie 之前會透過 Google 的同意訊息徵求訪客同意。本站本身仍不蒐集任何個人資料。',
+              'Este sitio muestra publicidad de Google AdSense. Proveedores externos, incluido Google, usan cookies para mostrar anuncios según las visitas previas del usuario a este y otros sitios. El uso de cookies publicitarias permite a Google y a sus socios mostrar anuncios basados en esas visitas. Puedes desactivar la publicidad personalizada en la Configuración de anuncios de Google. Donde la ley lo exige, se pide consentimiento mediante el mensaje de consentimiento de Google antes de usar estas cookies. El sitio en sí sigue sin recopilar datos personales.',
+            )}
+          />
+        ) : (
+          <AdsNotActive />
+        )}
         <p className="mt-3 text-sm">
           <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer" className="text-cyan-300 underline underline-offset-2">
             Google — How Google uses cookies in advertising
@@ -186,3 +182,27 @@ export default function PrivacyPage() {
   );
 }
 
+
+
+/** Advertising text used while no AdSense publisher ID is configured. */
+function AdsNotActive() {
+  return (
+    <>
+        <Paragraph
+          value={bi(
+            'At the time of writing this page, the site does not display Google AdSense or any other advertising. If advertising is added, ad cookies and personalised-ad settings would be governed by Google\u2019s policies, and this page would be updated to say so clearly.',
+            '截至本頁撰寫時，本站未顯示 Google AdSense 或任何其他廣告。若未來加入廣告，廣告 Cookie 與個人化廣告設定將受 Google 政策規範，本頁也會明確更新說明。',
+            'Mientras se redacta esta página, el sitio no muestra Google AdSense ni ninguna otra publicidad. Si se añade publicidad, las cookies de anuncios y la personalización se regirán por las políticas de Google y esta página se actualizará para decirlo con claridad.',
+          )}
+        />
+        <Paragraph
+          className="mt-3 max-w-4xl leading-relaxed text-slate-300"
+          value={bi(
+            'If Google AdSense is enabled in the future, the following will apply and this section will be updated to confirm it: third-party vendors, including Google, use cookies to serve ads based on a user’s prior visits to this and other websites; Google’s advertising cookies enable it and its partners to serve ads based on those visits; and you can opt out of personalised advertising in Google’s Ads Settings. Visitors in regions that require it would be asked for consent before such cookies are used.',
+            '若未來啟用 Google AdSense，將適用以下說明，屆時本節也會更新確認：包括 Google 在內的第三方供應商會使用 Cookie，依使用者先前造訪本站或其他網站的紀錄放送廣告；Google 的廣告 Cookie 讓 Google 及其合作夥伴能依這些造訪紀錄放送廣告；您可以在 Google 的「廣告設定」中停用個人化廣告。在法規要求的地區，使用這類 Cookie 之前會先徵求訪客同意。',
+            'Si en el futuro se activa Google AdSense, se aplicará lo siguiente y esta sección se actualizará para confirmarlo: proveedores externos, incluido Google, usan cookies para mostrar anuncios según las visitas previas del usuario a este y otros sitios; las cookies publicitarias de Google les permiten a Google y a sus socios mostrar anuncios basados en esas visitas; y puedes desactivar la publicidad personalizada en la Configuración de anuncios de Google. En las regiones que lo exigen, se pediría consentimiento antes de usar esas cookies.',
+          )}
+        />
+    </>
+  );
+}

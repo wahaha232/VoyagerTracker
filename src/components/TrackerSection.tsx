@@ -7,19 +7,17 @@
  * the prerendered HTML never shows stale "frozen" figures.
  */
 
-import { Suspense, lazy } from 'react';
 import type { SpacecraftId } from '../types/voyager';
 import { SPACECRAFT_META, TRANSLATIONS } from '../constants/voyagerData';
-import { useVoyagerLive } from '../hooks/useVoyagerLive';
+import { useOnScreen, useVoyagerLive } from '../hooks/useVoyagerLive';
 import { useI18n } from '../i18n/context';
 import { pageUrl } from '../constants/site';
 import ClientOnly from './ClientOnly';
+import ModelSlot from './ModelSlot';
 import Milestones from './Milestones';
 import SinceLastVisit from './SinceLastVisit';
 import TrackerCard from './TrackerCard';
 import VoyagerCanvas from './VoyagerCanvas';
-
-const Voyager3D = lazy(() => import('./Voyager3D'));
 
 interface TrackerSectionProps {
   /** Which spacecraft to show: both (home) or a single probe (voyager pages). */
@@ -207,12 +205,13 @@ export default function TrackerSection({
 /** Everything that depends on the visitor's clock (client-only). */
 function LiveBlock({ ids, showMap, showModel }: { ids: SpacecraftId[]; showMap: boolean; showModel: boolean }) {
   const { locale } = useI18n();
-  const telemetry = useVoyagerLive();
+  const [ref, onScreen] = useOnScreen<HTMLDivElement>();
+  const telemetry = useVoyagerLive(undefined, onScreen);
   const t = TRANSLATIONS[locale];
   const single = ids.length === 1 ? ids[0] : undefined;
 
   return (
-    <>
+    <div ref={ref}>
       <div className={`grid gap-6 ${ids.length > 1 ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
         {ids.map((id) => (
           <TrackerCard key={id} meta={SPACECRAFT_META[id]} telemetry={telemetry[id]} locale={locale} t={t} />
@@ -236,9 +235,7 @@ function LiveBlock({ ids, showMap, showModel }: { ids: SpacecraftId[]; showMap: 
               <h3 className="mb-1 text-lg font-semibold tracking-wide text-white">{t.model.title}</h3>
               <p className="mb-3 font-mono text-xs text-slate-400">{t.model.subtitle}</p>
               <div className="hud-panel relative h-[320px] w-full overflow-hidden rounded-2xl lg:h-[480px]">
-                <Suspense fallback={null}>
-                  <Voyager3D />
-                </Suspense>
+                <ModelSlot />
                 <div className="pointer-events-none absolute bottom-3 left-4 rounded-md border border-cyan-500/20 bg-space-950/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-cyan-300/80">
                   {t.model.dragHint}
                 </div>
@@ -247,6 +244,6 @@ function LiveBlock({ ids, showMap, showModel }: { ids: SpacecraftId[]; showMap: 
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }

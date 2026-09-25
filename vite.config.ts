@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'node:path';
 // @ts-expect-error — plain ESM helper shared with the build scripts.
-import { PAGES, NOT_FOUND } from './scripts/pages.mjs';
+import { ADSENSE_CLIENT, PAGES, NOT_FOUND } from './scripts/pages.mjs';
 
 // Multi-page (MPA) build for GitHub Pages: every page in scripts/pages.mjs
 // is a real, crawlable .html URL under the repo base path. The HTML entry
@@ -18,6 +18,8 @@ export default defineConfig({
   define: {
     // Date of the build; shown as "site last updated" and used in sitemap/JSON-LD.
     __BUILD_DATE__: JSON.stringify(new Date().toISOString().slice(0, 10)),
+    // True when an AdSense publisher ID is configured in scripts/pages.mjs.
+    __ADSENSE_ENABLED__: JSON.stringify(Boolean(ADSENSE_CLIENT)),
   },
   server: {
     port: 5173,

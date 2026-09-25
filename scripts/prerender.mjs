@@ -3,14 +3,16 @@
  *
  * 1. Renders each page with the SSR bundle (dist-ssr/entry-server.js) and
  *    injects the HTML into #root, so crawlers and no-JS visitors get the
- *    full text, headings and links. The browser then re-renders with the
- *    visitor's language and live values.
+ *    full text, headings and links. The browser then hydrates it and
+ *    applies the visitor's language and live values. The small site
+ *    stylesheet is inlined so the first paint needs no extra request.
  * 2. Adds JSON-LD that only describes what the page really contains; the
  *    FAQPage entries are generated from the same data the FAQ renders.
  * 3. Writes sitemap.xml from pages.mjs, so it can never list a missing URL.
  */
 
 import { readFileSync, writeFileSync, rmSync, existsSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { PAGES, NOT_FOUND, SITE_URL, SITE_NAME, pageHref } from './pages.mjs';
@@ -19,6 +21,23 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = resolve(ROOT, 'dist');
 const SSR = resolve(ROOT, 'dist-ssr/entry-server.js');
 const BUILD_DATE = new Date().toISOString().slice(0, 10);
+
+/**
+ * Date a page's content last changed: the last commit touching its page
+ * component (from src/pages/registry.ts), so the sitemap and JSON-LD do not
+ * claim a change on every rebuild. Falls back to the build date outside git.
+ */
+const registry = readFileSync(resolve(ROOT, 'src/pages/registry.ts'), 'utf8');
+function contentDate(key) {
+  const m = registry.match(new RegExp(String.raw`['"]?${key}['"]?: \(\) => import\('\./(\w+)'\)`));
+  const file = m ? `src/pages/${m[1]}.tsx` : '.';
+  try {
+    const d = execSync(`git log -1 --format=%cs -- "${file}"`, { cwd: ROOT, encoding: 'utf8' }).trim();
+    return d || BUILD_DATE;
+  } catch {
+    return BUILD_DATE;
+  }
+}
 
 const { render, faqForSchema } = await import(pathToFileURL(SSR).href);
 
@@ -43,7 +62,7 @@ function jsonLd(p) {
     description: p.description,
     inLanguage: 'en',
     isPartOf: { '@id': `${SITE_URL}#website` },
-    dateModified: BUILD_DATE,
+    dateModified: contentDate(p.key),
   };
   if (p.schema === 'Article') {
     Object.assign(node, {
@@ -73,9 +92,14 @@ function jsonLd(p) {
   return `<script type="application/ld+json">\n${json}\n    </script>`;
 }
 
+/** Inline the (small) site stylesheet so the first paint needs no extra request. */
+function inlineCss(html) {
+  return html.replace(/<link rel="stylesheet" crossorigin href="\/VoyagerTracker\/(assets\/[^"]+\.css)">/, (_, path) => `<style>${readFileSync(resolve(DIST, path), 'utf8')}</style>`);
+}
+
 function inject(p, withJsonLd) {
   const file = resolve(DIST, p.file);
-  let html = readFileSync(file, 'utf8');
+  let html = inlineCss(readFileSync(file, 'utf8'));
   const marker = `<div id="root" data-page="${p.key}"></div>`;
   if (!html.includes(marker)) throw new Error(`${p.file}: #root marker not found`);
   html = html.replace(marker, `<div id="root" data-page="${p.key}">${render(p.key)}</div>`);
@@ -91,7 +115,7 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 ${PAGES.map(
   (p) => `  <url>
     <loc>${pageHref(p)}</loc>
-    <lastmod>${BUILD_DATE}</lastmod>
+    <lastmod>${contentDate(p.key)}</lastmod>
     <changefreq>${p.changefreq}</changefreq>
     <priority>${p.priority}</priority>
   </url>`,

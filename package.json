@@ -11,7 +11,8 @@
     "validate": "esbuild scripts/validate-model.ts --bundle --platform=node --format=esm --outfile=node_modules/.cache/validate-model.mjs --log-level=warning && node node_modules/.cache/validate-model.mjs",
     "deploy": "npm run build && gh-pages -d dist",
     "check": "node scripts/check-site.mjs",
-    "test": "esbuild scripts/test-engine.ts --bundle --platform=node --format=esm --jsx=automatic --outfile=node_modules/.cache/test-engine.mjs --log-level=warning && node node_modules/.cache/test-engine.mjs"
+    "test": "esbuild scripts/test-engine.ts --bundle --platform=node --format=esm --jsx=automatic --outfile=node_modules/.cache/test-engine.mjs --log-level=warning && node node_modules/.cache/test-engine.mjs",
+    "og": "esbuild scripts/gen-og.ts --bundle --platform=node --format=esm --external:@resvg/resvg-js --outfile=node_modules/.cache/gen-og.mjs --log-level=warning && node node_modules/.cache/gen-og.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.0.0",
@@ -22,6 +23,8 @@
     "three": "^0.169.0"
   },
   "devDependencies": {
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@resvg/resvg-js": "^2.6.2",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/three": "^0.169.0",

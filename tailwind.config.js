@@ -16,8 +16,8 @@ export default {
       },
       keyframes: {
         'pulse-glow': {
-          '0%, 100%': { opacity: '1', filter: 'drop-shadow(0 0 6px rgba(34,211,238,0.8))' },
-          '50%': { opacity: '0.6', filter: 'drop-shadow(0 0 2px rgba(34,211,238,0.3))' },
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.5' },
         },
         'fade-in': {
           '0%': { opacity: '0', transform: 'translateY(8px)' },

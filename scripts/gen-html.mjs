@@ -11,9 +11,18 @@
 import { writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PAGES, NOT_FOUND, SITE_NAME, pageHref } from './pages.mjs';
+import { ADSENSE_CLIENT, PAGES, NOT_FOUND, SITE_NAME, SITE_URL, pageHref } from './pages.mjs';
+
+const OG_ALT = 'Voyager Tracker: calculated distances of Voyager 1 and Voyager 2 from Earth, with an independent-project notice.';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+
+
+if (ADSENSE_CLIENT && !/^ca-pub-\d{10,20}$/.test(ADSENSE_CLIENT)) throw new Error('ADSENSE_CLIENT must look like ca-pub-0000000000000000');
+const ADS = ADSENSE_CLIENT
+  ? `
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>`
+  : '';
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
@@ -29,7 +38,12 @@ function headMeta(p) {
     `<meta property="og:description" content="${esc(p.description)}" />`,
     `<meta property="og:url" content="${url}" />`,
     '<meta property="og:locale" content="en_US" />',
-    '<meta name="twitter:card" content="summary" />',
+    `<meta property="og:image" content="${SITE_URL}og-image.png" />`,
+    '<meta property="og:image:width" content="1200" />',
+    '<meta property="og:image:height" content="630" />',
+    `<meta property="og:image:alt" content="${OG_ALT}" />`,
+    '<meta name="twitter:card" content="summary_large_image" />',
+    `<meta name="twitter:image" content="${SITE_URL}og-image.png" />`,
     `<meta name="twitter:title" content="${esc(p.title)}" />`,
     `<meta name="twitter:description" content="${esc(p.description)}" />`,
   ].join('\n    ');
@@ -47,13 +61,7 @@ for (const p of [...PAGES, NOT_FOUND]) {
     ${headMeta(p)}
     <meta name="theme-color" content="#020617" />
     <link rel="icon" type="image/svg+xml" href="/VoyagerTracker/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap"
-      rel="stylesheet"
-    />
-    <!--jsonld-->
+    <!--jsonld-->${ADS}
   </head>
   <body>
     <div id="root" data-page="${p.key}"></div>

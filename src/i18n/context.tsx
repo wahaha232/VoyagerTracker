@@ -12,6 +12,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import type { ReactNode } from 'react';
@@ -43,9 +44,19 @@ const I18nContext = createContext<I18nValue>({
 });
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>(() => readInitialLocale());
+  // The first render always matches the prerendered (English) HTML so React
+  // can hydrate it; the saved language is applied right after.
+  const [locale, setLocale] = useState<Locale>('en-US');
+  const loaded = useRef(false);
 
   useEffect(() => {
+    const saved = readInitialLocale();
+    loaded.current = true;
+    if (saved !== 'en-US') setLocale(saved);
+  }, []);
+
+  useEffect(() => {
+    if (!loaded.current) return;
     try {
       window.localStorage.setItem(STORAGE_KEY, locale);
     } catch {

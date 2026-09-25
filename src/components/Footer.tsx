@@ -80,9 +80,9 @@ export default function Footer() {
               <>
                 「航海家號追蹤器」是獨立、非官方的教育專案，與美國國家航空暨太空總署（NASA）或噴射推進實驗室（JPL）沒有任何關聯，也未獲其背書或贊助。
                 本站顯示的距離、速度與其他太空船數值為計算或估計值，不應被視為 NASA 官方任務遙測。資料依據請見
-                <a href={pageUrl('sources')} className="text-cyan-300 hover:text-cyan-200">資料來源</a>
+                <a href={pageUrl('sources')} className="text-cyan-300 underline underline-offset-2 hover:text-cyan-200">資料來源</a>
                 與
-                <a href={pageUrl('how-it-works')} className="text-cyan-300 hover:text-cyan-200">運作原理</a>。
+                <a href={pageUrl('how-it-works')} className="text-cyan-300 underline underline-offset-2 hover:text-cyan-200">運作原理</a>。
               </>
             ) : es ? (
               <>
@@ -90,8 +90,8 @@ export default function Footer() {
                 ni patrocinado por la NASA ni por el Jet Propulsion Laboratory (JPL). Las distancias, velocidades y demás
                 datos de las naves son calculados o estimados y no deben interpretarse como telemetría oficial de la NASA.
                 Consulta{' '}
-                <a href={pageUrl('sources')} className="text-cyan-300 hover:text-cyan-200">Fuentes</a> y{' '}
-                <a href={pageUrl('how-it-works')} className="text-cyan-300 hover:text-cyan-200">Cómo funciona</a>.
+                <a href={pageUrl('sources')} className="text-cyan-300 underline underline-offset-2 hover:text-cyan-200">Fuentes</a> y{' '}
+                <a href={pageUrl('how-it-works')} className="text-cyan-300 underline underline-offset-2 hover:text-cyan-200">Cómo funciona</a>.
               </>
             ) : (
               <>
@@ -99,8 +99,8 @@ export default function Footer() {
                 by, or sponsored by NASA or the Jet Propulsion Laboratory (JPL). Displayed distance, velocity, and other
                 spacecraft information is calculated or estimated and should not be interpreted as official NASA mission
                 telemetry. See{' '}
-                <a href={pageUrl('sources')} className="text-cyan-300 hover:text-cyan-200">Sources</a> and{' '}
-                <a href={pageUrl('how-it-works')} className="text-cyan-300 hover:text-cyan-200">How It Works</a>.
+                <a href={pageUrl('sources')} className="text-cyan-300 underline underline-offset-2 hover:text-cyan-200">Sources</a> and{' '}
+                <a href={pageUrl('how-it-works')} className="text-cyan-300 underline underline-offset-2 hover:text-cyan-200">How It Works</a>.
               </>
             )}
           </p>

@@ -6,10 +6,10 @@
  * Long-form material lives on the topic pages linked from here.
  */
 
-import { Suspense, lazy } from 'react';
 import { pageUrl, type PageKey } from '../constants/site';
 import { LinkArrow } from '../components/icons';
 import ClientOnly from '../components/ClientOnly';
+import ModelSlot from '../components/ModelSlot';
 import TrackerSection from '../components/TrackerSection';
 import { RelatedLinks } from '../components/ui';
 import { txt, useLang } from '../components/content';
@@ -19,7 +19,6 @@ import DistanceGeometry from '../components/DistanceGeometry';
 import SourceBadge from '../components/SourceBadge';
 import type { Locale } from '../types/voyager';
 
-const Voyager3D = lazy(() => import('../components/Voyager3D'));
 
 const tr = (locale: Locale, en: string, zh: string, es: string) => txt({ en, zh, es }, locale);
 
@@ -154,11 +153,9 @@ export default function HomePage() {
           <div className="animate-fade-in">
             <div className="hud-panel relative h-[300px] w-full overflow-hidden rounded-2xl sm:h-[420px]">
               <ClientOnly>
-                <Suspense fallback={null}>
-                  <Voyager3D />
-                </Suspense>
+                <ModelSlot />
               </ClientOnly>
-              <div className="pointer-events-none absolute bottom-3 left-4 rounded-md border border-cyan-500/20 bg-space-950/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-cyan-300/80 backdrop-blur-sm">
+              <div className="pointer-events-none absolute bottom-3 left-4 rounded-md border border-cyan-500/20 bg-space-950/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-cyan-300/80">
                 {t('Drag to rotate · simplified 3D Voyager model', '拖曳旋轉 · 簡化的航海家 3D 模型', 'Arrastra para girar · modelo 3D simplificado')}
               </div>
             </div>
