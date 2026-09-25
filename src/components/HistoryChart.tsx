@@ -39,6 +39,27 @@ const X0 = Date.UTC(1977, 0, 1);
 const X1 = Date.UTC(2035, 0, 1);
 
 const toMs = (d: string) => Date.parse(`${d}T00:00:00Z`);
+
+/** Timestamp of every sample, parsed once (the rows are in date order). */
+const ROW_MS: Record<Craft, number[]> = {
+  voyager1: HISTORY.voyager1.map((r) => toMs(r[0])),
+  voyager2: HISTORY.voyager2.map((r) => toMs(r[0])),
+};
+
+/** Nearest sample for a timestamp (binary search; ties go to the earlier one). */
+function sampleAt(craft: Craft, ms: number) {
+  const t = ROW_MS[craft];
+  let lo = 0;
+  let hi = t.length - 1;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (t[mid] < ms) lo = mid + 1;
+    else hi = mid;
+  }
+  const best = lo > 0 && ms - t[lo - 1] <= t[lo] - ms ? lo - 1 : lo;
+  return HISTORY[craft][best];
+}
+
 const pick = (v: Tri, locale: string) => (locale === 'zh-TW' ? v.zh : locale === 'es' ? v.es : v.en);
 
 export default function HistoryChart() {
@@ -64,22 +85,19 @@ export default function HistoryChart() {
     const out: Record<Craft, { past: string; future: string }> = { voyager1: { past: '', future: '' }, voyager2: { past: '', future: '' } };
     for (const craft of ['voyager1', 'voyager2'] as Craft[]) {
       const rows = HISTORY[craft];
-      const past = rows.filter((r) => toMs(r[0]) <= today);
-      const future = rows.filter((r) => toMs(r[0]) >= (past.length ? toMs(past[past.length - 1][0]) : 0));
-      const line = (rs: typeof rows) => rs.map((r, i) => `${i ? 'L' : 'M'}${sx(toMs(r[0])).toFixed(1)},${sy(r[col]).toFixed(1)}`).join('');
-      out[craft] = { past: line(past), future: line(future) };
+      const t = ROW_MS[craft];
+      // Past: samples up to today; future: from the last past sample onwards.
+      const split = t.filter((ms) => ms <= today).length;
+      const line = (from: number, to: number) =>
+        rows
+          .slice(from, to)
+          .map((r, i) => `${i ? 'L' : 'M'}${sx(t[from + i]).toFixed(1)},${sy(r[col]).toFixed(1)}`)
+          .join('');
+      out[craft] = { past: line(0, split), future: line(Math.max(0, split - 1), rows.length) };
     }
     return out;
     // sx/sy depend only on mode-derived constants.
   }, [mode, today]);
-
-  /** Nearest sample index (per craft) for a timestamp. */
-  const sampleAt = (craft: Craft, ms: number) => {
-    const rows = HISTORY[craft];
-    let best = 0;
-    for (let i = 1; i < rows.length; i++) if (Math.abs(toMs(rows[i][0]) - ms) < Math.abs(toMs(rows[best][0]) - ms)) best = i;
-    return rows[best];
-  };
 
   const onMove = (e: PointerEvent<SVGSVGElement>) => {
     const rect = svgRef.current?.getBoundingClientRect();
@@ -96,7 +114,11 @@ export default function HistoryChart() {
     setHover((h) => Math.min(X1, Math.max(toMs(HISTORY.voyager2[0][0]), (h ?? today) + (e.key === 'ArrowRight' ? step : -step))));
   };
 
-  const fmt = (v: number, d = 1) => new Intl.NumberFormat(locale, { maximumFractionDigits: d, minimumFractionDigits: d }).format(v);
+  const formats = useMemo(
+    () => [1, 2].map((d) => new Intl.NumberFormat(locale, { maximumFractionDigits: d, minimumFractionDigits: d })),
+    [locale],
+  );
+  const fmt = (v: number, d: 1 | 2 = 1) => formats[d - 1].format(v);
   const hoverRows = hover !== null ? (['voyager1', 'voyager2'] as Craft[]).map((c) => ({ c, row: sampleAt(c, hover) })) : [];
   const years = [1977, 1985, 1995, 2005, 2015, 2025, 2035];
 
