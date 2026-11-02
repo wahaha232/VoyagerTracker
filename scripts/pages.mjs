@@ -19,7 +19,7 @@ export const PAGES = [
     file: 'index.html',
     title: 'Voyager Tracker — Estimated Distance, Speed & Mission Information',
     description:
-      'Where are Voyager 1 and Voyager 2 right now? Continuously calculated distance, speed and signal delay, explained in plain language, with mission history, comparisons and calculators.',
+      'Where are Voyager 1 and Voyager 2 right now? Continuously calculated distance, speed and signal delay, explained in plain language, with mission history, comparisons, calculators and a countdown to Voyager 1’s one-light-day milestone.',
     schema: 'WebPage',
     changefreq: 'weekly',
     priority: '1.0',
@@ -30,7 +30,7 @@ export const PAGES = [
     name: 'Voyager 1',
     title: 'Voyager 1 — Distance, Speed & Mission Information',
     description:
-      'Voyager 1’s estimated distance and speed today, its Jupiter and Saturn encounters, the Pale Blue Dot, its 2012 entry into interstellar space and which instruments still work.',
+      'Voyager 1’s estimated distance and speed today, its Jupiter and Saturn encounters, the Pale Blue Dot, its 2012 entry into interstellar space, which instruments still work, and a live countdown to its one-light-day milestone on 18 November 2026.',
     schema: 'Article',
     changefreq: 'weekly',
     priority: '0.9',

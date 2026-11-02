@@ -11,6 +11,7 @@ import { LinkArrow } from '../components/icons';
 import ClientOnly from '../components/ClientOnly';
 import ModelSlot from '../components/ModelSlot';
 import TrackerSection from '../components/TrackerSection';
+import LightDayCountdown from '../components/LightDayCountdown';
 import { RelatedLinks } from '../components/ui';
 import { txt, useLang } from '../components/content';
 import { useVoyagerLive, formatNumber } from '../hooks/useVoyagerLive';
@@ -170,6 +171,11 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ===== One light-day countdown ===== */}
+      <div className="mx-auto max-w-7xl px-4 pt-10 sm:px-6">
+        <LightDayCountdown variant="compact" />
+      </div>
 
       {/* ===== Tracker ===== */}
       <div id="live-tracker" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-12 sm:px-6">

@@ -62,14 +62,14 @@ export default function PrivacyPage() {
           value={
             __ADSENSE_ENABLED__
               ? bi(
-                  'This website does not set its own cookies. The pages load Google AdSense, which may set advertising cookies as described under Advertising below.',
-                  '本站不會自行設定 Cookie。頁面會載入 Google AdSense，該服務可能設定廣告 Cookie，詳見下方「廣告」一節。',
-                  'Este sitio no establece cookies propias. Las páginas cargan Google AdSense, que puede establecer cookies publicitarias, como se explica en Publicidad más abajo.',
+                  'This website does not set its own cookies. The pages load Google AdSense, which may set advertising cookies as described under Advertising below. The Voyager 1 page also offers NASA/JPL’s Eyes on the Solar System; that embedded application loads from eyes.nasa.gov only after you press its button, and NASA’s own analytics and privacy policy then apply.',
+                  '本站不會自行設定 Cookie。頁面會載入 Google AdSense，該服務可能設定廣告 Cookie，詳見下方「廣告」一節。航海家一號頁面另提供 NASA/JPL 的 Eyes on the Solar System；這個嵌入應用程式只有在您按下按鈕後才會從 eyes.nasa.gov 載入，屆時適用 NASA 自己的分析工具與隱私政策。',
+                  'Este sitio no establece cookies propias. Las páginas cargan Google AdSense, que puede establecer cookies publicitarias, como se explica en Publicidad más abajo. La página de la Voyager 1 también ofrece Eyes on the Solar System de NASA/JPL; esa aplicación incrustada solo se carga desde eyes.nasa.gov al pulsar su botón, y entonces se aplican los análisis y la política de privacidad de la NASA.',
                 )
               : bi(
-                  'This website does not set its own cookies. If advertising or third-party embeds are added in the future, those services may set cookies, and this policy will be updated before they are enabled.',
-                  '本站不會自行設定 Cookie。若未來加入廣告或第三方嵌入內容，該服務可能設定 Cookie，而本站會先更新本政策後才啟用。',
-                  'Este sitio no establece cookies propias. Si en el futuro se añaden anuncios o contenidos incrustados de terceros, esos servicios podrían establecer cookies y esta política se actualizará antes de activarlos.',
+                  'This website does not set its own cookies. The Voyager 1 page can load NASA/JPL’s Eyes on the Solar System from eyes.nasa.gov after you press its button; NASA’s analytics and privacy policy then apply. If advertising is added in the future, those services may set cookies, and this policy will be updated before they are enabled.',
+                  '本站不會自行設定 Cookie。航海家一號頁面可在您按下按鈕後，從 eyes.nasa.gov 載入 NASA/JPL 的 Eyes on the Solar System；屆時適用 NASA 的分析工具與隱私政策。若未來加入廣告，該服務可能設定 Cookie，而本站會先更新本政策後才啟用。',
+                  'Este sitio no establece cookies propias. La página de la Voyager 1 puede cargar Eyes on the Solar System de NASA/JPL desde eyes.nasa.gov al pulsar su botón; entonces se aplican los análisis y la política de privacidad de la NASA. Si en el futuro se añaden anuncios, esos servicios podrían establecer cookies y esta política se actualizará antes de activarlos.',
                 )
           }
         />

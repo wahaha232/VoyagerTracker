@@ -6,6 +6,9 @@ import { pageUrl } from '../constants/site';
 import { RelatedLinks } from '../components/ui';
 import { BiArticleHeader, BiSection, bi, FactGrid, txt, useLang } from '../components/content';
 import TrackerSection from '../components/TrackerSection';
+import LightDayCountdown from '../components/LightDayCountdown';
+import NasaEyesEmbed from '../components/NasaEyesEmbed';
+import VoyagerBlogFeed from '../components/VoyagerBlogFeed';
 import { InstrumentStatusList, PageQA, SourcesNote } from '../components/MissionExtras';
 
 type Tri = { en: string; zh: string; es: string };
@@ -79,9 +82,9 @@ const CONTEXT: { when: string; text: Tri }[] = [
   {
     when: '2026',
     text: T(
-      'The low-energy charged particle instrument was switched off in April, leaving the magnetometer and plasma wave instrument. NASA plans the same power-saving hardware swap it performed on Voyager 2, and Voyager 1 passes one light-day from Earth on 18 November.',
-      '低能量帶電粒子儀於 4 月關閉，剩下磁力計與電漿波儀器。NASA 計畫在一號上進行與二號相同的節電硬體改裝；航海家一號並將於 11 月 18 日來到距地球一光日處。',
-      'En abril se apagó el instrumento de partículas de baja energía, quedando el magnetómetro y el de ondas de plasma. La NASA prevé el mismo cambio de ahorro energético que hizo en la Voyager 2, y la Voyager 1 estará a un día-luz de la Tierra el 18 de noviembre.',
+      'The low-energy charged particle instrument was switched off in April, leaving the magnetometer and plasma wave instrument. In September engineers completed the same power-saving hardware swap performed on Voyager 2, and in October a 48-hour communications outage resolved itself. Voyager 1 reaches one light-day from Earth on 18 November at 5:16 a.m. EST.',
+      '低能量帶電粒子儀於 4 月關閉，剩下磁力計與電漿波儀器。9 月，工程師完成了與二號相同的節電硬體改裝；10 月，一次為期 48 小時的通訊中斷自行恢復。航海家一號將於 11 月 18 日美東時間上午 5:16 抵達距地球一光日處。',
+      'En abril se apagó el instrumento de partículas de baja energía, quedando el magnetómetro y el de ondas de plasma. En septiembre los ingenieros completaron el mismo cambio de ahorro energético que en la Voyager 2, y en octubre un corte de comunicaciones de 48 horas se resolvió solo. La Voyager 1 alcanza un día-luz de la Tierra el 18 de noviembre a las 5:16 a. m. EST.',
     ),
   },
 ];
@@ -127,6 +130,8 @@ export default function Voyager1Page() {
         )}
       />
 
+      <LightDayCountdown />
+
       <TrackerSection
         ids={['voyager1']}
         title={txt(T('Voyager 1 — calculated position right now', '航海家一號此刻的計算位置', 'Voyager 1: posición calculada ahora'), locale)}
@@ -168,6 +173,20 @@ export default function Voyager1Page() {
 
       <BiSection id="facts" title={bi('Voyager 1 at a glance', '航海家一號速覽', 'Voyager 1 de un vistazo')}>
         <FactGrid items={FACTS} />
+      </BiSection>
+
+      <BiSection id="nasa-eyes-3d" title={bi('Explore Voyager 1 in NASA’s 3D solar system', '在 NASA 的 3D 太陽系中探索航海家一號', 'Explora la Voyager 1 en el sistema solar 3D de la NASA')}>
+        <p className="mb-4 max-w-4xl leading-relaxed text-slate-300">
+          {txt(
+            T(
+              'NASA/JPL’s Eyes on the Solar System places the real Voyager 1 in an interactive 3D model of the solar system, with the planets, their orbits and the spacecraft’s path. The view below is the official NASA/JPL application, embedded directly from eyes.nasa.gov; it loads only when you ask, so it costs nothing until then.',
+              'NASA/JPL 的 Eyes on the Solar System 把真實的航海家一號放進互動式太陽系 3D 模型中，包含行星、軌道與探測器的路徑。下方是 NASA/JPL 的官方應用程式，直接從 eyes.nasa.gov 嵌入；按下按鈕後才會開始載入，在此之前不會耗用任何資源。',
+              'Eyes on the Solar System de NASA/JPL sitúa a la Voyager 1 real en un modelo 3D interactivo del sistema solar, con los planetas, sus órbitas y la trayectoria de la nave. La vista inferior es la aplicación oficial de NASA/JPL, incrustada directamente desde eyes.nasa.gov; solo se carga cuando lo pides, así que no consume recursos hasta entonces.',
+            ),
+            locale,
+          )}
+        </p>
+        <NasaEyesEmbed />
       </BiSection>
 
       <BiSection id="journey" title={bi('Voyager 1’s path through the solar system', '航海家一號穿越太陽系的路徑', 'El camino de la Voyager 1 por el sistema solar')}>
@@ -258,6 +277,24 @@ export default function Voyager1Page() {
         </p>
       </BiSection>
 
+      <BiSection
+        id="nasa-blog"
+        kicker={bi('Official NASA blog · live feed', 'NASA 官方部落格 · 即時饋送', 'Blog oficial de la NASA · en vivo')}
+        title={bi('Latest from NASA’s Voyager blog', 'NASA 航海家官方部落格最新消息', 'Lo último del blog oficial de Voyager')}
+      >
+        <p className="mb-4 max-w-4xl leading-relaxed text-slate-300">
+          {txt(
+            T(
+              'Mission updates published by NASA/JPL appear here automatically. This page reads NASA’s public RSS feed in your browser, so a new post shows up on your next visit without the site being rebuilt.',
+              'NASA/JPL 發布的任務更新會自動出現在這裡。本頁在您的瀏覽器中讀取 NASA 的公開 RSS 饋送，因此 NASA 一有新文章，您下次造訪時就會看到，不必重新建置本站。',
+              'Las novedades de la misión publicadas por NASA/JPL aparecen aquí automáticamente. Esta página lee la fuente RSS pública de la NASA en tu navegador, así que una entrada nueva aparece en tu próxima visita sin reconstruir el sitio.',
+            ),
+            locale,
+          )}
+        </p>
+        <VoyagerBlogFeed />
+      </BiSection>
+
       <BiSection id="golden-record" title={bi('The Golden Record aboard Voyager 1', '航海家一號上的金唱片', 'El Disco de Oro a bordo de la Voyager 1')}>
         <p className="max-w-4xl leading-relaxed text-slate-300">
           {txt(
@@ -281,6 +318,7 @@ export default function Voyager1Page() {
       <SourcesNote
         links={[
           { label: 'NASA Science — Voyager 1', url: 'https://science.nasa.gov/mission/voyager/voyager-1/' },
+          { label: 'NASA — Voyager 1: What Is a Light-Day?', url: 'https://science.nasa.gov/mission/voyager/voyager-1/voyager-1-what-is-a-light-day/' },
           { label: 'NASA — Where are Voyager 1 and Voyager 2 now?', url: 'https://science.nasa.gov/mission/voyager/where-are-voyager-1-and-voyager-2-now/' },
           { label: 'NASA — Voyager 1 returning science data from all four instruments (2024)', url: 'https://science.nasa.gov/blogs/voyager/2024/06/13/voyager-1-returning-science-data-from-all-four-instruments/' },
           { label: 'NASA — Shuts off instrument on Voyager 1 (2026)', url: 'https://science.nasa.gov/blogs/voyager/2026/04/17/nasa-shuts-off-instrument-on-voyager-1-to-keep-spacecraft-operating/' },
