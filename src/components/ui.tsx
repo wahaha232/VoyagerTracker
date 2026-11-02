@@ -64,12 +64,15 @@ export function Section({
   kicker,
   lead,
   id,
+  icon,
   children,
 }: {
   title: string;
   kicker?: string;
   lead?: string;
   id?: string;
+  /** Optional decorative icon shown before the heading (kids theme). */
+  icon?: string;
   children: ReactNode;
 }) {
   return (
@@ -79,7 +82,14 @@ export function Section({
           {kicker}
         </p>
       )}
-      <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">{title}</h2>
+      <h2 className="mb-4 text-2xl font-bold tracking-wide text-white sm:text-3xl">
+        {icon && (
+          <span aria-hidden="true" className="kids-section-icon">
+            {icon}
+          </span>
+        )}
+        {title}
+      </h2>
       {lead && <p className="mb-6 max-w-3xl text-slate-300/90">{lead}</p>}
       {children}
     </section>

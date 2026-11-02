@@ -1,0 +1,506 @@
+/* ============================================================
+   Warm Cosmic Storybook theme — kids page only.
+
+   Every selector is scoped to #root[data-page="kids"] (or the
+   body class added by KidsPage), so no other page changes.
+   ============================================================ */
+
+body.kids-body,
+body:has(#root[data-page="kids"]) {
+  background-color: #1e1b4b;
+}
+
+#root[data-page="kids"] .scanlines,
+#root[data-page="kids"] .vignette {
+  display: none !important;
+}
+
+#root[data-page="kids"] > div {
+  background:
+    radial-gradient(circle at 18% 8%, rgba(251, 191, 36, 0.18), transparent 38%),
+    radial-gradient(circle at 82% 82%, rgba(244, 114, 182, 0.16), transparent 42%),
+    linear-gradient(160deg, #1e1b4b 0%, #3b0764 45%, #172554 100%) !important;
+  color: #fffbeb !important;
+}
+
+/* Replace the default cyan/emerald glows with warm storybook light. */
+#root[data-page="kids"] > div > .pointer-events-none.fixed.inset-0 {
+  display: none !important;
+}
+
+#root[data-page="kids"] > div::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(251, 191, 36, 0.16), transparent 38%),
+    radial-gradient(circle at 82% 78%, rgba(244, 114, 182, 0.14), transparent 42%);
+}
+
+/* ---- Typography: rounded, readable, no engineering labels ---- */
+#root[data-page="kids"] main,
+#root[data-page="kids"] main .font-mono {
+  font-family: "Nunito", "Quicksand", "Rounded Mplus 1c", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", system-ui, sans-serif !important;
+  letter-spacing: 0.01em !important;
+}
+
+#root[data-page="kids"] main .font-mono,
+#root[data-page="kids"] main .uppercase,
+#root[data-page="kids"] main [class*="tracking-"] {
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* The header and footer are shared site chrome, but on this page they should
+   read as part of the storybook rather than the engineering dashboard. */
+#root[data-page="kids"] > div > header,
+#root[data-page="kids"] > div > footer {
+  font-family: "Nunito", "Quicksand", "Rounded Mplus 1c", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", system-ui, sans-serif !important;
+}
+
+#root[data-page="kids"] > div > header .font-mono,
+#root[data-page="kids"] > div > header .uppercase,
+#root[data-page="kids"] > div > header [class*="tracking-"],
+#root[data-page="kids"] > div > footer .font-mono,
+#root[data-page="kids"] > div > footer .uppercase,
+#root[data-page="kids"] > div > footer [class*="tracking-"] {
+  font-family: "Nunito", "Quicksand", "Rounded Mplus 1c", "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", system-ui, sans-serif !important;
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+}
+
+#root[data-page="kids"] main p,
+#root[data-page="kids"] main li,
+#root[data-page="kids"] main dd,
+#root[data-page="kids"] main summary {
+  color: #fef3c7 !important;
+}
+
+#root[data-page="kids"] main h2,
+#root[data-page="kids"] main h3 {
+  color: #fde68a !important;
+}
+
+#root[data-page="kids"] main [class*="text-slate-"] {
+  color: #fde68a !important;
+}
+
+#root[data-page="kids"] main [class*="text-cyan-"] {
+  color: #fbbf24 !important;
+}
+
+#root[data-page="kids"] main [class*="text-emerald-"] {
+  color: #a7f3d0 !important;
+}
+
+#root[data-page="kids"] main [class*="text-white"] {
+  color: #fffbeb !important;
+}
+
+#root[data-page="kids"] main h1.neon-text {
+  background: linear-gradient(90deg, #fde047, #fb923c, #f472b6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent !important;
+  text-shadow: none !important;
+  font-size: clamp(2.25rem, 5vw, 3.5rem) !important;
+  letter-spacing: 0 !important;
+  width: fit-content;
+  max-width: 100%;
+}
+
+#root[data-page="kids"] main h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#root[data-page="kids"] main h2 .kids-section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2em;
+  line-height: 1;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.2));
+}
+
+#root[data-page="kids"] main [data-kids-age] {
+  background: rgba(251, 191, 36, 0.14) !important;
+  border-color: rgba(253, 224, 71, 0.4) !important;
+  border-radius: 999px !important;
+}
+
+#root[data-page="kids"] main nav[aria-label="Breadcrumb"] {
+  font-family: inherit !important;
+  text-transform: none !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* ---- Chunky storybook cards ---- */
+#root[data-page="kids"] main [data-kids-craft],
+#root[data-page="kids"] main [data-kids-light],
+#root[data-page="kids"] main [data-kids-found],
+#root[data-page="kids"] main [data-kids-word],
+#root[data-page="kids"] main [data-kids-try] {
+  border-width: 3px !important;
+  border-style: solid !important;
+  border-radius: 1.5rem !important;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+#root[data-page="kids"] main [data-kids-craft]:hover,
+#root[data-page="kids"] main [data-kids-found]:hover,
+#root[data-page="kids"] main [data-kids-try]:hover,
+#root[data-page="kids"] main [data-kids-light]:hover,
+#root[data-page="kids"] main [data-kids-word]:hover {
+  transform: translateY(-4px);
+}
+
+/* Voyager 1: amber sun */
+#root[data-page="kids"] main [data-kids-craft="v1"] {
+  background: linear-gradient(145deg, rgba(251, 146, 60, 0.28), rgba(234, 179, 8, 0.16)) !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 8px 0 rgba(217, 119, 6, 0.5) !important;
+}
+#root[data-page="kids"] main [data-kids-craft="v1"] h3 {
+  color: #fcd34d !important;
+}
+#root[data-page="kids"] main [data-kids-craft="v1"] li {
+  border-color: rgba(253, 224, 71, 0.5) !important;
+}
+#root[data-page="kids"] main [data-kids-craft="v1"] p {
+  background: rgba(120, 53, 15, 0.25) !important;
+}
+
+/* Voyager 2: mint */
+#root[data-page="kids"] main [data-kids-craft="v2"] {
+  background: linear-gradient(145deg, rgba(52, 211, 153, 0.28), rgba(56, 189, 248, 0.12)) !important;
+  border-color: #34d399 !important;
+  box-shadow: 0 8px 0 rgba(5, 150, 105, 0.5) !important;
+}
+#root[data-page="kids"] main [data-kids-craft="v2"] h3 {
+  color: #a7f3d0 !important;
+}
+#root[data-page="kids"] main [data-kids-craft="v2"] li {
+  border-color: rgba(167, 243, 208, 0.5) !important;
+}
+#root[data-page="kids"] main [data-kids-craft="v2"] p {
+  background: rgba(6, 78, 59, 0.3) !important;
+}
+
+/* One light-day: coral + starlight yellow */
+#root[data-page="kids"] main #one-light-day-kids {
+  background: linear-gradient(135deg, rgba(244, 114, 182, 0.32), rgba(251, 191, 36, 0.32)) !important;
+  border: 3px dashed #fde047 !important;
+  border-radius: 1.75rem !important;
+  box-shadow: 0 12px 28px -8px rgba(251, 191, 36, 0.4) !important;
+}
+#root[data-page="kids"] main .kids-big-number {
+  color: #fde047 !important;
+  text-shadow: 0 2px 0 rgba(190, 24, 93, 0.35);
+}
+
+#root[data-page="kids"] main [data-kids-light] {
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(253, 224, 71, 0.38) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.25) !important;
+}
+#root[data-page="kids"] main [data-kids-light]:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-color: #fde047 !important;
+}
+
+/* Four warm discoveries */
+#root[data-page="kids"] main [data-kids-found] {
+  padding: 1.25rem !important;
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.25) !important;
+}
+#root[data-page="kids"] main [data-kids-found="0"] {
+  background: linear-gradient(145deg, rgba(251, 113, 133, 0.3), rgba(244, 63, 94, 0.12)) !important;
+  border-color: #fb7185 !important;
+  box-shadow: 0 8px 0 rgba(190, 24, 93, 0.45) !important;
+}
+#root[data-page="kids"] main [data-kids-found="0"] h3 {
+  color: #fecdd3 !important;
+}
+#root[data-page="kids"] main [data-kids-found="1"] {
+  background: linear-gradient(145deg, rgba(251, 191, 36, 0.3), rgba(245, 158, 11, 0.12)) !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 8px 0 rgba(180, 83, 9, 0.45) !important;
+}
+#root[data-page="kids"] main [data-kids-found="1"] h3 {
+  color: #fde68a !important;
+}
+#root[data-page="kids"] main [data-kids-found="2"] {
+  background: linear-gradient(145deg, rgba(52, 211, 153, 0.3), rgba(16, 185, 129, 0.12)) !important;
+  border-color: #34d399 !important;
+  box-shadow: 0 8px 0 rgba(5, 150, 105, 0.45) !important;
+}
+#root[data-page="kids"] main [data-kids-found="2"] h3 {
+  color: #a7f3d0 !important;
+}
+#root[data-page="kids"] main [data-kids-found="3"] {
+  background: linear-gradient(145deg, rgba(192, 132, 252, 0.3), rgba(139, 92, 246, 0.12)) !important;
+  border-color: #c084fc !important;
+  box-shadow: 0 8px 0 rgba(109, 40, 217, 0.45) !important;
+}
+#root[data-page="kids"] main [data-kids-found="3"] h3 {
+  color: #e9d5ff !important;
+}
+
+#root[data-page="kids"] main .kids-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 0.75rem;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 1.6rem;
+  line-height: 1;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Flashcards */
+#root[data-page="kids"] main [data-kids-word] {
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(253, 224, 71, 0.35) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.25) !important;
+}
+#root[data-page="kids"] main [data-kids-word]:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-color: #fde047 !important;
+  transform: translateY(-4px) rotate(-0.5deg);
+}
+#root[data-page="kids"] main [data-kids-word] dt {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  background: #fbbf24;
+  color: #1e1b4b !important;
+  font-size: 0.9rem !important;
+  font-weight: 800 !important;
+  text-transform: none !important;
+}
+
+#root[data-page="kids"] main [data-kids-try] {
+  background: rgba(255, 255, 255, 0.09) !important;
+  border-color: rgba(253, 224, 71, 0.35) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.25) !important;
+}
+#root[data-page="kids"] main [data-kids-try]:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-color: #fde047 !important;
+}
+
+/* Quiz: question badges, colourful borders, Bingo answers */
+#root[data-page="kids"] main #quiz details {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 3px solid #f472b6 !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 6px 0 rgba(190, 24, 93, 0.3) !important;
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+#root[data-page="kids"] main #quiz details:nth-of-type(1) {
+  border-color: #fb7185 !important;
+}
+#root[data-page="kids"] main #quiz details:nth-of-type(2) {
+  border-color: #fbbf24 !important;
+}
+#root[data-page="kids"] main #quiz details:nth-of-type(3) {
+  border-color: #34d399 !important;
+}
+#root[data-page="kids"] main #quiz details:hover {
+  transform: translateY(-2px);
+}
+#root[data-page="kids"] main #quiz details[open] {
+  background: rgba(253, 224, 71, 0.14) !important;
+  border-color: #fde047 !important;
+  transform: none;
+}
+#root[data-page="kids"] main #quiz summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  list-style: none;
+}
+#root[data-page="kids"] main #quiz summary::-webkit-details-marker {
+  display: none;
+}
+#root[data-page="kids"] main #quiz summary::marker {
+  content: "";
+}
+#root[data-page="kids"] main #quiz summary::after {
+  content: "＋";
+  margin-left: auto;
+  color: #fde047;
+  font-weight: 900;
+}
+#root[data-page="kids"] main #quiz details[open] summary::after {
+  content: "－";
+}
+#root[data-page="kids"] main .kids-question-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: #f472b6;
+  color: #1e1b4b !important;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+#root[data-page="kids"] main .kids-answer {
+  background: rgba(253, 224, 71, 0.18) !important;
+  border-top: 2px dashed rgba(253, 224, 71, 0.5) !important;
+}
+#root[data-page="kids"] main .kids-bingo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  color: #fde047 !important;
+  font-weight: 900;
+}
+#root[data-page="kids"] main .kids-answer-label {
+  color: #fef3c7 !important;
+  font-weight: 700;
+}
+
+/* Golden Record fact + grown-ups note */
+#root[data-page="kids"] main [data-kids-fact] {
+  background: linear-gradient(145deg, rgba(251, 191, 36, 0.18), rgba(244, 114, 182, 0.1)) !important;
+  border-color: rgba(253, 224, 71, 0.4) !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 6px 0 rgba(180, 83, 9, 0.3) !important;
+}
+#root[data-page="kids"] main [data-kids-grownups] > div {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(253, 224, 71, 0.35) !important;
+  border-radius: 1.25rem !important;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.25) !important;
+}
+#root[data-page="kids"] main [data-kids-grownups] * {
+  color: #fef3c7 !important;
+}
+
+/* Related links */
+#root[data-page="kids"] main aside.hud-panel {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 3px solid rgba(253, 224, 71, 0.35) !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.22) !important;
+}
+#root[data-page="kids"] main aside.hud-panel::before,
+#root[data-page="kids"] main aside.hud-panel::after {
+  border-color: #fbbf24 !important;
+}
+#root[data-page="kids"] main aside.hud-panel h2 {
+  color: #fde68a !important;
+}
+#root[data-page="kids"] main aside.hud-panel a {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(253, 224, 71, 0.25) !important;
+  border-radius: 1rem !important;
+}
+#root[data-page="kids"] main aside.hud-panel a:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: #fde047 !important;
+}
+
+/* Header and footer: warm frame around the storybook page */
+#root[data-page="kids"] > div > header {
+  background: rgba(30, 27, 75, 0.9) !important;
+  border-color: rgba(253, 224, 71, 0.25) !important;
+}
+#root[data-page="kids"] > div > header nav a {
+  color: #fef3c7 !important;
+}
+#root[data-page="kids"] > div > header nav a[aria-current="page"] {
+  background: rgba(251, 191, 36, 0.18) !important;
+  color: #fde68a !important;
+}
+#root[data-page="kids"] > div > header [class*="text-cyan-"] {
+  color: #fbbf24 !important;
+}
+#root[data-page="kids"] > div > header select {
+  background: rgba(30, 27, 75, 0.9) !important;
+  border-color: rgba(253, 224, 71, 0.35) !important;
+  color: #fef3c7 !important;
+}
+#root[data-page="kids"] > div > header button[aria-controls="mobile-nav"] {
+  border-color: rgba(253, 224, 71, 0.35) !important;
+}
+#root[data-page="kids"] > div > header a[aria-label="Voyager Tracker home"] > span:first-child {
+  background: linear-gradient(135deg, #fbbf24, #f472b6) !important;
+  color: #1e1b4b !important;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.35) !important;
+}
+
+/* On narrow phones the brand text pushes the language/kids/menu controls
+   off-screen; keep the logo mark and give the controls room. */
+@media (max-width: 479px) {
+  #root[data-page="kids"] > div > header a[aria-label="Voyager Tracker home"] > span:last-child {
+    display: none !important;
+  }
+}
+
+#root[data-page="kids"] > div > footer {
+  background: rgba(30, 27, 75, 0.86) !important;
+  border-color: rgba(253, 224, 71, 0.22) !important;
+}
+#root[data-page="kids"] > div > footer [class*="text-cyan-"] {
+  color: #fbbf24 !important;
+}
+#root[data-page="kids"] > div > footer [class*="text-slate-"] {
+  color: #fde68a !important;
+}
+#root[data-page="kids"] > div > footer .text-white {
+  color: #fffbeb !important;
+}
+#root[data-page="kids"] > div > footer .mt-10.rounded-xl {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(253, 224, 71, 0.25) !important;
+}
+#root[data-page="kids"] > div > footer a[href*="github.com"] {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(253, 224, 71, 0.35) !important;
+}
+#root[data-page="kids"] > div > footer .mt-6.border-t {
+  border-color: rgba(253, 224, 71, 0.2) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #root[data-page="kids"] main [data-kids-craft],
+  #root[data-page="kids"] main [data-kids-light],
+  #root[data-page="kids"] main [data-kids-found],
+  #root[data-page="kids"] main [data-kids-word],
+  #root[data-page="kids"] main [data-kids-try] {
+    transition: none !important;
+  }
+  #root[data-page="kids"] main [data-kids-craft]:hover,
+  #root[data-page="kids"] main [data-kids-light]:hover,
+  #root[data-page="kids"] main [data-kids-found]:hover,
+  #root[data-page="kids"] main [data-kids-word]:hover,
+  #root[data-page="kids"] main [data-kids-try]:hover {
+    transform: none !important;
+  }
+}

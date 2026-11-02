@@ -17,7 +17,14 @@ import { PAGE_LOADERS, isPageKey } from './pages/registry';
 import '@fontsource/jetbrains-mono/latin-400.css';
 import '@fontsource/jetbrains-mono/latin-500.css';
 import '@fontsource/jetbrains-mono/latin-700.css';
+// Rounded storybook font, used only by the kids page theme.
+import '@fontsource/nunito/latin-400.css';
+import '@fontsource/nunito/latin-600.css';
+import '@fontsource/nunito/latin-700.css';
+import '@fontsource/nunito/latin-800.css';
+import '@fontsource/nunito/latin-900.css';
 import './index.css';
+import './kids-theme.css';
 
 const rootEl = document.getElementById('root') as HTMLElement;
 const raw = rootEl.dataset.page;

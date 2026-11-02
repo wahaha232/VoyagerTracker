@@ -15,6 +15,7 @@
     "og": "esbuild scripts/gen-og.ts --bundle --platform=node --format=esm --external:@resvg/resvg-js --outfile=node_modules/.cache/gen-og.mjs --log-level=warning && node node_modules/.cache/gen-og.mjs"
   },
   "dependencies": {
+    "@fontsource/nunito": "^5.3.0",
     "@react-three/drei": "^10.0.0",
     "@react-three/fiber": "^9.0.0",
     "lucide-react": "^0.454.0",

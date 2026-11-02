@@ -163,12 +163,15 @@ export function BiSection({
   title,
   kicker,
   lead,
+  icon,
   children,
 }: {
   id?: string;
   title: Bi;
   kicker?: Bi;
   lead?: Bi;
+  /** Optional decorative icon (kids theme); ignored elsewhere. */
+  icon?: string;
   children: ReactNode;
 }) {
   const locale = useLang();
@@ -178,6 +181,7 @@ export function BiSection({
       title={txt(title, locale)}
       kicker={kicker ? txt(kicker, locale) : undefined}
       lead={lead ? txt(lead, locale) : undefined}
+      icon={icon}
     >
       {children}
     </UiSection>

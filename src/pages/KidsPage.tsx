@@ -1,11 +1,15 @@
-/**
+﻿/**
  * KidsPage — /kids.html  (EN / 繁中 / Español)
  *
  * A short, friendly guide for younger readers: short sentences, explained
  * words, big numbers and a small quiz. Advertising is deliberately not
  * loaded on this page (see scripts/gen-html.mjs).
+ *
+ * The warm storybook theme lives in src/kids-theme.css and is scoped to
+ * #root[data-page="kids"] so no other page is affected.
  */
 
+import { useEffect } from 'react';
 import { pageUrl } from '../constants/site';
 import { BiArticleHeader, BiSection, bi, txt, useLang } from '../components/content';
 import { Callout, RelatedLinks } from '../components/ui';
@@ -98,7 +102,7 @@ const LIGHT_CARDS: { title: Tri; text: Tri }[] = [
   },
 ];
 
-const FOUND: { title: Tri; text: Tri }[] = [
+const FOUND: { title: Tri; text: Tri; badge: string }[] = [
   {
     title: T('Volcanoes on Io', '木衛一的火山', 'Volcanes en Ío'),
     text: T(
@@ -106,6 +110,7 @@ const FOUND: { title: Tri; text: Tri }[] = [
       '航海家一號看到木星衛星木衛一上有火山正在噴發——這是地球以外首次發現的活火山。',
       'La Voyager 1 vio volcanes en erupción en Ío, una luna de Júpiter: los primeros volcanes activos hallados fuera de la Tierra.',
     ),
+    badge: '🌋',
   },
   {
     title: T('Saturn’s rings', '土星環', 'Los anillos de Saturno'),
@@ -114,6 +119,7 @@ const FOUND: { title: Tri; text: Tri }[] = [
       '土星環由數千道細窄的小環組成，並不是一個實心的圓環。',
       'Los anillos están formados por miles de anillos estrechos, no por uno solo y macizo.',
     ),
+    badge: '🪐',
   },
   {
     title: T('The ice giants', '冰巨行星', 'Los gigantes de hielo'),
@@ -122,6 +128,7 @@ const FOUND: { title: Tri; text: Tri }[] = [
       '航海家二號是史上唯一造訪天王星與海王星的太空船。',
       'La Voyager 2 es la única nave que ha visitado Urano y Neptuno.',
     ),
+    badge: '🧊',
   },
   {
     title: T('The Pale Blue Dot', '蒼藍小點', 'El pálido punto azul'),
@@ -130,6 +137,7 @@ const FOUND: { title: Tri; text: Tri }[] = [
       '1990 年，航海家一號回頭從很遠的地方拍下地球。我們整個世界看起來就像一粒小小的藍點。',
       'En 1990 la Voyager 1 miró hacia atrás y fotografió la Tierra desde muy lejos. Todo nuestro mundo parecía un pequeño punto azul.',
     ),
+    badge: '🌍',
   },
 ];
 
@@ -206,6 +214,11 @@ const QUIZ: { q: Tri; a: Tri }[] = [
 export default function KidsPage() {
   const locale = useLang();
 
+  useEffect(() => {
+    document.body.classList.add('kids-body');
+    return () => document.body.classList.remove('kids-body');
+  }, []);
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
       <BiArticleHeader
@@ -218,7 +231,10 @@ export default function KidsPage() {
         )}
       />
 
-      <p className="mb-10 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300">
+      <p
+        data-kids-age
+        className="mb-10 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-cyan-300"
+      >
         <SatelliteIcon className="h-4 w-4" />
         {txt(
           T('Ages 8–12 · about 4 minutes', '8–12 歲 · 約 4 分鐘', '8–12 años · unos 4 minutos'),
@@ -226,10 +242,18 @@ export default function KidsPage() {
         )}
       </p>
 
-      <BiSection id="meet" title={bi('Meet the two explorers', '認識兩位探險家', 'Conoce a los dos exploradores')}>
+      <BiSection
+        id="meet"
+        icon="🚀"
+        title={bi('Meet the two explorers', '認識兩位探險家', 'Conoce a los dos exploradores')}
+      >
         <div className="grid gap-4 lg:grid-cols-2">
-          {EXPLORERS.map((craft) => (
-            <article key={craft.name} className={`rounded-2xl border p-5 ${craft.ring}`}>
+          {EXPLORERS.map((craft, index) => (
+            <article
+              key={craft.name}
+              data-kids-craft={index === 0 ? 'v1' : 'v2'}
+              className={`rounded-2xl border p-5 ${craft.ring}`}
+            >
               <h3 className={`text-2xl font-black tracking-wide ${craft.accent}`}>{craft.name}</h3>
               <ul className="mt-3 space-y-2 text-[15px] leading-relaxed text-slate-200">
                 {craft.lines.map((line) => (
@@ -246,7 +270,11 @@ export default function KidsPage() {
         </div>
       </BiSection>
 
-      <BiSection id="distance" title={bi('How far away are they?', '它們有多遠？', '¿A qué distancia están?')}>
+      <BiSection
+        id="distance"
+        icon="📏"
+        title={bi('How far away are they?', '它們有多遠？', '¿A qué distancia están?')}
+      >
         <p className="mb-5 max-w-3xl text-lg leading-relaxed text-slate-300">
           {txt(
             T(
@@ -258,11 +286,14 @@ export default function KidsPage() {
           )}
         </p>
 
-        <div className="mb-5 rounded-2xl border border-cyan-500/40 bg-gradient-to-br from-cyan-500/10 to-emerald-500/5 p-6 text-center">
+        <div
+          id="one-light-day-kids"
+          className="mb-5 rounded-2xl border border-cyan-500/40 bg-gradient-to-br from-cyan-500/10 to-emerald-500/5 p-6 text-center"
+        >
           <p className="font-mono text-xs font-bold uppercase tracking-[0.25em] text-cyan-300">
             {txt(T('One light-day', '一光日', 'Un día-luz'), locale)}
           </p>
-          <p className="mt-2 text-3xl font-black text-white sm:text-4xl">
+          <p className="kids-big-number mt-2 text-3xl font-black text-white sm:text-4xl">
             {txt(T('25.9 billion km', '259 億公里', '25 900 millones de km'), locale)}
           </p>
           <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-relaxed text-slate-200">
@@ -279,7 +310,11 @@ export default function KidsPage() {
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {LIGHT_CARDS.map((card) => (
-            <div key={card.title.en} className="rounded-xl border border-slate-800 bg-space-900/40 p-4">
+            <div
+              key={card.title.en}
+              data-kids-light
+              className="rounded-xl border border-slate-800 bg-space-900/40 p-4"
+            >
               <p className="font-semibold text-white">{txt(card.title, locale)}</p>
               <p className="mt-1 text-sm leading-relaxed text-slate-300">{txt(card.text, locale)}</p>
             </div>
@@ -287,10 +322,21 @@ export default function KidsPage() {
         </div>
       </BiSection>
 
-      <BiSection id="found" title={bi('Cool things Voyager found', '航海家的酷發現', 'Cosas geniales que encontró Voyager')}>
+      <BiSection
+        id="found"
+        icon="🔭"
+        title={bi('Cool things Voyager found', '航海家的酷發現', 'Cosas geniales que encontró Voyager')}
+      >
         <div className="grid gap-4 sm:grid-cols-2">
-          {FOUND.map((item) => (
-            <div key={item.title.en} className="rounded-2xl border border-slate-700/60 bg-space-900/40 p-5">
+          {FOUND.map((item, index) => (
+            <div
+              key={item.title.en}
+              data-kids-found={index}
+              className="rounded-2xl border border-slate-700/60 bg-space-900/40 p-5"
+            >
+              <span className="kids-badge" aria-hidden="true">
+                {item.badge}
+              </span>
               <h3 className="text-lg font-bold text-white">{txt(item.title, locale)}</h3>
               <p className="mt-2 text-[15px] leading-relaxed text-slate-300">{txt(item.text, locale)}</p>
             </div>
@@ -298,7 +344,11 @@ export default function KidsPage() {
         </div>
       </BiSection>
 
-      <BiSection id="golden-record" title={bi('A message for the stars', '給星星的訊息', 'Un mensaje para las estrellas')}>
+      <BiSection
+        id="golden-record"
+        icon="💿"
+        title={bi('A message for the stars', '給星星的訊息', 'Un mensaje para las estrellas')}
+      >
         <div className="grid gap-5 lg:grid-cols-[1.3fr_1fr]">
           <p className="text-lg leading-relaxed text-slate-300">
             {txt(
@@ -310,7 +360,7 @@ export default function KidsPage() {
               locale,
             )}
           </p>
-          <div className="rounded-2xl border border-amber-400/30 bg-amber-400/5 p-5">
+          <div data-kids-fact className="rounded-2xl border border-amber-400/30 bg-amber-400/5 p-5">
             <p className="font-mono text-xs font-bold uppercase tracking-widest text-amber-300">
               {txt(T('Did you know?', '你知道嗎？', '¿Lo sabías?'), locale)}
             </p>
@@ -335,10 +385,18 @@ export default function KidsPage() {
         </div>
       </BiSection>
 
-      <BiSection id="words" title={bi('Words to know', '認識這些詞', 'Palabras que debes saber')}>
+      <BiSection
+        id="words"
+        icon="📖"
+        title={bi('Words to know', '認識這些詞', 'Palabras que debes saber')}
+      >
         <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {GLOSSARY.map((item) => (
-            <div key={item.term.en} className="rounded-xl border border-slate-800 bg-space-900/40 p-4">
+            <div
+              key={item.term.en}
+              data-kids-word
+              className="rounded-xl border border-slate-800 bg-space-900/40 p-4"
+            >
               <dt className="font-mono text-xs font-bold uppercase tracking-widest text-cyan-300">{txt(item.term, locale)}</dt>
               <dd className="mt-1.5 text-sm leading-relaxed text-slate-300">{txt(item.meaning, locale)}</dd>
             </div>
@@ -346,28 +404,41 @@ export default function KidsPage() {
         </dl>
       </BiSection>
 
-      <BiSection id="quiz" title={bi('Quick quiz', '小測驗', 'Prueba rápida')}>
+      <BiSection id="quiz" icon="🎯" title={bi('Quick quiz', '小測驗', 'Prueba rápida')}>
         <p className="mb-4 max-w-3xl text-slate-300">
           {txt(
-            T('Read the question, say your answer, then open it to check.', '先讀題目、說出答案，再打開看看對不對。', 'Lee la pregunta, di tu respuesta y ábrela para comprobarla.'),
+            T(
+              'Read the question, say your answer, then open it to check.',
+              '先讀題目、說出答案，再打開看看對不對。',
+              'Lee la pregunta, di tu respuesta y ábrela para comprobarla.',
+            ),
             locale,
           )}
         </p>
         <div className="space-y-3">
-          {QUIZ.map((item) => (
+          {QUIZ.map((item, index) => (
             <details key={item.q.en} className="rounded-xl border border-slate-800 bg-space-900/40">
               <summary className="cursor-pointer p-4 text-base font-semibold text-slate-100 hover:text-cyan-300">
-                {txt(item.q, locale)}
+                <span className="kids-question-badge">
+                  <span aria-hidden="true">❓</span>
+                  {txt(T('Question', '第', 'Pregunta'), locale)} {index + 1}
+                </span>
+                <span>{txt(item.q, locale)}</span>
               </summary>
-              <p className="border-t border-slate-800 px-4 py-3 text-[15px] leading-relaxed text-cyan-100">
-                {txt(item.a, locale)}
-              </p>
+              <div className="kids-answer border-t border-slate-800 px-4 py-3">
+                <p className="kids-bingo">
+                  <span aria-hidden="true">🎉</span>
+                  {txt(T('Bingo!', '答對了！', '¡Bingo!'), locale)}
+                  <span className="kids-answer-label">{txt(T('Answer', '答案', 'Respuesta'), locale)}:</span>
+                </p>
+                <p className="mt-1 text-[15px] leading-relaxed text-cyan-100">{txt(item.a, locale)}</p>
+              </div>
             </details>
           ))}
         </div>
       </BiSection>
 
-      <BiSection id="try" title={bi('Try it yourself', '自己試試看', 'Pruébalo tú')}>
+      <BiSection id="try" icon="🎮" title={bi('Try it yourself', '自己試試看', 'Pruébalo tú')}>
         <div className="grid gap-3 sm:grid-cols-3">
           {[
             {
@@ -389,6 +460,7 @@ export default function KidsPage() {
             <a
               key={link.href}
               href={link.href}
+              data-kids-try
               className="group rounded-2xl border border-slate-700/60 bg-space-900/40 p-5 transition-colors hover:border-cyan-400/50"
             >
               <span className="flex items-start justify-between gap-2 font-semibold text-white group-hover:text-cyan-300">
@@ -401,16 +473,18 @@ export default function KidsPage() {
         </div>
       </BiSection>
 
-      <Callout tone="emerald" title={txt(T('For grown-ups', '給家長與老師', 'Para adultos'), locale)}>
-        {txt(
-          T(
-            'This page is written for readers around 8–12 years old: sentences are short and difficult words are explained. The full articles are linked below. This page deliberately loads no advertising script.',
-            '本頁為約 8 至 12 歲的讀者撰寫：句子較短，困難的詞彙都有解釋。下方連結到完整文章。本頁刻意不載入廣告程式碼。',
-            'Esta página está escrita para lectores de unos 8 a 12 años: las frases son cortas y las palabras difíciles se explican. Los artículos completos están enlazados abajo. Esta página no carga el script de publicidad a propósito.',
-          ),
-          locale,
-        )}
-      </Callout>
+      <div data-kids-grownups>
+        <Callout tone="emerald" title={txt(T('For grown-ups', '給家長與老師', 'Para adultos'), locale)}>
+          {txt(
+            T(
+              'This page is written for readers around 8–12 years old: sentences are short and difficult words are explained. The full articles are linked below. This page deliberately loads no advertising script.',
+              '本頁為約 8 至 12 歲的讀者撰寫：句子較短，困難的詞彙都有解釋。下方連結到完整文章。本頁刻意不載入廣告程式碼。',
+              'Esta página está escrita para lectores de unos 8 a 12 años: las frases son cortas y las palabras difíciles se explican. Los artículos completos están enlazados abajo. Esta página no carga el script de publicidad a propósito.',
+            ),
+            locale,
+          )}
+        </Callout>
+      </div>
 
       <RelatedLinks items={['voyager-1', 'voyager-2', 'golden-record', 'timeline', 'tools', 'faq']} />
     </div>
