@@ -9,7 +9,7 @@
 import { pageUrl, type PageKey } from '../constants/site';
 import { LinkArrow } from '../components/icons';
 import ClientOnly from '../components/ClientOnly';
-import ModelSlot from '../components/ModelSlot';
+import NasaEyesEmbed from '../components/NasaEyesEmbed';
 import TrackerSection from '../components/TrackerSection';
 import LightDayCountdown from '../components/LightDayCountdown';
 import { RelatedLinks } from '../components/ui';
@@ -167,13 +167,23 @@ export default function HomePage() {
 
           <div>
             <div className="hud-panel relative h-[300px] w-full overflow-hidden rounded-2xl sm:h-[420px]">
-              <ClientOnly>
-                <ModelSlot />
-              </ClientOnly>
-              <div className="pointer-events-none absolute bottom-3 left-4 rounded-md border border-cyan-500/20 bg-space-950/60 px-3 py-1.5 font-mono text-[10px] uppercase tracking-widest text-cyan-300/80">
-                {t('Drag to rotate · simplified 3D Voyager model', '拖曳旋轉 · 簡化的航海家 3D 模型', 'Arrastra para girar · modelo 3D simplificado')}
-              </div>
+              <NasaEyesEmbed variant="compact" />
             </div>
+            <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] leading-relaxed text-slate-400">
+              {t(
+                'Interactive 3D: NASA/JPL Eyes on the Solar System.',
+                '互動 3D：NASA/JPL Eyes on the Solar System。',
+                '3D interactivo: NASA/JPL Eyes on the Solar System.',
+              )}{' '}
+              <a
+                href="https://eyes.nasa.gov/apps/solar-system/#/sc_voyager_1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-cyan-300 underline underline-offset-2 hover:text-cyan-200"
+              >
+                {t('Source: NASA/JPL', '來源：NASA/JPL', 'Fuente: NASA/JPL')}
+              </a>
+            </p>
           </div>
         </div>
       </section>

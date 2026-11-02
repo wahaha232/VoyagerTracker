@@ -187,29 +187,31 @@ function CountdownWidget() {
         ))}
       </select>
 
-      <dl className="mt-3 space-y-1.5 text-xs leading-relaxed">
-        <div>
-          <dt className="font-mono uppercase tracking-widest text-slate-400">
-            {pick({ en: 'Target', zh: '目標時刻', es: 'Objetivo' }, locale)}
-          </dt>
-          <dd className="text-slate-200">{target}</dd>
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        <div className="rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-3">
+          <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-300">
+            {pick({ en: 'Arrival in', zh: '抵達時間', es: 'Llegada en' }, locale)} {pick(zone.city, locale)}
+          </p>
+          <p key={zoneId} className="mt-1 text-sm font-semibold leading-relaxed text-white">
+            {target}
+          </p>
+          <p className="mt-1 font-mono text-[11px] text-cyan-200">{offsetLabel(zoneId, LIGHT_DAY_INSTANT_MS)}</p>
         </div>
-        <div>
-          <dt className="font-mono uppercase tracking-widest text-slate-400">
+        <div className="rounded-xl border border-slate-700/60 bg-space-900/70 p-3">
+          <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">
             {pick({ en: 'Now in', zh: '目前時間', es: 'Ahora en' }, locale)} {pick(zone.city, locale)}
-          </dt>
-          <dd className="font-mono text-slate-300">
-            {localNow} <span className="text-cyan-300">{offsetLabel(zoneId, LIGHT_DAY_INSTANT_MS)}</span>
-          </dd>
+          </p>
+          <p className="mt-1 font-mono text-sm leading-relaxed text-slate-200">{localNow}</p>
+          <p className="mt-1 font-mono text-[11px] text-slate-400">{offsetLabel(zoneId, LIGHT_DAY_INSTANT_MS)}</p>
         </div>
-      </dl>
+      </div>
 
-      <p className="mt-3 text-[11px] leading-relaxed text-slate-400">
+      <p className="mt-3 rounded-lg border border-amber-400/30 bg-amber-400/5 px-3 py-2 text-[11px] leading-relaxed text-amber-100">
         {pick(
           {
-            en: 'The moment is the same everywhere; only the clock reading changes with the time zone.',
-            zh: '這個瞬間在全球都相同，只有時鐘讀數會隨時區改變。',
-            es: 'El instante es el mismo en todo el mundo; solo cambia la lectura del reloj según la zona.',
+            en: 'The countdown is the same in every time zone because one light-day is one fixed instant. Changing the zone changes the arrival clock reading and date — not the remaining time.',
+            zh: '倒數在所有時區都相同，因為一光日是一個固定的瞬間。切換時區只會改變抵達時的時鐘讀數與日期，不會改變剩餘時間。',
+            es: 'La cuenta atrás es la misma en todas las zonas porque un día-luz es un instante fijo. Cambiar de zona cambia la hora y la fecha de llegada, no el tiempo restante.',
           },
           locale,
         )}
