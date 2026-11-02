@@ -7,6 +7,7 @@ import { RelatedLinks } from '../components/ui';
 import { BiArticleHeader, BiSection, bi, FactGrid, txt, useLang } from '../components/content';
 import TrackerSection from '../components/TrackerSection';
 import LightDayCountdown from '../components/LightDayCountdown';
+import OneLightDayEntry from '../components/oneLightDay/OneLightDayEntry';
 import NasaEyesEmbed from '../components/NasaEyesEmbed';
 import VoyagerBlogFeed from '../components/VoyagerBlogFeed';
 import { InstrumentStatusList, PageQA, SourcesNote } from '../components/MissionExtras';
@@ -129,6 +130,8 @@ export default function Voyager1Page() {
           'La Voyager 1 es el objeto humano más lejano y el primero en llegar al espacio interestelar. Lanzada en 1977, exploró Júpiter y Saturno, fotografió la Tierra como un «pálido punto azul» y sigue enviando datos desde más allá de la heliosfera.',
         )}
       />
+
+      <OneLightDayEntry />
 
       <LightDayCountdown />
 
