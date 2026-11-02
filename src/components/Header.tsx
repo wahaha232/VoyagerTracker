@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { ALL_PAGES, HEADER_NAV, pageLabel, pageUrl, type PageKey } from '../constants/site';
 import { useI18n } from '../i18n/context';
 import type { Locale } from '../types/voyager';
-import { CloseIcon, MenuIcon, SatelliteIcon } from './icons';
+import { CloseIcon, KidsIcon, MenuIcon, SatelliteIcon } from './icons';
 
 interface HeaderProps {
   current: PageKey;
@@ -103,6 +103,19 @@ export default function Header({ current }: HeaderProps) {
               </option>
             ))}
           </select>
+          <a
+            href={pageUrl('kids')}
+            aria-current={current === 'kids' ? 'page' : undefined}
+            aria-label={es ? 'Voyager para niños' : zh ? '給孩子的航海家號' : 'Voyager for kids'}
+            title={es ? 'Voyager para niños' : zh ? '給孩子的航海家號' : 'Voyager for kids'}
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-colors ${
+              current === 'kids'
+                ? 'border-amber-300/70 bg-amber-400/20 text-amber-100'
+                : 'border-amber-400/30 bg-amber-400/10 text-amber-200 hover:border-amber-300/70 hover:text-white'
+            }`}
+          >
+            <KidsIcon className="h-5 w-5" />
+          </a>
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}

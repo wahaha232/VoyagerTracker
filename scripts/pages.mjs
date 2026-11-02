@@ -102,6 +102,17 @@ export const PAGES = [
     priority: '0.7',
   },
   {
+    key: 'kids',
+    file: 'kids.html',
+    name: 'Voyager for Kids',
+    title: 'Voyager for Kids — A Simple Guide to the Two Spacecraft',
+    description:
+      'A short, friendly guide to NASA’s Voyager 1 and Voyager 2 for younger readers: the two robot explorers, how far away they are, what they found, a light-day, a glossary and a quick quiz.',
+    schema: 'Article',
+    changefreq: 'monthly',
+    priority: '0.7',
+  },
+  {
     key: 'why-voyager-matters',
     file: 'why-voyager-matters.html',
     name: 'Why Voyager Still Matters',

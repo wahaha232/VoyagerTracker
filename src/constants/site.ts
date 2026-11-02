@@ -18,6 +18,7 @@ export type PageKey =
   | 'timeline'
   | 'discoveries'
   | 'golden-record'
+  | 'kids'
   | 'why-voyager-matters'
   | 'tools'
   | 'how-it-works'
@@ -111,6 +112,15 @@ export const PAGES: Record<PageKey, PageInfo> = {
       en: 'What is on the record each Voyager carries, and why it was made.',
       zh: '每艘航海家號攜帶的唱片裡有什麼，以及它為何被製作。',
       es: 'Qué contiene el disco que lleva cada Voyager y por qué se hizo.',
+    },
+  },
+  kids: {
+    href: 'kids.html',
+    label: { en: 'For Kids', zh: '兒童版', es: 'Para niños' },
+    description: {
+      en: 'A short, friendly guide to Voyager for younger readers: the two spacecraft, how far they are, and what they found.',
+      zh: '寫給年輕讀者的航海家號簡明指南：兩艘探測器、它們有多遠，以及它們發現了什麼。',
+      es: 'Una guía breve y amable de Voyager para lectores jóvenes: las dos naves, su distancia y sus descubrimientos.',
     },
   },
   'why-voyager-matters': {
@@ -219,6 +229,7 @@ export const HEADER_NAV: PageKey[] = [
   'timeline',
   'discoveries',
   'golden-record',
+  'kids',
   'tools',
   'faq',
   'sources',
@@ -235,6 +246,7 @@ export const ALL_PAGES: PageKey[] = [
   'timeline',
   'discoveries',
   'golden-record',
+  'kids',
   'why-voyager-matters',
   'tools',
   'how-it-works',

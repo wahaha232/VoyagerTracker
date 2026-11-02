@@ -18,6 +18,7 @@ import MissionPage from './pages/MissionPage';
 import TimelinePage from './pages/TimelinePage';
 import DiscoveriesPage from './pages/DiscoveriesPage';
 import GoldenRecordPage from './pages/GoldenRecordPage';
+import KidsPage from './pages/KidsPage';
 import WhyVoyagerMattersPage from './pages/WhyVoyagerMattersPage';
 import ToolsPage from './pages/ToolsPage';
 import HowItWorksPage from './pages/HowItWorksPage';
@@ -39,6 +40,7 @@ const PAGES: Record<PageKey, ComponentType> = {
   timeline: TimelinePage,
   discoveries: DiscoveriesPage,
   'golden-record': GoldenRecordPage,
+  kids: KidsPage,
   'why-voyager-matters': WhyVoyagerMattersPage,
   tools: ToolsPage,
   'how-it-works': HowItWorksPage,

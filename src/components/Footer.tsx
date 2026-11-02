@@ -15,7 +15,7 @@ const GROUPS: { title: Record<Locale, string>; keys: PageKey[] }[] = [
   },
   {
     title: { 'en-US': 'Learn', 'zh-TW': '認識任務', es: 'Aprende' },
-    keys: ['mission', 'discoveries', 'golden-record', 'why-voyager-matters', 'tools'],
+    keys: ['mission', 'discoveries', 'golden-record', 'kids', 'why-voyager-matters', 'tools'],
   },
   {
     title: { 'en-US': 'Project', 'zh-TW': '關於本站', es: 'Proyecto' },

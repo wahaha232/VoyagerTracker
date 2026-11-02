@@ -19,6 +19,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 
 if (ADSENSE_CLIENT && !/^ca-pub-\d{10,20}$/.test(ADSENSE_CLIENT)) throw new Error('ADSENSE_CLIENT must look like ca-pub-0000000000000000');
+// The For Kids page deliberately omits the advertising script below.
 const ADS = ADSENSE_CLIENT
   ? `
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}" crossorigin="anonymous"></script>`
@@ -61,7 +62,7 @@ for (const p of [...PAGES, NOT_FOUND]) {
     ${headMeta(p)}
     <meta name="theme-color" content="#020617" />
     <link rel="icon" type="image/svg+xml" href="/VoyagerTracker/favicon.svg" />
-    <!--jsonld-->${ADS}
+    <!--jsonld-->${p.key === 'kids' ? '' : ADS}
   </head>
   <body>
     <div id="root" data-page="${p.key}"></div>

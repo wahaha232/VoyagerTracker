@@ -18,6 +18,7 @@ export const PAGE_LOADERS: Record<PageKey, Loader> = {
   timeline: () => import('./TimelinePage'),
   discoveries: () => import('./DiscoveriesPage'),
   'golden-record': () => import('./GoldenRecordPage'),
+  kids: () => import('./KidsPage'),
   'why-voyager-matters': () => import('./WhyVoyagerMattersPage'),
   tools: () => import('./ToolsPage'),
   'how-it-works': () => import('./HowItWorksPage'),

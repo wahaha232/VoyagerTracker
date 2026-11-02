@@ -19,6 +19,17 @@ export function SatelliteIcon({ className }: IconProps) {
   );
 }
 
+export function KidsIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9 10h.01" />
+      <path d="M15 10h.01" />
+      <path d="M8.5 14.5c1 1.5 2.3 2.2 3.5 2.2s2.5-.7 3.5-2.2" />
+    </svg>
+  );
+}
+
 export function MenuIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={className} aria-hidden="true">

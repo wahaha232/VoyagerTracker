@@ -327,7 +327,7 @@ export default function Voyager1Page() {
         ]}
       />
 
-      <RelatedLinks items={['compare', 'voyager-2', 'timeline', 'why-voyager-matters', 'tools']} />
+      <RelatedLinks items={['compare', 'voyager-2', 'timeline', 'why-voyager-matters', 'kids', 'tools']} />
     </div>
   );
 }

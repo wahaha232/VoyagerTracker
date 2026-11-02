@@ -86,6 +86,12 @@ const EXPLORE: { key: PageKey; en: string; zh: string; es: string }[] = [
     es: 'Volcanes en Ío, los anillos de Saturno, el campo magnético inclinado de Urano, los vientos de Neptuno — explicados para todos.',
   },
   {
+    key: 'kids',
+    en: 'A short, friendly version for younger readers: meet the two spacecraft, see how far they are, and learn the words scientists use.',
+    zh: '寫給年輕讀者的簡短友善版本：認識兩艘探測器、看看它們有多遠，並學會科學家使用的詞彙。',
+    es: 'Una versión breve y amable para lectores jóvenes: conoce las dos naves, mira a qué distancia están y aprende las palabras que usan los científicos.',
+  },
+  {
     key: 'why-voyager-matters',
     en: 'Why a mission launched in 1977 is still producing science nobody else can — and what it teaches about building things that last.',
     zh: '為什麼一項 1977 年發射的任務，至今仍能產出其他任務無法取得的科學資料——以及它對「打造耐久系統」的啟示。',
@@ -307,6 +313,7 @@ export default function HomePage() {
                       tools: t('Calculators', '計算工具', 'Calculadoras'),
                       timeline: t('Interactive timeline', '互動式時間軸', 'Cronología interactiva'),
                       discoveries: t('What Voyager discovered', '航海家的科學發現', 'Qué descubrió Voyager'),
+                      kids: t('Voyager for kids', '給孩子的航海家號', 'Voyager para niños'),
                       'why-voyager-matters': t('Why Voyager still matters', '航海家為何至今仍重要', 'Por qué Voyager sigue importando'),
                       'how-it-works': t('How the tracker works', '追蹤器如何運作', 'Cómo funciona el rastreador'),
                     }[item.key as string]
